@@ -1,0 +1,222 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          String    @default("USER") // ADMIN or USER
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model SiteSettings {
+  id                String   @id @default(cuid())
+  siteNameAr        String   @default("مصنع السلام للزيوت النباتية")
+  siteNameEn        String   @default("Elsalam Vegetable Oils Factory")
+  siteDescriptionAr String?
+  siteDescriptionEn String?
+  contactEmail      String?
+  contactPhone      String?
+  addressAr         String?
+  addressEn         String?
+  facebookUrl       String?
+  twitterUrl        String?
+  instagramUrl      String?
+  linkedinUrl       String?
+  smtpHost          String?
+  smtpPort          Int?     @default(587)
+  smtpUser          String?
+  smtpPass          String?
+  smtpFrom          String?
+  smtpFromName      String?
+  smtpSecure        String?  @default("tls")
+  logoUrl           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model PageContent {
+  id        String   @id @default(cuid())
+  pageSlug  String   @unique
+  content   String   // JSON string containing sections data
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name_ar   String
+  name_en   String
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id                   Int       @id @default(autoincrement())
+  slug                 String    @unique
+  name_ar              String
+  name_en              String
+  short_description_ar String?
+  short_description_en String?
+  description_ar       String?
+  description_en       String?
+  long_description_ar  String?
+  long_description_en  String?
+  featured_image       String?
+  price                Float?
+  price_unit_ar        String?
+  price_unit_en        String?
+  is_exportable        Boolean   @default(false)
+  is_featured          Boolean   @default(false)
+  icon                 String?
+  gradient_from        String?
+  gradient_to          String?
+  categoryId           Int?
+  activePromotionId    Int?      @unique
+
+  category       Category?       @relation(fields: [categoryId], references: [id])
+  features       ProductFeature[]
+  certifications ProductCertification[]
+  pdf_datasheet  String?
+  meta_title     String?
+  meta_description String?
+  specs          ProductSpec[]
+  technical_specs TechnicalSpec[]
+  images         ProductImage[]
+  packagings     ProductPackaging[]
+  promotions     Promotion[]
+
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model ProductFeature {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  feature_ar String
+  feature_en String
+}
+
+model ProductCertification {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+}
+
+model ProductSpec {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  label_ar  String
+  label_en  String
+  value_ar  String
+  value_en  String
+}
+
+model TechnicalSpec {
+  id          Int     @id @default(autoincrement())
+  productId   Int
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  property_ar String
+  property_en String
+  value_ar    String
+  value_en    String
+  unit_ar     String?
+  unit_en     String?
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt_text  String?
+}
+
+model ProductPackaging {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size_ar   String
+  size_en   String
+  price     Float?
+}
+
+model Promotion {
+  id             Int       @id @default(autoincrement())
+  productId      Int?
+  product        Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  title_ar       String
+  title_en       String
+  description_ar String?
+  description_en String?
+  discount_type  String    // e.g., 'percentage', 'fixed'
+  discount_value Float
+  original_price Float?
+  promo_price    Float?
+  badge_ar       String?
+  badge_en       String?
+  featured_image String?
+  starts_at      DateTime?
+  ends_at        DateTime
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model News {
+  id               Int       @id @default(autoincrement())
+  slug             String    @unique
+  title_ar         String
+  title_en         String
+  excerpt_ar       String?
+  excerpt_en       String?
+  content_ar       String?
+  content_en       String?
+  category         String    @default("news")
+  tags             String?
+  featured_image   String?
+  image_alt        String?
+  meta_title       String?
+  meta_description String?
+  is_featured      Boolean   @default(false)
+  is_published     Boolean   @default(false)
+  published_at     DateTime?
+  scheduled_at     DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Message {
+  id          Int       @id @default(autoincrement())
+  name        String
+  email       String
+  phone       String?
+  company     String?
+  subject     String
+  body        String
+  type        String    @default("inquiry") // inquiry, complaint, suggestion, order, partnership
+  status      String    @default("new")     // new, read, replied, archived
+  priority    String    @default("normal")  // low, normal, high, urgent
+  reply       String?
+  repliedAt   DateTime?
+  repliedBy   String?
+  notes       String?
+  isStarred   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}

@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* =========================================
+     BUTTONS
+     ========================================= */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 h-12 px-6 rounded-sm font-arabic font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent-green focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply bg-primary-green text-surface-white hover:bg-primary-dark shadow-sm;
+  }
+  .btn-secondary {
+    @apply bg-surface-soft text-primary-green border border-primary-green hover:bg-surface-light;
+  }
+  .btn-outline {
+    @apply bg-transparent text-text-dark border border-surface-light hover:bg-surface-soft;
+  }
+  .btn-ghost {
+    @apply bg-transparent text-primary-green hover:bg-surface-soft;
+  }
+  .btn-large {
+    @apply h-16 px-10 text-body-lg;
+  }
+
+  /* =========================================
+     CARDS
+     ========================================= */
+  .card {
+    @apply bg-surface-white rounded-md shadow-card hover:shadow-elevation transition-shadow duration-300 overflow-hidden;
+  }
+  .card-feature {
+    @apply p-6 border border-surface-light hover:border-accent-green/30;
+  }
+  
+  /* =========================================
+     FORMS & INPUTS
+     ========================================= */
+  .input-group {
+    @apply mb-4;
+  }
+  .input-label {
+    @apply block text-sm font-medium text-text-dark mb-2;
+  }
+  .input-field {
+    @apply w-full h-12 px-4 rounded-sm border border-surface-light bg-surface-white text-body text-text-dark placeholder-text-dark/40 focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green transition-shadow;
+  }
+  .input-field.error {
+    @apply border-red-500 focus:border-red-500 focus:ring-red-500;
+  }
+  .input-error-msg {
+    @apply text-red-500 text-sm mt-1;
+  }
+
+  /* =========================================
+     BADGES & TAGS
+     ========================================= */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-sm text-small font-medium;
+  }
+  .badge-neutral {
+    @apply bg-surface-light text-text-dark;
+  }
+  .badge-success {
+    @apply bg-accent-green/20 text-primary-dark;
+  }
+  .badge-warning {
+    @apply bg-accent-gold/20 text-yellow-800;
+  }
+
+  /* =========================================
+     TIMELINE (PRODUCTION PROCESS)
+     ========================================= */
+  .timeline-container {
+    @apply relative border-s-2 border-surface-light ps-6 ms-3;
+  }
+  .timeline-item {
+    @apply mb-10 relative;
+  }
+  .timeline-dot {
+    @apply absolute w-4 h-4 rounded-full bg-primary-green -start-[35px] top-1 border-4 border-surface-white shadow-sm;
+  }
+}
+
+@layer utilities {
+  /* =========================================
+     CUSTOM UTILITIES
+     ========================================= */
+  .radius-section-tl-br {
+    border-top-left-radius: 48px;
+    border-bottom-right-radius: 48px;
+  }
+  .radius-section-tr-bl {
+    border-top-right-radius: 48px;
+    border-bottom-left-radius: 48px;
+  }
+  .bg-organic-pattern {
+    /* Placeholder for organic palm leaf pattern overlay */
+    background-image: radial-gradient(#2E7D32 0.5px, transparent 0.5px);
+    background-size: 20px 20px;
+    opacity: 0.03;
+  }
+}

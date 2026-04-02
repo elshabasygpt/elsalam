@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elsalam Vegetable Oils - Element UI Kit</title>
+  
+  <!-- Standard Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS via Play CDN (For instant preview without build step) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Injecting Design System Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { green: '#2E7D32', dark: '#1B5E20' },
+            accent: { green: '#66BB6A', gold: '#F4A100' },
+            surface: { soft: '#F8FAF9', light: '#EDEDED', white: '#FFFFFF' },
+            text: { dark: '#1F2937' }
+          },
+          fontFamily: {
+            arabic: ['Cairo', 'sans-serif'],
+            english: ['Inter', 'sans-serif'],
+          },
+          boxShadow: {
+            'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+            'elevation': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            'modal': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          }
+        },
+        container: { center: true, padding: '16px', screens: { tablet: '1024px', desktop: '1280px' } }
+      }
+    }
+  </script>
+
+  <!-- Component Classes equivalent to globals.css -->
+  <style type="text/tailwindcss">
+    @layer components {
+      .btn { @apply inline-flex items-center justify-center gap-2 h-[48px] px-[24px] rounded-[6px] font-arabic font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent-green focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed; }
+      .btn-primary { @apply bg-primary-green text-surface-white hover:bg-primary-dark shadow-sm; }
+      .btn-secondary { @apply bg-surface-soft text-primary-green border border-primary-green hover:bg-surface-light; }
+      .btn-outline { @apply bg-transparent text-text-dark border border-surface-light hover:bg-surface-soft; }
+      .btn-ghost { @apply bg-transparent text-primary-green hover:bg-surface-soft; }
+      
+      .card { @apply bg-surface-white rounded-[12px] shadow-card hover:shadow-elevation transition-shadow duration-300 overflow-hidden border border-surface-light/50; }
+      
+      .input-field { @apply w-full h-[48px] px-[16px] rounded-[6px] border border-surface-light bg-surface-white text-[16px] text-text-dark placeholder:text-text-dark/40 focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green transition-shadow; }
+      .input-label { @apply block text-[14px] font-medium text-text-dark mb-[8px]; }
+      
+      .badge { @apply inline-flex items-center px-[12px] py-[4px] rounded-[6px] text-[14px] font-medium; }
+      .badge-neutral { @apply bg-surface-light text-text-dark; }
+      .badge-success { @apply bg-accent-green/20 text-primary-dark; }
+      .badge-warning { @apply bg-accent-gold/20 text-yellow-800; }
+    }
+    
+    .leaf-curve-tl { border-top-left-radius: 48px; }
+    .leaf-curve-br { border-bottom-right-radius: 48px; }
+  </style>
+</head>
+<body class="bg-surface-soft font-arabic text-text-dark antialiased pb-24">
+
+  <!-- Header -->
+  <header class="bg-primary-dark text-surface-white py-12 px-6 shadow-elevation leaf-curve-br mb-12">
+    <div class="container mx-auto">
+      <h1 class="text-4xl font-bold mb-2">🌿 مصنع السلام - مكتبة المكونات (UI Kit)</h1>
+      <p class="text-lg opacity-80 font-english">Elsalam Vegetable Oils Design System</p>
+    </div>
+  </header>
+
+  <main class="container mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="col-span-1 lg:col-span-3">
+      <div class="bg-surface-white p-6 rounded-[12px] shadow-card sticky top-6">
+        <h3 class="text-xl font-bold mb-4 border-b border-surface-light pb-2">المحتويات</h3>
+        <ul class="space-y-3 font-medium">
+          <li><a href="#typography" class="text-primary-green hover:underline">الخطوط (Typography)</a></li>
+          <li><a href="#colors" class="text-primary-green hover:underline">الألوان (Colors)</a></li>
+          <li><a href="#buttons" class="text-primary-green hover:underline">الأزرار (Buttons)</a></li>
+          <li><a href="#cards" class="text-primary-green hover:underline">البطاقات (Cards)</a></li>
+          <li><a href="#forms" class="text-primary-green hover:underline">النماذج (Forms)</a></li>
+          <li><a href="#timeline" class="text-primary-green hover:underline">مسار الإنتاج (Timeline)</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="col-span-1 lg:col-span-9 space-y-16">
+
+      <!-- Typography -->
+      <section id="typography" class="space-y-6">
+        <h2 class="text-3xl font-bold border-s-4 border-primary-green ps-4">النصوص والخطوط</h2>
+        <div class="card p-8 space-y-8">
+          
+          <div class="flex flex-col gap-2 border-b border-surface-light pb-4">
+            <span class="text-sm font-english text-text-dark/60">Heading 1 - H1 (48px)</span>
+            <h1 class="text-[48px] font-bold leading-tight">جودة مستخلصة من الطبيعة</h1>
+          </div>
+          
+          <div class="flex flex-col gap-2 border-b border-surface-light pb-4">
+            <span class="text-sm font-english text-text-dark/60">Heading 2 - H2 (36px)</span>
+            <h2 class="text-[36px] font-bold leading-snug">أحدث تقنيات عصر الزيوت</h2>
+          </div>
+
+          <div class="flex flex-col gap-2 border-b border-surface-light pb-4">
+            <span class="text-sm font-english text-text-dark/60">Heading 3 - H3 (28px)</span>
+            <h3 class="text-[28px] font-semibold leading-normal">منتجاتنا المتميزة</h3>
+          </div>
+
+          <div class="flex flex-col gap-2 border-b border-surface-light pb-4">
+            <span class="text-sm font-english text-text-dark/60">Body Text - Regular (16px)</span>
+            <p class="text-[16px] leading-relaxed">
+              نحن في مصنع السلام نلتزم بتقديم أفضل أنواع الزيوت النباتية، السمن، والشورتنج، مستخدمين أحدث خطوط الإنتاج والتقنيات الأوروبية لضمان أعلى معايير الجودة والسلامة الغذائية للسوق المصري والتصدير.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Colors -->
+      <section id="colors" class="space-y-6">
+        <h2 class="text-3xl font-bold border-s-4 border-primary-green ps-4">لوحة الألوان</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+          
+          <div class="card overflow-hidden">
+            <div class="h-24 bg-primary-green"></div>
+            <div class="p-4">
+              <h4 class="font-bold">Primary Green</h4>
+              <p class="text-sm font-english mt-1 text-text-dark/70">#2E7D32</p>
+            </div>
+          </div>
+
+          <div class="card overflow-hidden">
+            <div class="h-24 bg-primary-dark"></div>
+            <div class="p-4">
+              <h4 class="font-bold">Dark Green</h4>
+              <p class="text-sm font-english mt-1 text-text-dark/70">#1B5E20</p>
+            </div>
+          </div>
+
+          <div class="card overflow-hidden">
+            <div class="h-24 bg-accent-green"></div>
+            <div class="p-4">
+              <h4 class="font-bold">Accent Green</h4>
+              <p class="text-sm font-english mt-1 text-text-dark/70">#66BB6A</p>
+            </div>
+          </div>
+
+          <div class="card overflow-hidden">
+            <div class="h-24 bg-accent-gold"></div>
+            <div class="p-4">
+              <h4 class="font-bold">Golden Orange</h4>
+              <p class="text-sm font-english mt-1 text-text-dark/70">#F4A100</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Buttons -->
+      <section id="buttons" class="space-y-6">
+        <h2 class="text-3xl font-bold border-s-4 border-primary-green ps-4">الأزرار والحالات</h2>
+        <div class="card p-8">
+          <div class="flex flex-wrap gap-4 items-center">
+            <button class="btn btn-primary">زر رئيسي (Primary)</button>
+            <button class="btn btn-secondary">زر ثانوي (Secondary)</button>
+            <button class="btn btn-outline">زر محدد (Outline)</button>
+            <button class="btn btn-ghost">زر شفاف (Ghost)</button>
+            <button class="btn btn-primary" disabled>غير مفعل (Disabled)</button>
+          </div>
+          
+          <div class="mt-8 flex flex-wrap gap-4 items-center">
+            <!-- Large Button with SVG -->
+            <button class="btn btn-primary h-[64px] px-[32px] text-[18px]">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              طلب عرض سعر
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cards -->
+      <section id="cards" class="space-y-6">
+        <h2 class="text-3xl font-bold border-s-4 border-primary-green ps-4">البطاقات (Cards)</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          <!-- Product Card -->
+          <div class="card group">
+            <div class="h-48 bg-surface-light flex items-center justify-center relative overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-r from-primary-green/20 to-transparent"></div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-primary-green/50 group-hover:scale-110 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+              </svg>
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold">زيت صويا ممتاز</h3>
+                <span class="badge badge-success">متاح للتصدير</span>
+              </div>
+              <p class="text-text-dark/70 text-sm mb-6 leading-relaxed">زيت صويا مكرر عالي الجودة مستخلص بأحدث تقنيات المصنع، مثالي للاستخدامات الصناعية والغذائية.</p>
+              <button class="btn btn-outline w-full">تفاصيل المنتج</button>
+            </div>
+          </div>
+
+          <!-- Feature / Service Card -->
+          <div class="card p-8 border border-surface-light shadow-sm hover:border-primary-green/30">
+            <div class="w-12 h-12 bg-primary-green/10 rounded-[12px] flex items-center justify-center text-primary-green mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">رقابة الجودة الصارمة</h3>
+            <p class="text-text-dark/70 text-sm leading-relaxed">
+              معامل مجهزة بالكامل لضمان خلو المنتجات من الشوائب ومطابقتها لمعايير الأيزو والمواصفات القياسية.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Forms -->
+      <section id="forms" class="space-y-6">
+        <h2 class="text-3xl font-bold border-s-4 border-primary-green ps-4">النماذج والإدخال</h2>
+        <div class="card p-8 max-w-xl">
+          <form onsubmit="event.preventDefault()">
+            
+            <div class="mb-4">
+              <label class="input-label">اسم الشركة</label>
+              <input type="text" class="input-field" placeholder="أدخل اسم شركتك">
+            </div>
+
+            <div class="mb-4">
+              <label class="input-label">البريد الإلكتروني</label>
+              <input type="email" class="input-field" placeholder="example@company.com" dir="ltr">
+            </div>
+
+            <!-- Error State Example -->
+            <div class="mb-6">
+              <label class="input-label text-red-500">رقم الهاتف</label>
+              <input type="tel" class="input-field border-red-500 focus:ring-red-500 focus:border-red-500" value="010123" dir="ltr">
+              <span class="text-sm text-red-500 mt-1 block">يرجى إدخال رقم هاتف صحيح</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full">إرسال الطلب</button>
+            
+          </form>
+        </div>
+      </section>
+
+      <!-- Manufacturing Timeline (Industry Specific) -->
+      <section id="timeline" class="space-y-6">
+        <h2 class="text-3xl font-bold border-s-4 border-primary-green ps-4">مسار الإنتاج (Timeline Pattern)</h2>
+        <div class="card p-8">
+          
+          <div class="relative border-s-2 border-surface-light ps-8 ms-4 py-2 space-y-12">
+            
+            <div class="relative">
+              <div class="absolute w-5 h-5 rounded-full bg-primary-green -start-[43px] top-1 border-4 border-surface-white shadow-sm"></div>
+              <h4 class="text-lg font-bold text-primary-dark mb-1">1. استلام وتجهيز البذور</h4>
+              <p class="text-sm text-text-dark/70">يتم استلام البذور الزراعية (صويا، عباد شمس) وتمريرها على أجهزة التنظيف المغناطيسية والغربلة.</p>
+            </div>
+
+            <div class="relative">
+              <div class="absolute w-5 h-5 rounded-full bg-primary-green -start-[43px] top-1 border-4 border-surface-white shadow-sm"></div>
+              <h4 class="text-lg font-bold text-primary-dark mb-1">2. العصر الميكانيكي والاستخلاص</h4>
+              <p class="text-sm text-text-dark/70">تكسير وتسخين البذور لزيادة المردود الزيتي، ثم عصرها آلياً واستخلاص الزيت الخام.</p>
+            </div>
+
+            <div class="relative opacity-50">
+              <div class="absolute w-5 h-5 rounded-full bg-surface-light -start-[43px] top-1 border-4 border-surface-white shadow-sm"></div>
+              <h4 class="text-lg font-bold text-text-dark mb-1">3. التكرير والتشكيل (Refining)</h4>
+              <p class="text-sm text-text-dark/70">إزالة الصمغ، التبييض، ونزع الرائحة للوصول للزيت النقي عالي الشفافية.</p>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+</body>
+</html>
