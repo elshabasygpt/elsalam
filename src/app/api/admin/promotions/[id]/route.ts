@@ -3,13 +3,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     try {
         const body = await req.json();
-        const id = parseInt(params.id);
+        const p = await params;
+        const id = parseInt(p.id);
         const {
             title_ar, title_en, description_ar, description_en,
             discount_type, discount_value, original_price, promo_price,
@@ -35,12 +36,13 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     }
 }
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     try {
-        const id = parseInt(params.id);
+        const p = await params;
+        const id = parseInt(p.id);
         await prisma.promotion.delete({ where: { id } });
         return NextResponse.json({ success: true });
     } catch (error) {

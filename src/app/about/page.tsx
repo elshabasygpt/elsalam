@@ -267,7 +267,7 @@ export default function AboutPage() {
                                                         </div>
                                                         {/* Logo / Initial Mobile */}
                                                         <div className="relative w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border overflow-hidden bg-white">
-                                                            <img src={`/images/logos/${logo.code}.png`} alt={station.title} className="absolute inset-0 w-full h-full object-contain p-2 z-10 bg-white" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+                                                            <img src="/images/placeholder.svg" alt={station.title} className="absolute inset-0 w-full h-full object-contain p-2 z-10 bg-white" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
                                                             <div className={cn("absolute inset-0 flex items-center justify-center font-black text-xl border", logo.color)}>{logo.initial}</div>
                                                         </div>
                                                     </div>
@@ -306,7 +306,7 @@ export default function AboutPage() {
                                                             </div>
                                                             <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border overflow-hidden bg-white">
                                                                 <div className={cn("absolute inset-0 flex items-center justify-center font-black text-xl border", logo.color)}>{logo.initial}</div>
-                                                                <img src={`/images/logos/${logo.code}.png`} alt={station.title} className="absolute inset-0 w-full h-full object-contain p-2 z-10 bg-white" onError={(e) => { e.currentTarget.classList.add('hidden'); }} />
+                                                                <img src="/images/placeholder.svg" alt={station.title} className="absolute inset-0 w-full h-full object-contain p-2 z-10 bg-white" onError={(e) => { e.currentTarget.classList.add('hidden'); }} />
                                                             </div>
                                                         </div>
                                                         {station.desc && <p className="text-gray-600 leading-relaxed text-xs md:text-sm mb-3 relative z-10">{station.desc}</p>}
@@ -341,7 +341,7 @@ export default function AboutPage() {
                                                             </div>
                                                             <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border overflow-hidden bg-white">
                                                                 <div className={cn("absolute inset-0 flex items-center justify-center font-black text-xl border", logo.color)}>{logo.initial}</div>
-                                                                <img src={`/images/logos/${logo.code}.png`} alt={station.title} className="absolute inset-0 w-full h-full object-contain p-2 z-10 bg-white" onError={(e) => { e.currentTarget.classList.add('hidden'); }} />
+                                                                <img src="/images/placeholder.svg" alt={station.title} className="absolute inset-0 w-full h-full object-contain p-2 z-10 bg-white" onError={(e) => { e.currentTarget.classList.add('hidden'); }} />
                                                             </div>
                                                         </div>
                                                         {station.desc && <p className="text-gray-600 leading-relaxed text-xs md:text-sm mb-3 relative z-10">{station.desc}</p>}

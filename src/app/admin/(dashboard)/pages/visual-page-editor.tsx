@@ -545,7 +545,7 @@ function FieldRenderer({
                 valueEn={data[field.key + "_en"] || ""}
                 onChangeAr={(v) => onChange(field.key + "_ar", v)}
                 onChangeEn={(v) => onChange(field.key + "_en", v)}
-                type={field.type}
+                type={field.type === "list" ? "text" : field.type}
                 required={field.required}
                 placeholder={field.placeholder}
                 placeholderEn={field.placeholderEn}
@@ -569,7 +569,7 @@ function FieldRenderer({
             label={field.labelAr}
             value={data[field.key] || ""}
             onChange={(v) => onChange(field.key, v)}
-            type={field.type}
+            type={field.type === "list" ? "text" : field.type}
             required={field.required}
             placeholder={field.placeholder}
             dir="rtl"

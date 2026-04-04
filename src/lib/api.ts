@@ -1,6 +1,6 @@
 import type { Product, Category, MessagePayload, SiteSettings } from "@/types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/public";
 
 async function fetchAPI<T>(endpoint: string): Promise<T> {
     const controller = new AbortController();

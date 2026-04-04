@@ -66,7 +66,7 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <html lang="ar" dir="rtl" className={`${cairo.variable} ${inter.variable}`}>
+        <html lang="ar" dir="rtl" className={`${cairo.variable} ${inter.variable}`} suppressHydrationWarning>
             <head>
                 <script
                     type="application/ld+json"
