@@ -20,12 +20,29 @@ import { VirtualTour } from "@/components/organisms/VirtualTour";
 import { Testimonials } from "@/components/organisms/Testimonials";
 import { FAQ } from "@/components/organisms/FAQ";
 import { Navbar } from "@/components/organisms/Navbar";
+import { useState, useEffect } from "react";
 
 interface HomePageClientProps {
     cmsContent: Record<string, any>;
 }
 
-export function HomePageClient({ cmsContent }: HomePageClientProps) {
+export function HomePageClient({ cmsContent: initialContent }: HomePageClientProps) {
+    // Start with server-side content, then fetch fresh from client
+    const [cmsContent, setCmsContent] = useState<Record<string, any>>(initialContent);
+
+    useEffect(() => {
+        // Always fetch the latest content from DB when the page loads in the browser
+        // This bypasses ANY server-side cache and ensures updated images/text appear immediately
+        fetch(`/api/public/pages/home`, { cache: "no-store" })
+            .then(r => r.json())
+            .then(json => {
+                if (json.data && Object.keys(json.data).length > 0) {
+                    setCmsContent(json.data);
+                }
+            })
+            .catch(() => {/* keep server-side content on error */});
+    }, []);
+
     return (
         <PageContentProvider content={cmsContent}>
             <main className="min-h-screen bg-surface-soft font-arabic relative">
