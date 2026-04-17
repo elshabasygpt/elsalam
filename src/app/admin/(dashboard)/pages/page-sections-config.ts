@@ -4,7 +4,11 @@ export interface FieldConfig {
     key: string;
     labelAr: string;
     labelEn: string;
-    type: "text" | "textarea" | "url" | "list";
+    type: "text" | "textarea" | "url" | "list" | "select" | "color" | "range" | "toggle";
+    options?: { label: string; value: string }[];
+    min?: number;
+    max?: number;
+    step?: number;
     bilingual: boolean;
     required?: boolean;
     placeholder?: string;
@@ -51,7 +55,218 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             ],
         },
 
-        // ── 2. Stats Counter ──
+        // ── 1b. Hero Design Controls ──
+        {
+            id: "heroDesign",
+            title: "🎨 تصميم الهيرو — الخط والألوان والتخطيط",
+            emoji: "🎨",
+            description: "تحكم كامل في حجم الخط ووزنه وألوان النصوص والحشو وتأثير الزجاج وطبقة التعتيم",
+            fields: [
+                // ─── Typography ───────────────────────────────
+                {
+                    key: "titleFontSize",
+                    labelAr: "حجم العنوان الرئيسي (H1)",
+                    labelEn: "Title Font Size",
+                    type: "select",
+                    bilingual: false,
+                    options: [
+                        { label: "صغير — 36px", value: "text-4xl" },
+                        { label: "متوسط — 48px", value: "text-5xl" },
+                        { label: "كبير — 60px", value: "text-6xl" },
+                        { label: "كبير جداً — 72px", value: "text-7xl" },
+                        { label: "ضخم — 96px", value: "text-8xl" },
+                    ],
+                },
+                {
+                    key: "titleFontWeight",
+                    labelAr: "وزن خط العنوان",
+                    labelEn: "Title Font Weight",
+                    type: "select",
+                    bilingual: false,
+                    options: [
+                        { label: "Bold (700)", value: "font-bold" },
+                        { label: "Extra Bold (800)", value: "font-extrabold" },
+                        { label: "Black (900)", value: "font-black" },
+                    ],
+                },
+                {
+                    key: "titleLineHeight",
+                    labelAr: "ارتفاع السطر (Line Height)",
+                    labelEn: "Line Height",
+                    type: "select",
+                    bilingual: false,
+                    options: [
+                        { label: "ضيق — 1.1", value: "leading-tight" },
+                        { label: "متقارب — 1.25", value: "leading-snug" },
+                        { label: "عادي — 1.5", value: "leading-normal" },
+                        { label: "واسع — 1.75", value: "leading-relaxed" },
+                    ],
+                },
+                {
+                    key: "subtitleFontSize",
+                    labelAr: "حجم خط العنوان الفرعي",
+                    labelEn: "Subtitle Font Size",
+                    type: "select",
+                    bilingual: false,
+                    options: [
+                        { label: "صغير — 14px", value: "text-sm" },
+                        { label: "عادي — 16px", value: "text-base" },
+                        { label: "متوسط — 18px", value: "text-lg" },
+                        { label: "كبير — 20px", value: "text-xl" },
+                        { label: "كبير جداً — 24px", value: "text-2xl" },
+                    ],
+                },
+                // ─── Colors ────────────────────────────────────
+                {
+                    key: "titleColor",
+                    labelAr: "لون العنوان الرئيسي (السطر الأول)",
+                    labelEn: "Title Color",
+                    type: "color",
+                    bilingual: false,
+                    placeholder: "#ffffff",
+                },
+                {
+                    key: "titleLine2Color",
+                    labelAr: "لون الكلمة المميزة (السطر الثاني)",
+                    labelEn: "Highlighted Title Color",
+                    type: "color",
+                    bilingual: false,
+                    placeholder: "#34d399",
+                },
+                {
+                    key: "subtitleColor",
+                    labelAr: "لون النص التوضيحي",
+                    labelEn: "Subtitle Color",
+                    type: "color",
+                    bilingual: false,
+                    placeholder: "#d1d5db",
+                },
+                // ─── Spacing ───────────────────────────────────
+                {
+                    key: "contentPaddingTop",
+                    labelAr: "الحشو العلوي للمحتوى",
+                    labelEn: "Content Padding Top",
+                    type: "range",
+                    bilingual: false,
+                    min: 20,
+                    max: 200,
+                    step: 4,
+                },
+                {
+                    key: "contentPaddingBottom",
+                    labelAr: "الحشو السفلي للمحتوى",
+                    labelEn: "Content Padding Bottom",
+                    type: "range",
+                    bilingual: false,
+                    min: 16,
+                    max: 160,
+                    step: 4,
+                },
+                {
+                    key: "cardPaddingX",
+                    labelAr: "الحشو الأفقي للبطاقة الداخلية",
+                    labelEn: "Card Padding X",
+                    type: "range",
+                    bilingual: false,
+                    min: 16,
+                    max: 80,
+                    step: 4,
+                },
+                {
+                    key: "cardPaddingY",
+                    labelAr: "الحشو العمودي للبطاقة الداخلية",
+                    labelEn: "Card Padding Y",
+                    type: "range",
+                    bilingual: false,
+                    min: 16,
+                    max: 80,
+                    step: 4,
+                },
+                // ─── Glassmorphism Card ────────────────────────
+                {
+                    key: "cardBgOpacity",
+                    labelAr: "شفافية خلفية البطاقة (0 = شفاف، 80 = شبه معتم)",
+                    labelEn: "Card Background Opacity",
+                    type: "range",
+                    bilingual: false,
+                    min: 0,
+                    max: 80,
+                    step: 5,
+                },
+                {
+                    key: "cardBlur",
+                    labelAr: "تأثير الضبابية (Blur)",
+                    labelEn: "Card Blur",
+                    type: "select",
+                    bilingual: false,
+                    options: [
+                        { label: "بدون ضباب", value: "backdrop-blur-none" },
+                        { label: "خفيف", value: "backdrop-blur-sm" },
+                        { label: "متوسط", value: "backdrop-blur-md" },
+                        { label: "قوي", value: "backdrop-blur-xl" },
+                        { label: "قوي جداً", value: "backdrop-blur-3xl" },
+                    ],
+                },
+                {
+                    key: "cardBorderEnabled",
+                    labelAr: "إظهار حدود البطاقة",
+                    labelEn: "Show Card Border",
+                    type: "toggle",
+                    bilingual: false,
+                },
+                {
+                    key: "cardRounded",
+                    labelAr: "انحناء حواف البطاقة",
+                    labelEn: "Card Corner Radius",
+                    type: "select",
+                    bilingual: false,
+                    options: [
+                        { label: "حاد", value: "rounded-xl" },
+                        { label: "متوسط", value: "rounded-2xl" },
+                        { label: "دائري كبير", value: "rounded-3xl" },
+                        { label: "كبسول", value: "rounded-[2rem]" },
+                    ],
+                },
+                // ─── Overlay ───────────────────────────────────
+                {
+                    key: "overlayOpacity",
+                    labelAr: "شدة تعتيم خلفية الصورة (0 = بدون، 95 = معتم جداً)",
+                    labelEn: "Background Overlay Opacity",
+                    type: "range",
+                    bilingual: false,
+                    min: 0,
+                    max: 95,
+                    step: 5,
+                },
+                // ─── Layout ─────────────────────────────────────
+                {
+                    key: "textAlign",
+                    labelAr: "محاذاة النص",
+                    labelEn: "Text Alignment",
+                    type: "select",
+                    bilingual: false,
+                    options: [
+                        { label: "يسار / بداية السطر", value: "text-start" },
+                        { label: "وسط", value: "text-center" },
+                    ],
+                },
+                {
+                    key: "cardMaxWidth",
+                    labelAr: "أقصى عرض للبطاقة",
+                    labelEn: "Card Max Width",
+                    type: "select",
+                    bilingual: false,
+                    options: [
+                        { label: "ضيق — 576px", value: "max-w-xl" },
+                        { label: "متوسط — 672px", value: "max-w-2xl" },
+                        { label: "واسع — 768px", value: "max-w-3xl" },
+                        { label: "أوسع — 896px", value: "max-w-4xl" },
+                        { label: "كامل العرض", value: "max-w-full" },
+                    ],
+                },
+            ],
+        },
+
         {
             id: "stats",
             title: "الإحصائيات والأرقام",

@@ -15,7 +15,11 @@ interface FieldConfig {
     key: string;
     labelAr: string;
     labelEn: string;
-    type: "text" | "textarea" | "url" | "list";
+    type: "text" | "textarea" | "url" | "list" | "select" | "color" | "range" | "toggle";
+    options?: { label: string; value: string }[];
+    min?: number;
+    max?: number;
+    step?: number;
     bilingual: boolean;
     required?: boolean;
     placeholder?: string;
@@ -212,6 +216,167 @@ function SingleField({
                     dir={dir}
                 />
             )}
+        </div>
+    );
+}
+
+// ── New Design Control Fields ──
+
+function SelectField({
+    label,
+    value,
+    onChange,
+    options,
+    description,
+}: {
+    label: string;
+    value: string;
+    onChange: (v: string) => void;
+    options: { label: string; value: string }[];
+    description?: string;
+}) {
+    return (
+        <div>
+            <label className="flex items-center gap-1.5 text-xs font-bold text-slate-500 mb-1.5">
+                {label}
+            </label>
+            {description && <p className="text-[10px] text-slate-400 mb-2">{description}</p>}
+            <div className="flex flex-wrap gap-2">
+                {options.map((opt) => (
+                    <button
+                        type="button"
+                        key={opt.value}
+                        onClick={() => onChange(opt.value)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                            value === opt.value
+                                ? "bg-green-600 text-white border-green-600 shadow-md"
+                                : "bg-slate-50 text-slate-600 border-slate-200 hover:border-green-400 hover:text-green-700"
+                        }`}
+                    >
+                        {opt.label}
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function ColorField({
+    label,
+    value,
+    onChange,
+    description,
+}: {
+    label: string;
+    value: string;
+    onChange: (v: string) => void;
+    description?: string;
+}) {
+    return (
+        <div>
+            <label className="flex items-center gap-2 text-xs font-bold text-slate-500 mb-1.5">
+                {label}
+            </label>
+            {description && <p className="text-[10px] text-slate-400 mb-2">{description}</p>}
+            <div className="flex items-center gap-3">
+                <div className="relative">
+                    <input
+                        type="color"
+                        value={value || "#ffffff"}
+                        onChange={(e) => onChange(e.target.value)}
+                        className="w-12 h-10 rounded-lg cursor-pointer border border-slate-200 bg-slate-50 p-0.5"
+                    />
+                </div>
+                <input
+                    type="text"
+                    value={value || ""}
+                    onChange={(e) => onChange(e.target.value)}
+                    placeholder="#ffffff"
+                    className="w-32 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none"
+                    dir="ltr"
+                />
+                <div
+                    className="w-8 h-8 rounded-lg border border-slate-200 shadow-inner"
+                    style={{ backgroundColor: value || "#ffffff" }}
+                />
+            </div>
+        </div>
+    );
+}
+
+function RangeField({
+    label,
+    value,
+    onChange,
+    min = 0,
+    max = 100,
+    step = 1,
+    unit = "",
+    description,
+}: {
+    label: string;
+    value: number;
+    onChange: (v: number) => void;
+    min?: number;
+    max?: number;
+    step?: number;
+    unit?: string;
+    description?: string;
+}) {
+    return (
+        <div>
+            <label className="flex items-center justify-between text-xs font-bold text-slate-500 mb-1.5">
+                <span>{label}</span>
+                <span className="text-green-600 font-black text-sm">{value}{unit}</span>
+            </label>
+            {description && <p className="text-[10px] text-slate-400 mb-2">{description}</p>}
+            <input
+                type="range"
+                min={min}
+                max={max}
+                step={step}
+                value={value}
+                onChange={(e) => onChange(Number(e.target.value))}
+                className="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-green-600"
+            />
+            <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+                <span>{min}{unit}</span>
+                <span>{max}{unit}</span>
+            </div>
+        </div>
+    );
+}
+
+function ToggleField({
+    label,
+    value,
+    onChange,
+    description,
+}: {
+    label: string;
+    value: boolean;
+    onChange: (v: boolean) => void;
+    description?: string;
+}) {
+    return (
+        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <div>
+                <p className="text-xs font-bold text-slate-700">{label}</p>
+                {description && <p className="text-[10px] text-slate-400 mt-0.5">{description}</p>}
+            </div>
+            <button
+                type="button"
+                onClick={() => onChange(!value)}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-300 ${
+                    value ? "bg-green-500" : "bg-slate-300"
+                }`}
+            >
+                <span
+                    className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 ${
+                        value ? "translate-x-5" : "translate-x-0.5"
+                    }`}
+                />
+            </button>
         </div>
     );
 }
@@ -501,7 +666,7 @@ function FieldRenderer({
                                             valueEn={item[lf.key + "_en"] || ""}
                                             onChangeAr={(v) => handleItemChange(idx, lf.key + "_ar", v)}
                                             onChangeEn={(v) => handleItemChange(idx, lf.key + "_en", v)}
-                                            type={lf.type === "list" ? "text" : lf.type}
+                                            type={(lf.type === "text" || lf.type === "textarea" || lf.type === "url") ? lf.type : "text"}
                                             placeholder={lf.placeholder}
                                             placeholderEn={lf.placeholderEn}
                                         />
@@ -523,7 +688,7 @@ function FieldRenderer({
                                             label={lf.labelAr}
                                             value={item[lf.key] || ""}
                                             onChange={(v) => handleItemChange(idx, lf.key, v)}
-                                            type={lf.type === "list" ? "text" : lf.type}
+                                            type={(lf.type === "text" || lf.type === "textarea") ? lf.type : "text"}
                                             placeholder={lf.placeholder}
                                         />
                                     );
@@ -545,7 +710,7 @@ function FieldRenderer({
                 valueEn={data[field.key + "_en"] || ""}
                 onChangeAr={(v) => onChange(field.key + "_ar", v)}
                 onChangeEn={(v) => onChange(field.key + "_en", v)}
-                type={field.type === "list" ? "text" : field.type}
+                type={(field.type === "text" || field.type === "textarea" || field.type === "url") ? field.type : "text"}
                 required={field.required}
                 placeholder={field.placeholder}
                 placeholderEn={field.placeholderEn}
@@ -564,12 +729,57 @@ function FieldRenderer({
         );
     }
 
+    if (field.type === "select" && field.options) {
+        return (
+            <SelectField
+                label={field.labelAr}
+                value={data[field.key] || field.options[0]?.value || ""}
+                onChange={(v) => onChange(field.key, v)}
+                options={field.options}
+            />
+        );
+    }
+
+    if (field.type === "color") {
+        return (
+            <ColorField
+                label={field.labelAr}
+                value={data[field.key] || ""}
+                onChange={(v) => onChange(field.key, v)}
+            />
+        );
+    }
+
+    if (field.type === "range") {
+        return (
+            <RangeField
+                label={field.labelAr}
+                value={Number(data[field.key] ?? field.min ?? 0)}
+                onChange={(v) => onChange(field.key, v)}
+                min={field.min}
+                max={field.max}
+                step={field.step}
+            />
+        );
+    }
+
+    if (field.type === "toggle") {
+        return (
+            <ToggleField
+                label={field.labelAr}
+                value={Boolean(data[field.key])}
+                onChange={(v) => onChange(field.key, v)}
+            />
+        );
+    }
+
+    const simpleType = (field.type === "text" || field.type === "textarea") ? field.type : "text";
     return (
         <SingleField
             label={field.labelAr}
             value={data[field.key] || ""}
             onChange={(v) => onChange(field.key, v)}
-            type={field.type === "list" ? "text" : field.type}
+            type={simpleType}
             required={field.required}
             placeholder={field.placeholder}
             dir="rtl"
