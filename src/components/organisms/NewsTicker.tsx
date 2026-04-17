@@ -38,17 +38,17 @@ export const NewsTicker = () => {
 
                 {/* Badge section - Fixed on the start side */}
                 <div className={cn(
-                    "flex-shrink-0 z-30 bg-primary-green text-white font-bold text-sm px-4 md:px-6 flex items-center justify-center gap-2.5 shadow-[0_0_20px_rgba(46,125,50,0.5)] border-r border-green-600/50",
+                    "flex-shrink-0 z-30 bg-primary-green text-white font-bold text-sm px-4 md:px-6 flex items-center justify-center gap-2.5 shadow-[0_0_20px_rgba(46,125,50,0.5)] border-inline-end border-green-600/50",
                 )}>
                     <Megaphone className="w-6 h-6 animate-pulse text-green-200" strokeWidth={1.5} />
                     <span className="whitespace-nowrap text-base">{locale === 'ar' ? 'أحدث الأخبار' : 'Latest News'}</span>
                 </div>
 
                 {/* Marquee section */}
-                <div className="flex-grow overflow-hidden relative flex items-center">
+                <div className="flex-grow overflow-hidden relative flex items-center px-4">
                     {/* Gradient fades for smooth entry/exit */}
-                    <div className={cn("absolute top-0 bottom-0 w-16 bg-gradient-to-r from-black/60 to-transparent z-10 pointer-events-none", isRTL ? "right-0" : "left-0")} />
-                    <div className={cn("absolute top-0 bottom-0 w-16 bg-gradient-to-l from-black/60 to-transparent z-10 pointer-events-none", isRTL ? "left-0" : "right-0")} />
+                    <div className={cn("absolute top-0 bottom-0 w-24 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10 pointer-events-none", isRTL ? "left-0 rotate-180" : "left-0")} />
+                    <div className={cn("absolute top-0 bottom-0 w-24 bg-gradient-to-l from-black/80 via-black/40 to-transparent z-10 pointer-events-none", isRTL ? "right-0 rotate-180" : "right-0")} />
 
                     <div className={cn(
                         "flex w-max items-center h-full",

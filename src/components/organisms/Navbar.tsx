@@ -117,8 +117,8 @@ export const Navbar = () => {
                     </Link>
 
                     {/* Center Desktop Navigation */}
-                    <nav className="hidden lg:flex items-center justify-center flex-1 mx-4 h-full">
-                        <ul className="flex items-center gap-1">
+                    <nav className="hidden lg:flex items-center justify-center flex-1 mx-1 xl:mx-4 h-full">
+                        <ul className="flex items-center gap-0.5 xl:gap-1">
                             {navLinks.map((link) => (
                                 <li
                                     key={link.id}
@@ -138,7 +138,7 @@ export const Navbar = () => {
                                         {link.label}
                                         {(link.hasMegaDropdown || link.hasSimpleDropdown) && (
                                             <ChevronDown className={cn(
-                                                "w-5 h-5 transition-transform duration-300",
+                                                "w-4 h-4 transition-transform duration-300",
                                                 activeDropdown === link.id ? "rotate-180" : ""
                                             )} />
                                         )}
@@ -214,9 +214,9 @@ export const Navbar = () => {
                     </nav>
 
                     {/* Right Call-to-Action & Utils */}
-                    <div className="hidden lg:flex items-center gap-4 shrink-0 relative z-50">
+                    <div className="hidden lg:flex items-center gap-2 xl:gap-4 shrink-0 relative z-50">
                         <div className={cn(
-                            "flex items-center pl-4 border-l transition-colors duration-300",
+                            "flex items-center pl-2 xl:pl-4 border-l transition-colors duration-300",
                             isSolid ? "border-surface-light text-text-dark" : "border-white/20 text-white"
                         )}>
                             <LanguageSwitcher currentLocale={locale} onChange={setLocale} />
@@ -224,14 +224,14 @@ export const Navbar = () => {
                         <Link
                             href="/contact"
                             className={cn(
-                                "flex items-center justify-center gap-2 h-10 px-5 rounded-lg font-bold text-sm transition-all duration-300 relative overflow-hidden group/btn",
+                                "flex items-center justify-center gap-2 h-10 px-4 sm:px-5 rounded-lg font-bold text-sm transition-all duration-300 relative overflow-hidden group/btn",
                                 isSolid
                                     ? "bg-green-700 text-white hover:bg-green-800 shadow-md hover:shadow-lg"
                                     : "bg-white text-green-800 hover:bg-gray-50 shadow-lg"
                             )}
                         >
-                            <span className="text-base">{t.nav.getQuote}</span>
-                            <ArrowLeft className={cn("w-5 h-5 transition-transform", isRTL ? "group-hover/btn:-translate-x-1" : "group-hover/btn:translate-x-1 rotate-180")} strokeWidth={2.5} />
+                            <span className="text-sm sm:text-base">{t.nav.getQuote}</span>
+                            <ArrowLeft className={cn("w-4 h-4 sm:w-5 sm:h-5 transition-transform", isRTL ? "group-hover/btn:-translate-x-1" : "group-hover/btn:translate-x-1 rotate-180")} strokeWidth={2.5} />
                         </Link>
                     </div>
 
