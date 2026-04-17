@@ -611,7 +611,7 @@ function SlideCard({
                                 <div>
                                     <p className="text-[10px] font-bold text-slate-400 mb-1">أو أدخل رابط الصورة مباشرةً</p>
                                     <input className={`${inputCls} font-mono text-xs text-left`} dir="ltr"
-                                        type="url" placeholder="/images/hero-bg.png"
+                                        type="text" placeholder="/images/hero-bg.png"
                                         value={slide.image || ""}
                                         onChange={e => onChange("image", e.target.value)} />
                                 </div>
@@ -874,7 +874,7 @@ function SingleField({
                 />
             ) : (
                 <input
-                    type={type === "url" ? "url" : "text"}
+                    type="text"
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     className={`${inputCls} ${dir === "ltr" ? "text-left" : ""}`}
