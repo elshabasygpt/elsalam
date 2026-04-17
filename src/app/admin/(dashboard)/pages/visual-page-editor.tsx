@@ -555,7 +555,7 @@ function SlideCard({
                                     <div>
                                         <p className="text-[10px] font-bold text-slate-400 mb-1">🔗 رابط الزر الأساسي</p>
                                         <input className={`${inputCls} text-left font-mono text-xs`} dir="ltr"
-                                            type="url" placeholder="/products"
+                                            type="text" placeholder="/products"
                                             value={slide.ctaPrimaryLink || ""}
                                             onChange={e => onChange("ctaPrimaryLink", e.target.value)} />
                                     </div>
@@ -566,7 +566,7 @@ function SlideCard({
                                     <div>
                                         <p className="text-[10px] font-bold text-slate-400 mb-1">🔗 رابط الزر الثانوي</p>
                                         <input className={`${inputCls} text-left font-mono text-xs`} dir="ltr"
-                                            type="url" placeholder="/contact"
+                                            type="text" placeholder="/contact"
                                             value={slide.ctaSecondaryLink || ""}
                                             onChange={e => onChange("ctaSecondaryLink", e.target.value)} />
                                     </div>
@@ -798,7 +798,7 @@ function BilingualField({
                     />
                 ) : (
                     <input
-                        type={type === "url" ? "url" : "text"}
+                        type="text"
                         value={valueAr}
                         onChange={(e) => onChangeAr(e.target.value)}
                         className={inputCls}
@@ -825,7 +825,7 @@ function BilingualField({
                     />
                 ) : (
                     <input
-                        type={type === "url" ? "url" : "text"}
+                        type="text"
                         value={valueEn}
                         onChange={(e) => onChangeEn(e.target.value)}
                         className={`${inputCls} text-left`}
@@ -1186,7 +1186,7 @@ function ImageUploadField({
             {/* URL input fallback */}
             <div className="mt-2">
                 <input
-                    type="url"
+                    type="text"
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     className={`${inputCls} text-left text-[11px]`}
