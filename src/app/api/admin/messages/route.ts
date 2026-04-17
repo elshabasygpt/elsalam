@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: "desc" },
     });
 
-    const [total, newCount, read, replied, archived, starred] = await Promise.all([
+    const [total, newCount, read, replied, archived, starredCount] = await Promise.all([
         prisma.message.count(),
         prisma.message.count({ where: { status: "new" } }),
         prisma.message.count({ where: { status: "read" } }),
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
         prisma.message.count({ where: { isStarred: true } }),
     ]);
 
-    const counts = { total, new: newCount, read, replied, archived, starred };
+    const counts = { total, new: newCount, read, replied, archived, starred: starredCount };
 
     return NextResponse.json({ messages, counts });
 }

@@ -6,7 +6,8 @@ import {
     Save, Loader2, ArrowRight, ChevronDown, ChevronUp,
     Plus, Trash2, Code2, Eye, CheckCircle2,
     Languages, Upload, ImageIcon, X, FileText,
-    Type, Palette, Maximize2, Square, LayoutTemplate
+    Type, Palette, Maximize2, Square, LayoutTemplate,
+    Link2, AlignLeft, Image as ImageIcon2, GripVertical
 } from "lucide-react";
 import Link from "next/link";
 
@@ -351,6 +352,360 @@ function HeroDesignPanel({
                     <span className="text-[10px] text-slate-400">الألوان النشطة</span>
                 </div>
             </div>
+        </div>
+    );
+}
+
+// ─── Hero Slides Panel ────────────────────────────────────────────────────
+
+const SLIDE_TABS = [
+    { id: "content", label: "المحتوى",  icon: AlignLeft  },
+    { id: "buttons", label: "الأزرار",   icon: Link2      },
+    { id: "image",   label: "الصورة",    icon: ImageIcon2 },
+] as const;
+
+type SlideTabId = typeof SLIDE_TABS[number]["id"];
+
+function SlideCard({
+    slide,
+    index,
+    total,
+    onChange,
+    onRemove,
+    onMoveUp,
+    onMoveDown,
+}: {
+    slide: Record<string, any>;
+    index: number;
+    total: number;
+    onChange: (key: string, val: string) => void;
+    onRemove: () => void;
+    onMoveUp: () => void;
+    onMoveDown: () => void;
+}) {
+    const [open, setOpen] = useState(index === 0);
+    const [tab, setTab]   = useState<SlideTabId>("content");
+    const fileRef = useRef<HTMLInputElement>(null);
+    const [uploading, setUploading] = useState(false);
+
+    const inputCls = "w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all";
+    const label    = (ar: string, en: string) => (
+        <div className="grid grid-cols-2 gap-3">
+            <div>
+                <p className="text-[10px] font-bold text-slate-400 mb-1 flex items-center gap-1">{ar} <span className="px-1 py-0.5 bg-green-50 text-green-600 text-[8px] rounded font-black">عربي</span></p>
+                <input className={inputCls} dir="rtl"
+                    value={slide[ar === "اسم التبويب" ? "tabName_ar" : ar === "الشارة" ? "badge_ar" : ar === "السطر الأول" ? "titleLine1_ar" : ar === "السطر الثاني" ? "titleLine2_ar" : ar === "نص الزر الأساسي" ? "ctaPrimary_ar" : "ctaSecondary_ar"] || ""}
+                    onChange={e => onChange(ar === "اسم التبويب" ? "tabName_ar" : ar === "الشارة" ? "badge_ar" : ar === "السطر الأول" ? "titleLine1_ar" : ar === "السطر الثاني" ? "titleLine2_ar" : ar === "نص الزر الأساسي" ? "ctaPrimary_ar" : "ctaSecondary_ar", e.target.value)}
+                    placeholder={`أدخل ${ar} بالعربية`} />
+            </div>
+            <div>
+                <p className="text-[10px] font-bold text-slate-400 mb-1 flex items-center gap-1">{en} <span className="px-1 py-0.5 bg-blue-50 text-blue-600 text-[8px] rounded font-black">EN</span></p>
+                <input className={`${inputCls} text-left`} dir="ltr"
+                    value={slide[ar === "اسم التبويب" ? "tabName_en" : ar === "الشارة" ? "badge_en" : ar === "السطر الأول" ? "titleLine1_en" : ar === "السطر الثاني" ? "titleLine2_en" : ar === "نص الزر الأساسي" ? "ctaPrimary_en" : "ctaSecondary_en"] || ""}
+                    onChange={e => onChange(ar === "اسم التبويب" ? "tabName_en" : ar === "الشارة" ? "badge_en" : ar === "السطر الأول" ? "titleLine1_en" : ar === "السطر الثاني" ? "titleLine2_en" : ar === "نص الزر الأساسي" ? "ctaPrimary_en" : "ctaSecondary_en", e.target.value)}
+                    placeholder={`Enter ${en} in English`} />
+            </div>
+        </div>
+    );
+
+    const handleUpload = async (file: File) => {
+        setUploading(true);
+        try {
+            const fd = new FormData(); fd.append("file", file);
+            const r  = await fetch("/api/admin/upload", { method: "POST", body: fd });
+            const d  = await r.json();
+            if (r.ok) onChange("image", d.url);
+        } finally { setUploading(false); }
+    };
+
+    // Title preview from ar fields
+    const previewTitle = slide.titleLine2_ar || slide.titleLine2 || `شريحة ${index + 1}`;
+    const tabName      = slide.tabName_ar   || slide.tabName    || `شريحة ${index + 1}`;
+
+    return (
+        <div className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+            open ? "border-green-200 shadow-md" : "border-slate-200 hover:border-slate-300"
+        }`}>
+            {/* ── Card Header ── */}
+            <div
+                className={`flex items-center gap-3 px-4 py-3 cursor-pointer ${
+                    open ? "bg-green-50" : "bg-slate-50 hover:bg-slate-100"
+                }`}
+                onClick={() => setOpen(!open)}
+            >
+                {/* Drag handle */}
+                <GripVertical className="w-4 h-4 text-slate-300 flex-shrink-0" />
+
+                {/* Number badge */}
+                <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black flex-shrink-0 ${
+                    open ? "bg-green-600 text-white" : "bg-slate-200 text-slate-500"
+                }`}>{index + 1}</span>
+
+                {/* Thumbnail */}
+                {slide.image && (
+                    <img src={slide.image} alt="" className="w-10 h-7 rounded object-cover border border-slate-200 flex-shrink-0" />
+                )}
+
+                {/* Title */}
+                <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-slate-700 truncate">{tabName}</p>
+                    <p className="text-[10px] text-slate-400 truncate">{previewTitle}</p>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-1 flex-shrink-0" onClick={e => e.stopPropagation()}>
+                    {index > 0 && (
+                        <button type="button" onClick={onMoveUp}
+                            className="p-1.5 rounded-lg hover:bg-white text-slate-400 hover:text-green-600 transition-colors" title="نقل لأعلى">
+                            <ChevronUp className="w-4 h-4" />
+                        </button>
+                    )}
+                    {index < total - 1 && (
+                        <button type="button" onClick={onMoveDown}
+                            className="p-1.5 rounded-lg hover:bg-white text-slate-400 hover:text-green-600 transition-colors" title="نقل لأسفل">
+                            <ChevronDown className="w-4 h-4" />
+                        </button>
+                    )}
+                    <button type="button" onClick={onRemove}
+                        className="p-1.5 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500 transition-colors" title="حذف">
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                </div>
+
+                <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform flex-shrink-0 ${
+                    open ? "rotate-180" : ""
+                }`} />
+            </div>
+
+            {/* ── Card Body ── */}
+            {open && (
+                <div className="bg-white">
+                    {/* Inner Tab Bar */}
+                    <div className="flex border-b border-slate-100 bg-slate-50/50">
+                        {SLIDE_TABS.map(t => {
+                            const Icon = t.icon;
+                            const active = tab === t.id;
+                            return (
+                                <button key={t.id} type="button" onClick={() => setTab(t.id)}
+                                    className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold border-b-2 transition-all ${
+                                        active
+                                            ? "border-green-500 text-green-700 bg-white"
+                                            : "border-transparent text-slate-400 hover:text-slate-600"
+                                    }`}>
+                                    <Icon className="w-3.5 h-3.5" />{t.label}
+                                    {active && <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    <div className="p-4 space-y-4">
+                        {/* ── CONTENT TAB ── */}
+                        {tab === "content" && (
+                            <>
+                                {/* Tab Name */}
+                                <div>
+                                    <p className="text-xs font-bold text-slate-500 mb-2">📌 اسم التبويب (يظهر أسفل الهيرو)</p>
+                                    {label("اسم التبويب", "Tab Name")}
+                                </div>
+                                {/* Badge */}
+                                <div>
+                                    <p className="text-xs font-bold text-slate-500 mb-2">🏷 الشارة الصغيرة (أعلى اليسار)</p>
+                                    {label("الشارة", "Badge")}
+                                </div>
+                                {/* Title Lines */}
+                                <div className="rounded-xl border border-slate-100 p-3 space-y-3 bg-slate-50/50">
+                                    <p className="text-xs font-bold text-slate-500">📝 العنوان الرئيسي (H1) — سطرين</p>
+                                    <div>
+                                        <p className="text-[10px] text-slate-400 mb-1">السطر الأول — باللون العادي</p>
+                                        {label("السطر الأول", "Title Line 1")}
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] text-slate-400 mb-1">السطر الثاني — باللون المميز (أخضر)</p>
+                                        {label("السطر الثاني", "Title Line 2")}
+                                    </div>
+                                </div>
+                                {/* Subtitle */}
+                                <div>
+                                    <p className="text-xs font-bold text-slate-500 mb-2">💬 النص التوضيحي</p>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <p className="text-[10px] font-bold text-slate-400 mb-1">عربي</p>
+                                            <textarea className={`${inputCls} resize-none`} rows={3} dir="rtl"
+                                                value={slide.subtitle_ar || slide.subtitle || ""}
+                                                onChange={e => onChange("subtitle_ar", e.target.value)} />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-bold text-slate-400 mb-1">English</p>
+                                            <textarea className={`${inputCls} resize-none text-left`} rows={3} dir="ltr"
+                                                value={slide.subtitle_en || ""}
+                                                onChange={e => onChange("subtitle_en", e.target.value)} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {/* ── BUTTONS TAB ── */}
+                        {tab === "buttons" && (
+                            <>
+                                <div className="rounded-xl border border-green-100 bg-green-50/30 p-3 space-y-3">
+                                    <p className="text-xs font-bold text-green-700">⭐ الزر الأساسي (Primary)</p>
+                                    {label("نص الزر الأساسي", "Primary Button")}
+                                    <div>
+                                        <p className="text-[10px] font-bold text-slate-400 mb-1">🔗 رابط الزر الأساسي</p>
+                                        <input className={`${inputCls} text-left font-mono text-xs`} dir="ltr"
+                                            type="url" placeholder="/products"
+                                            value={slide.ctaPrimaryLink || ""}
+                                            onChange={e => onChange("ctaPrimaryLink", e.target.value)} />
+                                    </div>
+                                </div>
+                                <div className="rounded-xl border border-slate-100 bg-slate-50/30 p-3 space-y-3">
+                                    <p className="text-xs font-bold text-slate-600">💠 الزر الثانوي (Secondary)</p>
+                                    {label("نص الزر الثانوي", "Secondary Button")}
+                                    <div>
+                                        <p className="text-[10px] font-bold text-slate-400 mb-1">🔗 رابط الزر الثانوي</p>
+                                        <input className={`${inputCls} text-left font-mono text-xs`} dir="ltr"
+                                            type="url" placeholder="/contact"
+                                            value={slide.ctaSecondaryLink || ""}
+                                            onChange={e => onChange("ctaSecondaryLink", e.target.value)} />
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {/* ── IMAGE TAB ── */}
+                        {tab === "image" && (
+                            <>
+                                {slide.image && (
+                                    <div className="relative rounded-xl overflow-hidden border border-slate-200 group">
+                                        <img src={slide.image} alt="" className="w-full h-36 object-cover" />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                            <button type="button"
+                                                onClick={() => fileRef.current?.click()}
+                                                className="px-3 py-1.5 bg-white text-slate-700 rounded-lg text-xs font-bold shadow">
+                                                تغيير الصورة
+                                            </button>
+                                            <button type="button"
+                                                onClick={() => onChange("image", "")}
+                                                className="p-1.5 bg-red-500 text-white rounded-lg shadow">
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                                <input ref={fileRef} type="file" accept="image/*" className="hidden"
+                                    onChange={async e => { const f = e.target.files?.[0]; if (f) { await handleUpload(f); e.target.value = ""; } }} />
+                                {!slide.image && (
+                                    <div
+                                        onClick={() => fileRef.current?.click()}
+                                        className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center cursor-pointer hover:border-green-300 hover:bg-green-50/30 transition-all">
+                                        {uploading
+                                            ? <Loader2 className="w-8 h-8 text-green-500 animate-spin mx-auto mb-2" />
+                                            : <ImageIcon className="w-8 h-8 text-slate-300 mx-auto mb-2" />}
+                                        <p className="text-xs font-bold text-slate-400">
+                                            {uploading ? "جاري رفع الصورة..." : "اضغط لرفع صورة الخلفية"}
+                                        </p>
+                                    </div>
+                                )}
+                                <div>
+                                    <p className="text-[10px] font-bold text-slate-400 mb-1">أو أدخل رابط الصورة مباشرةً</p>
+                                    <input className={`${inputCls} font-mono text-xs text-left`} dir="ltr"
+                                        type="url" placeholder="/images/hero-bg.png"
+                                        value={slide.image || ""}
+                                        onChange={e => onChange("image", e.target.value)} />
+                                </div>
+                                {uploading && (
+                                    <div className="flex items-center gap-2 text-xs text-green-600 font-bold">
+                                        <Loader2 className="w-4 h-4 animate-spin" /> جاري رفع الصورة...
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function HeroSlidesPanel({
+    data,
+    onChange,
+}: {
+    data: Record<string, any>;
+    onChange: (key: string, value: any) => void;
+}) {
+    const slides: Record<string, any>[] = data.slides || [];
+
+    const update = (idx: number, key: string, val: string) => {
+        const copy = [...slides];
+        copy[idx] = { ...copy[idx], [key]: val };
+        onChange("slides", copy);
+    };
+
+    const addSlide = () => {
+        onChange("slides", [...slides, {
+            tabName_ar: "", tabName_en: "",
+            badge_ar: "", badge_en: "",
+            titleLine1_ar: "", titleLine1_en: "",
+            titleLine2_ar: "", titleLine2_en: "",
+            subtitle_ar: "", subtitle_en: "",
+            ctaPrimary_ar: "", ctaPrimary_en: "",
+            ctaPrimaryLink: "/products",
+            ctaSecondary_ar: "", ctaSecondary_en: "",
+            ctaSecondaryLink: "/contact",
+            image: "",
+        }]);
+    };
+
+    const removeSlide = (idx: number) => {
+        if (!confirm("تأكيد حذف هذه الشريحة؟")) return;
+        onChange("slides", slides.filter((_, i) => i !== idx));
+    };
+
+    const moveSlide = (from: number, to: number) => {
+        const copy = [...slides];
+        const [m] = copy.splice(from, 1);
+        copy.splice(to, 0, m);
+        onChange("slides", copy);
+    };
+
+    return (
+        <div className="space-y-3">
+            {/* Stats */}
+            <div className="flex items-center justify-between px-1">
+                <span className="text-xs text-slate-400">
+                    <span className="font-bold text-slate-600">{slides.length}</span> شريحة
+                </span>
+                <span className="text-[10px] text-slate-300">يمكن إضافة حتى 5 شرائح</span>
+            </div>
+
+            {/* Slide Cards */}
+            {slides.map((slide, idx) => (
+                <SlideCard
+                    key={idx}
+                    slide={slide}
+                    index={idx}
+                    total={slides.length}
+                    onChange={(key, val) => update(idx, key, val)}
+                    onRemove={() => removeSlide(idx)}
+                    onMoveUp={() => moveSlide(idx, idx - 1)}
+                    onMoveDown={() => moveSlide(idx, idx + 1)}
+                />
+            ))}
+
+            {/* Add Slide Button */}
+            {slides.length < 5 && (
+                <button
+                    type="button"
+                    onClick={addSlide}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-sm font-bold hover:border-green-400 hover:text-green-600 hover:bg-green-50/40 transition-all group"
+                >
+                    <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    إضافة شريحة جديدة
+                </button>
+            )}
         </div>
     );
 }
@@ -1257,6 +1612,26 @@ export function VisualPageEditor({
                 <div className="space-y-4">
                     {sections.map((section, sIdx) => {
                         const sectionData = formData[section.id] || {};
+
+                        // ── Special: Hero Slides Panel ──
+                        if (section.id === "heroSlides") {
+                            return (
+                                <CollapsibleSection
+                                    key={section.id}
+                                    title={section.title}
+                                    emoji={section.emoji}
+                                    description={section.description}
+                                    defaultOpen={true}
+                                >
+                                    <HeroSlidesPanel
+                                        data={sectionData}
+                                        onChange={(key, value) =>
+                                            handleFieldChange(section.id, key, value)
+                                        }
+                                    />
+                                </CollapsibleSection>
+                            );
+                        }
 
                         // ── Special: Hero Design Panel ──
                         if (section.id === "heroDesign") {
