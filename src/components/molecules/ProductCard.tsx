@@ -28,46 +28,62 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     isAvailableForExport,
     features = [],
     packaging = [],
-    gradientFrom = "from-green-800",
-    gradientTo = "to-green-950",
+    gradientFrom = "from-green-600",
+    gradientTo = "to-green-800",
     icon,
     className,
 }) => {
     const { t, isRTL } = useLanguage();
     const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
+    const hasImage = imageUrl && !imageUrl.includes("placeholder") && imageUrl.trim() !== "";
+
     return (
         <article
             className={cn(
-                "group relative bg-white rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-400 overflow-hidden border border-gray-100 flex flex-col h-full",
+                "group relative bg-white rounded-3xl shadow-sm hover:shadow-2xl hover:shadow-slate-200/60 hover:-translate-y-1.5 transition-all duration-500 overflow-hidden border border-slate-100 flex flex-col h-full",
                 className
             )}
         >
             {/* ── Image & Header Container ── */}
-            <div className="relative h-64 w-full bg-slate-50/50 overflow-hidden flex items-center justify-center p-8 group-hover:bg-slate-50 transition-colors duration-500">
-                {/* Subtle gradient glow behind the product based on props */}
-                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full blur-3xl opacity-20 bg-gradient-to-br ${gradientFrom} ${gradientTo} group-hover:scale-110 group-hover:opacity-30 transition-all duration-700`} />
+            <div className="relative h-[280px] w-full bg-slate-50/50 overflow-hidden flex items-center justify-center p-8 group-hover:bg-slate-100/50 transition-colors duration-500">
+                {/* Decorative background blur */}
+                <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl ${gradientFrom} ${gradientTo} rounded-full blur-[80px] opacity-10 group-hover:opacity-20 transition-opacity duration-700`} />
+                <div className={`absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr ${gradientFrom} ${gradientTo} rounded-full blur-[60px] opacity-10 group-hover:opacity-20 transition-opacity duration-700`} />
 
                 {/* Main Visual */}
-                <div className="relative z-10 w-full h-full flex items-center justify-center">
-                    {icon || imageUrl.includes("placeholder") ? (
-                        <div className={`w-24 h-24 rounded-[2rem] bg-gradient-to-br ${gradientFrom} ${gradientTo} shadow-lg shadow-green-900/10 flex items-center justify-center text-white/90 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
-                            {icon || <Package className="w-10 h-10" strokeWidth={1.5} />}
+                <div className="relative z-10 w-full h-full flex items-center justify-center mt-4">
+                    {hasImage ? (
+                        <div className="relative w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out">
+                            <img
+                                src={imageUrl}
+                                alt={title}
+                                className="w-full h-full object-contain drop-shadow-xl"
+                                onError={(e) => { 
+                                    (e.target as HTMLImageElement).style.display = 'none'; 
+                                    (e.target as any).nextElementSibling!.style.display = 'flex'; 
+                                }}
+                            />
+                            {/* Fallback triggered on image error */}
+                            <div className="hidden absolute inset-0 items-center justify-center">
+                                <div className={`w-28 h-28 rounded-3xl bg-gradient-to-br ${gradientFrom} ${gradientTo} shadow-lg shadow-green-900/20 flex flex-col items-center justify-center text-white`}>
+                                    <Package className="w-12 h-12 mb-2" strokeWidth={1} />
+                                    <span className="text-[10px] opacity-70 font-bold">No Image</span>
+                                </div>
+                            </div>
                         </div>
                     ) : (
-                        <img
-                            src={imageUrl}
-                            alt={title}
-                            className="max-w-full max-h-full object-contain drop-shadow-md group-hover:-translate-y-2 group-hover:scale-105 transition-all duration-500"
-                        />
+                        <div className={`w-32 h-32 rounded-full bg-gradient-to-br ${gradientFrom} ${gradientTo} shadow-2xl shadow-green-900/10 flex items-center justify-center text-white/95 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700`}>
+                            {icon || <Package className="w-14 h-14" strokeWidth={1.5} />}
+                        </div>
                     )}
                 </div>
 
                 {/* Export badge */}
                 {isAvailableForExport && (
-                    <div className="absolute top-4 left-4 z-20 bg-white/90 backdrop-blur-md text-green-700 text-[11px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm border border-green-100">
+                    <div className="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur-sm text-green-700 text-[10px] font-black px-3.5 py-2 rounded-full flex items-center gap-2 shadow-sm border border-slate-100">
                         <span className="relative flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-green-600"></span>
                         </span>
                         {t.featuredProducts.availableForExport}
                     </div>
@@ -75,57 +91,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </div>
 
             {/* ── Content ── */}
-            <div className="p-6 flex flex-col flex-grow bg-white border-t border-gray-50">
+            <div className="p-8 flex flex-col flex-grow bg-white relative z-20">
                 {/* Title & Subtitle */}
-                <div className="mb-3">
-                    <h3 className="font-extrabold text-gray-900 text-lg md:text-xl leading-snug group-hover:text-green-700 transition-colors">{title}</h3>
+                <div className="mb-4">
                     {subtitle && (
-                        <p className="text-green-600 text-[10px] font-black mt-1.5 tracking-wider uppercase">{subtitle}</p>
+                        <p className="text-green-600 text-[11px] font-black mb-2 tracking-widest uppercase">{subtitle}</p>
                     )}
+                    <h3 className="font-extrabold text-slate-800 text-xl leading-tight group-hover:text-green-700 transition-colors">{title}</h3>
                 </div>
 
                 {/* Description */}
-                <p className="text-gray-500 text-sm leading-relaxed mb-6 line-clamp-3">{description}</p>
+                <p className="text-slate-500 text-sm leading-relaxed mb-8 line-clamp-2">{description}</p>
 
-                {/* Features List */}
-                {features.length > 0 && (
-                    <ul className="space-y-2 mb-6">
-                        {features.map((f, i) => (
-                            <li key={i} className="flex items-start gap-2.5 text-[13px] text-gray-600 font-medium">
-                                <div className="mt-0.5 rounded-full bg-green-50 p-0.5 shrink-0">
-                                    <Check className="w-3.5 h-3.5 text-green-600" strokeWidth={3} />
-                                </div>
-                                {f}
-                            </li>
-                        ))}
-                    </ul>
-                )}
-
-                {/* Packaging Sizes */}
-                {packaging.length > 0 && (
-                    <div className="mt-auto mb-4 pt-3 border-t border-gray-100">
-                        <div className="flex items-center gap-1.5 mb-2">
-                            <Package className="w-5 h-5 text-gray-400" />
-                            <span className="text-xs text-gray-400 font-semibold">{t.featuredProducts.availablePackaging}</span>
-                        </div>
-                        <div className="flex flex-wrap gap-1.5">
-                            {packaging.map((p, i) => (
-                                <span key={i} className="px-2.5 py-1 bg-gray-50 text-gray-600 text-xs rounded-lg border border-gray-100 font-medium">
-                                    {p}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* CTA Button */}
-                <div className="mt-8">
+                <div className="mt-auto pt-6 border-t border-slate-100">
                     <Link
                         href={`/products/${id}`}
-                        className="group/btn w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-gray-50 border border-gray-100 text-green-700 font-black text-sm rounded-xl hover:bg-green-700 hover:text-white hover:border-green-700 active:scale-[0.97] transition-all duration-300 shadow-sm"
+                        className="group/btn w-full inline-flex items-center justify-between px-6 py-4 bg-slate-50 text-slate-700 hover:text-white font-bold text-sm rounded-2xl hover:bg-green-600 transition-all duration-300 relative overflow-hidden"
                     >
-                        {t.featuredProducts.productDetails}
-                        <ArrowIcon className="w-5 h-5 group-hover/btn:-translate-x-1.5 transition-transform duration-300" strokeWidth={2.5} />
+                        <span className="relative z-10">{t.featuredProducts.productDetails}</span>
+                        <div className="relative z-10 w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-400 group-hover/btn:bg-white/20 group-hover/btn:text-white transition-colors">
+                            <ArrowIcon className="w-4 h-4 group-hover/btn:-translate-x-1 transition-transform" strokeWidth={2.5} />
+                        </div>
                     </Link>
                 </div>
             </div>
