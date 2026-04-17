@@ -39,7 +39,7 @@ export const Footer = () => {
             </div>
 
             {/* ── Main Footer Content ── */}
-            <Container className="pt-16 pb-8">
+            <Container className="pt-16 pb-8 mobile-bottom-offset">
                 <ScrollReveal>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12 pb-12 border-b border-white/10">
 

@@ -1,8 +1,9 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Cairo, Inter } from 'next/font/google'
 import './globals.css'
 import { QuickContactWidget } from '@/components/organisms/QuickContactWidget'
 import { BackToTop } from '@/components/organisms/BackToTop'
+import { MobileBottomNav } from '@/components/organisms/MobileBottomNav'
 import { LanguageProvider } from '@/lib/i18n-context'
 import { Toaster } from 'react-hot-toast'
 
@@ -25,12 +26,27 @@ export const metadata: Metadata = {
     },
     description: 'الريادة في عصر وإنتاج الزيوت النباتية، السمن، والشورتنج للسوق المحلي والتصدير. أكثر من 25 عاماً من الخبرة وشهادات ISO و HACCP.',
     keywords: ['زيوت نباتية', 'سمن', 'شورتنج', 'مصنع السلام', 'تصدير زيوت', 'vegetable oils', 'margarine', 'shortening'],
+    manifest: '/manifest.json',
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: 'black-translucent',
+        title: 'السلام',
+    },
     openGraph: {
         title: 'مصنع السلام للزيوت النباتية',
         description: 'الريادة في عصر وإنتاج الزيوت النباتية، السمن، والشورتنج.',
         type: 'website',
         locale: 'ar_EG',
     },
+}
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    themeColor: '#16a34a',
+    viewportFit: 'cover',
 }
 
 const jsonLd = {
@@ -73,12 +89,13 @@ export default function RootLayout({
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
                 />
             </head>
-            <body className="font-arabic antialiased text-text-dark bg-surface-soft min-h-screen flex flex-col">
+            <body className="font-arabic antialiased text-text-dark bg-surface-soft min-h-screen flex flex-col pb-safe">
                 <LanguageProvider>
                     <Toaster position="top-center" reverseOrder={false} />
                     {children}
                     <QuickContactWidget />
                     <BackToTop />
+                    <MobileBottomNav />
                 </LanguageProvider>
             </body>
         </html>

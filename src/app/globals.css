@@ -101,3 +101,90 @@
 .bg-organic-pattern {
     background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232E7D32' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
+
+/* ═══════════════════════════════════════════════
+   📱 MOBILE APP-LIKE EXPERIENCE
+═══════════════════════════════════════════════ */
+
+/* iOS Safe Area — prevents content hiding behind home indicator */
+.pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 72px);
+}
+
+@media (min-width: 768px) {
+    .pb-safe {
+        padding-bottom: 0;
+    }
+}
+
+/* Prevent blue flash on tap (iOS/Android) */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent accidental text selection on tap */
+button, a {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* iOS Input Zoom Prevention — must be 16px to prevent zoom */
+@media (max-width: 767px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="url"],
+    input[type="password"],
+    input[type="search"],
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Smooth momentum scrolling on iOS */
+.scroll-momentum {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+}
+
+/* Horizontal scroll momentum */
+.scroll-momentum-x {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: auto;
+}
+
+/* Hide scrollbar visually but keep functionality */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Swipe snap for product carousels */
+.snap-carousel {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+
+.snap-carousel > * {
+    scroll-snap-align: start;
+}
+
+/* Swipeable animation — no flash between slides */
+@media (prefers-reduced-motion: no-preference) {
+    .snap-carousel {
+        scroll-behavior: smooth;
+    }
+}
+
+/* Bottom nav offset for pages on mobile */
+@media (max-width: 767px) {
+    .mobile-bottom-offset {
+        padding-bottom: calc(64px + env(safe-area-inset-bottom));
+    }
+}
