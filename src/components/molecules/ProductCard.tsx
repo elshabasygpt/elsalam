@@ -95,23 +95,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 {/* Title & Subtitle */}
                 <div className="mb-4">
                     {subtitle && (
-                        <p className="text-green-600 text-[11px] font-black mb-2 tracking-widest uppercase">{subtitle}</p>
+                        <p className="text-green-600 text-[11px] font-black mb-1.5 tracking-widest uppercase">{subtitle}</p>
                     )}
-                    <h3 className="font-extrabold text-slate-800 text-xl leading-tight group-hover:text-green-700 transition-colors">{title}</h3>
+                    <h3 className="font-extrabold text-slate-800 text-[22px] leading-tight group-hover:text-green-700 transition-colors">{title}</h3>
                 </div>
 
                 {/* Description */}
-                <p className="text-slate-500 text-sm leading-relaxed mb-8 line-clamp-2">{description}</p>
+                <p className="text-slate-500 text-sm leading-relaxed mb-8 line-clamp-3">{description}</p>
 
-                <div className="mt-auto pt-6 border-t border-slate-100">
+                <div className="mt-auto pt-5 border-t border-slate-100 outline-none">
                     <Link
                         href={`/products/${id}`}
-                        className="group/btn w-full inline-flex items-center justify-between px-6 py-4 bg-slate-50 text-slate-700 hover:text-white font-bold text-sm rounded-2xl hover:bg-green-600 transition-all duration-300 relative overflow-hidden"
+                        className="group/btn w-full flex items-center justify-between px-6 py-4 bg-slate-50 text-green-700 hover:text-white font-[900] text-[15px] rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all duration-300 shadow-sm border border-slate-100"
                     >
                         <span className="relative z-10">{t.featuredProducts.productDetails}</span>
-                        <div className="relative z-10 w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-400 group-hover/btn:bg-white/20 group-hover/btn:text-white transition-colors">
-                            <ArrowIcon className="w-4 h-4 group-hover/btn:-translate-x-1 transition-transform" strokeWidth={2.5} />
-                        </div>
+                        <ArrowIcon className="relative z-10 w-6 h-6 group-hover/btn:-translate-x-2 transition-all duration-300 drop-shadow-sm" strokeWidth={3} />
                     </Link>
                 </div>
             </div>
