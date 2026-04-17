@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/utils/classnames";
-import { Check, ArrowLeft, ArrowRight, Package } from "lucide-react";
+import { ArrowLeft, ArrowRight, Package } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n-context";
 
