@@ -135,8 +135,7 @@ export async function getProducts(params?: {
     if (params?.page) searchParams.set("page", params.page.toString());
 
     const res = await fetch(`${API_BASE}/products?${searchParams.toString()}`, {
-        next: { revalidate: 60 },
-        signal: AbortSignal.timeout(5000),
+        cache: "no-store",
     });
     if (!res.ok) throw new Error("Failed to fetch products");
     return res.json();
@@ -144,7 +143,7 @@ export async function getProducts(params?: {
 
 export async function getProductDetail(slug: string): Promise<ProductDetail> {
     const res = await fetch(`${API_BASE}/products/${slug}`, {
-        next: { revalidate: 60 },
+        cache: "no-store",
     });
     if (!res.ok) throw new Error("Failed to fetch product");
     const json = await res.json();
@@ -153,8 +152,7 @@ export async function getProductDetail(slug: string): Promise<ProductDetail> {
 
 export async function getCategories(): Promise<ProductCategory[]> {
     const res = await fetch(`${API_BASE}/categories`, {
-        next: { revalidate: 300 },
-        signal: AbortSignal.timeout(5000),
+        cache: "no-store",
     });
     if (!res.ok) throw new Error("Failed to fetch categories");
     const json = await res.json();
@@ -163,8 +161,7 @@ export async function getCategories(): Promise<ProductCategory[]> {
 
 export async function getPromotions(): Promise<PromotionItem[]> {
     const res = await fetch(`${API_BASE}/promotions`, {
-        next: { revalidate: 60 },
-        signal: AbortSignal.timeout(5000),
+        cache: "no-store",
     });
     if (!res.ok) return []; // graceful fallback
     const json = await res.json();
