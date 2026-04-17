@@ -2,7 +2,14 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hash } from 'bcryptjs';
 
-export async function GET() {
+export async function GET(req: Request) {
+    const { searchParams } = new URL(req.url);
+    const secret = searchParams.get("secret");
+
+    if (secret !== process.env.SEED_SECRET) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     try {
         const password = await hash('admin123', 10);
         const user = await prisma.user.upsert({

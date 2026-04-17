@@ -23,14 +23,16 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: "desc" },
     });
 
-    const counts = {
-        total: await prisma.message.count(),
-        new: await prisma.message.count({ where: { status: "new" } }),
-        read: await prisma.message.count({ where: { status: "read" } }),
-        replied: await prisma.message.count({ where: { status: "replied" } }),
-        archived: await prisma.message.count({ where: { status: "archived" } }),
-        starred: await prisma.message.count({ where: { isStarred: true } }),
-    };
+    const [total, newCount, read, replied, archived, starred] = await Promise.all([
+        prisma.message.count(),
+        prisma.message.count({ where: { status: "new" } }),
+        prisma.message.count({ where: { status: "read" } }),
+        prisma.message.count({ where: { status: "replied" } }),
+        prisma.message.count({ where: { status: "archived" } }),
+        prisma.message.count({ where: { isStarred: true } }),
+    ]);
+
+    const counts = { total, new: newCount, read, replied, archived, starred };
 
     return NextResponse.json({ messages, counts });
 }

@@ -35,3 +35,13 @@ yarn-debug.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local Debug/Scratch
+scratch/
+*.txt
+*.log
+dev_output.txt
+dev_error.txt
+build_output.txt
+build_output2.txt
+
