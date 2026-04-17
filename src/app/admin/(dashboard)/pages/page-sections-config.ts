@@ -357,7 +357,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
                         { key: "title", labelAr: "اسم المنتج", labelEn: "Product Name", type: "text", bilingual: true, placeholder: "زيت صويا مكرر" },
                         { key: "subtitle", labelAr: "الاسم الإنجليزي", labelEn: "English Name", type: "text", bilingual: false, placeholder: "Refined Soybean Oil" },
                         { key: "description", labelAr: "الوصف", labelEn: "Description", type: "textarea", bilingual: true },
-                        { key: "image", labelAr: "صورة المنتج", labelEn: "Product Image", type: "text", bilingual: false, placeholder: "/images/products/soy-oil.png" },
+                        { key: "image", labelAr: "صورة المنتج", labelEn: "Product Image", type: "url", bilingual: false, placeholder: "/images/products/soy-oil.png" },
                         { key: "slug", labelAr: "رابط المنتج (أو Slug)", labelEn: "Product Link/Slug", type: "text", bilingual: false, placeholder: "soybean-oil أو /products/soybean-oil" },
                     ],
                 },
