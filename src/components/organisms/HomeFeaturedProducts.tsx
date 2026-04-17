@@ -19,11 +19,30 @@ export const HomeFeaturedProducts = () => {
     const carouselRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        getProducts({ featured: true })
-            .then((res) => setProducts(res.data.slice(0, 4)))
-            .catch(() => setProducts([]))
-            .finally(() => setLoading(false));
-    }, []);
+        // Use CMS products if defined and not empty
+        if (cmsSect?.products && Array.isArray(cmsSect.products) && cmsSect.products.length > 0) {
+            const cmsProducts: ProductItem[] = cmsSect.products.map((p: any, idx: number) => ({
+                id: `cms-${idx}`,
+                slug: p.slug || "#",
+                name_ar: p.title_ar || p.title || "",
+                name_en: p.title_en || p.title || "",
+                short_description_ar: p.description_ar || p.description || "",
+                short_description_en: p.description_en || p.description || "",
+                featured_image: p.image || null,
+                is_exportable: true, // CMS products are usually exportable
+                gradient_from: "from-green-700",
+                gradient_to: "to-green-950",
+            }));
+            setProducts(cmsProducts);
+            setLoading(false);
+        } else {
+            // Fallback to database API
+            getProducts({ featured: true })
+                .then((res) => setProducts(res.data.slice(0, 4)))
+                .catch(() => setProducts([]))
+                .finally(() => setLoading(false));
+        }
+    }, [cmsSect]);
 
     // Track active dot as user scrolls
     useEffect(() => {

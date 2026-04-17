@@ -122,10 +122,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 <div className="mt-8">
                     <Link
                         href={`/products/${id}`}
-                        className="group/btn w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-gray-50 border border-gray-100 text-green-700 font-extrabold text-[13px] rounded-xl hover:bg-green-700 hover:text-white hover:border-green-700 active:scale-[0.97] transition-all duration-300 shadow-sm"
+                        className="group/btn w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-gray-50 border border-gray-100 text-green-700 font-black text-sm rounded-xl hover:bg-green-700 hover:text-white hover:border-green-700 active:scale-[0.97] transition-all duration-300 shadow-sm"
                     >
                         {t.featuredProducts.productDetails}
-                        <ArrowIcon className="w-4 h-4 group-hover/btn:-translate-x-1.5 transition-transform duration-300" strokeWidth={2.5} />
+                        <ArrowIcon className="w-5 h-5 group-hover/btn:-translate-x-1.5 transition-transform duration-300" strokeWidth={2.5} />
                     </Link>
                 </div>
             </div>
