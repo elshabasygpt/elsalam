@@ -6,14 +6,13 @@ import { ProductCard } from "@/components/molecules/ProductCard";
 import { ArrowLeft, Loader2, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n-context";
-import { usePageContent } from "@/lib/page-content-context";
+import { usePageContent, getBilingualValue } from "@/lib/page-content-context";
 import { useState, useEffect, useRef } from "react";
 import { getProducts, type ProductItem } from "@/lib/products-api";
-import { getItemBilingual } from "@/lib/i18n-utils";
 
 export const HomeFeaturedProducts = () => {
     const { t, isRTL, locale } = useLanguage();
-    const { content: cmsContent } = usePageContent("home");
+    const cmsSect = usePageContent("featuredProducts");
     const [products, setProducts] = useState<ProductItem[]>([]);
     const [loading, setLoading]   = useState(true);
     const [activeIdx, setActiveIdx] = useState(0);
@@ -46,11 +45,10 @@ export const HomeFeaturedProducts = () => {
     };
 
     // CMS Values
-    const cmsSect = cmsContent?.featuredProducts;
-    const badge    = getItemBilingual(cmsSect, "badge", locale) || t.featuredProducts.badge;
-    const title    = getItemBilingual(cmsSect, "title", locale) || t.featuredProducts.title;
-    const subtitle = getItemBilingual(cmsSect, "subtitle", locale) || t.featuredProducts.subtitle;
-    const viewAll  = getItemBilingual(cmsSect, "viewAll", locale) || t.featuredProducts.viewAll;
+    const badge    = getBilingualValue(cmsSect, "badge", locale) || t.featuredProducts.badge;
+    const title    = getBilingualValue(cmsSect, "title", locale) || t.featuredProducts.title;
+    const subtitle = getBilingualValue(cmsSect, "subtitle", locale) || t.featuredProducts.subtitle;
+    const viewAll  = getBilingualValue(cmsSect, "viewAll", locale) || t.featuredProducts.viewAll;
 
     return (
         <section className="py-16 md:py-24 bg-gray-50" id="products">
