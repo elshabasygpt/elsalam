@@ -4,8 +4,9 @@ import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
     Save, Loader2, ArrowRight, ChevronDown, ChevronUp,
-    Plus, Trash2, GripVertical, Code2, Eye, CheckCircle2,
-    Languages, Upload, ImageIcon, X, FileText
+    Plus, Trash2, Code2, Eye, CheckCircle2,
+    Languages, Upload, ImageIcon, X, FileText,
+    Type, Palette, Maximize2, Square, LayoutTemplate
 } from "lucide-react";
 import Link from "next/link";
 
@@ -44,6 +45,316 @@ interface VisualPageEditorProps {
 }
 
 // ─── Sub-Components ───
+
+// ─── Hero Design Panel (Tabbed Visual Editor) ───────────────────────────────
+
+const DESIGN_TABS = [
+    { id: "typography", label: "الخط",      icon: Type          },
+    { id: "colors",     label: "الألوان",   icon: Palette       },
+    { id: "spacing",    label: "المسافات",  icon: Maximize2     },
+    { id: "card",       label: "البطاقة",   icon: Square        },
+    { id: "layout",     label: "التخطيط",   icon: LayoutTemplate },
+] as const;
+
+type DesignTabId = typeof DESIGN_TABS[number]["id"];
+
+function HeroDesignPanel({
+    data,
+    onChange,
+}: {
+    data: Record<string, any>;
+    onChange: (key: string, value: any) => void;
+}) {
+    const [tab, setTab] = useState<DesignTabId>("typography");
+
+    const cls = {
+        input: "w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all text-sm font-medium",
+    };
+
+    // ── Shared helpers ──
+    function SelectCtrl({ label, fieldKey, options }: { label: string; fieldKey: string; options: { l: string; v: string }[] }) {
+        return (
+            <div>
+                <p className="text-xs font-bold text-slate-500 mb-2">{label}</p>
+                <div className="flex flex-wrap gap-2">
+                    {options.map(o => (
+                        <button type="button" key={o.v} onClick={() => onChange(fieldKey, o.v)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                                (data[fieldKey] || options[0].v) === o.v
+                                    ? "bg-green-600 text-white border-green-600 shadow"
+                                    : "bg-white text-slate-600 border-slate-200 hover:border-green-400"
+                            }`}>{o.l}</button>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    function ColorCtrl({ label, fieldKey, def }: { label: string; fieldKey: string; def: string }) {
+        const val = data[fieldKey] || def;
+        return (
+            <div>
+                <p className="text-xs font-bold text-slate-500 mb-2">{label}</p>
+                <div className="flex items-center gap-3">
+                    <input type="color" value={val}
+                        onChange={e => onChange(fieldKey, e.target.value)}
+                        className="w-12 h-10 rounded-lg cursor-pointer border border-slate-200 p-0.5" />
+                    <input type="text" value={val}
+                        onChange={e => onChange(fieldKey, e.target.value)}
+                        className="w-28 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
+                        dir="ltr" />
+                    <div className="w-8 h-8 rounded-lg border border-slate-200 shadow-inner flex-shrink-0"
+                        style={{ backgroundColor: val }} />
+                    <span className="text-xs text-slate-400 flex-1">معاينة</span>
+                </div>
+            </div>
+        );
+    }
+
+    function RangeCtrl({ label, fieldKey, min, max, step = 4, unit = "px", def }: {
+        label: string; fieldKey: string; min: number; max: number; step?: number; unit?: string; def: number;
+    }) {
+        const val = Number(data[fieldKey] ?? def);
+        return (
+            <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-slate-600">{label}</span>
+                    <span className="text-sm font-black text-green-600 tabular-nums">{val}{unit}</span>
+                </div>
+                <input type="range" min={min} max={max} step={step} value={val}
+                    onChange={e => onChange(fieldKey, Number(e.target.value))}
+                    className="w-full h-2 rounded-full appearance-none cursor-pointer accent-green-600" />
+                <div className="flex justify-between text-[10px] text-slate-300 mt-1">
+                    <span>{min}{unit}</span><span>{max}{unit}</span>
+                </div>
+            </div>
+        );
+    }
+
+    function ToggleCtrl({ label, fieldKey, sub }: { label: string; fieldKey: string; sub?: string }) {
+        const val = data[fieldKey] !== false;
+        return (
+            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <div>
+                    <p className="text-xs font-bold text-slate-700">{label}</p>
+                    {sub && <p className="text-[10px] text-slate-400 mt-0.5">{sub}</p>}
+                </div>
+                <button type="button" onClick={() => onChange(fieldKey, !val)}
+                    className={`relative w-11 h-6 rounded-full transition-colors duration-300 flex-shrink-0 ${
+                        val ? "bg-green-500" : "bg-slate-300"
+                    }`}>
+                    <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 ${
+                        val ? "translate-x-5" : "translate-x-0.5"
+                    }`} />
+                </button>
+            </div>
+        );
+    }
+
+    // ── Tab Contents ──
+    const TYPOGRAPHY = (
+        <div className="space-y-5">
+            <SelectCtrl label="حجم العنوان الرئيسي (H1)" fieldKey="titleFontSize" options={[
+                { l: "صغير – 36px",        v: "text-4xl" },
+                { l: "متوسط – 48px",        v: "text-5xl" },
+                { l: "كبير – 60px",          v: "text-6xl" },
+                { l: "كبير جداً – 72px",    v: "text-7xl" },
+                { l: "ضخم – 96px",           v: "text-8xl" },
+            ]} />
+            <SelectCtrl label="وزن خط العنوان" fieldKey="titleFontWeight" options={[
+                { l: "Bold (700)",       v: "font-bold" },
+                { l: "Extra Bold (800)", v: "font-extrabold" },
+                { l: "Black (900)",      v: "font-black" },
+            ]} />
+            <SelectCtrl label="ارتفاع السطر (Line Height)" fieldKey="titleLineHeight" options={[
+                { l: "ضيق – 1.1",   v: "leading-tight" },
+                { l: "متقارب – 1.25", v: "leading-snug" },
+                { l: "عادي – 1.5",   v: "leading-normal" },
+                { l: "واسع – 1.75",  v: "leading-relaxed" },
+            ]} />
+            <SelectCtrl label="حجم خط العنوان الفرعي" fieldKey="subtitleFontSize" options={[
+                { l: "صغير – 14px",     v: "text-sm" },
+                { l: "عادي – 16px",     v: "text-base" },
+                { l: "متوسط – 18px",    v: "text-lg" },
+                { l: "كبير – 20px",     v: "text-xl" },
+                { l: "كبير جداً – 24px", v: "text-2xl" },
+            ]} />
+        </div>
+    );
+
+    const COLORS = (
+        <div className="space-y-5">
+            <div className="grid grid-cols-1 gap-4">
+                <ColorCtrl label="🔡 لون العنوان الرئيسي (السطر الأول)" fieldKey="titleColor" def="#ffffff" />
+                <div className="border-t border-slate-100 pt-4">
+                    <ColorCtrl label="✨ لون الكلمة المميزة (السطر الثاني)" fieldKey="titleLine2Color" def="#34d399" />
+                </div>
+                <div className="border-t border-slate-100 pt-4">
+                    <ColorCtrl label="💬 لون النص التوضيحي" fieldKey="subtitleColor" def="#d1d5db" />
+                </div>
+            </div>
+            {/* Live mini-preview */}
+            <div className="rounded-xl overflow-hidden border border-slate-200">
+                <div className="px-4 py-2 bg-slate-100 border-b border-slate-200">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">معاينة مصغرة للألوان</p>
+                </div>
+                <div className="p-5 bg-slate-800">
+                    <p className="text-2xl font-black mb-1" style={{ color: data.titleColor || "#ffffff" }}>
+                        العنوان الأول
+                    </p>
+                    <p className="text-2xl font-black mb-3" style={{ color: data.titleLine2Color || "#34d399" }}>
+                        الكلمة المميزة
+                    </p>
+                    <p className="text-sm" style={{ color: data.subtitleColor || "#d1d5db" }}>
+                        النص التوضيحي للهيرو يظهر هنا بهذا اللون
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+
+    const SPACING = (
+        <div className="space-y-4">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">📦 حشو الصفحة (Content Padding)</p>
+            <RangeCtrl label="حشو علوي" fieldKey="contentPaddingTop"    min={20}  max={240} def={144} />
+            <RangeCtrl label="حشو سفلي" fieldKey="contentPaddingBottom" min={16}  max={160} def={96} />
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2 pt-2">🃏 حشو البطاقة (Card Padding)</p>
+            <RangeCtrl label="أفقي (يسار/يمين)" fieldKey="cardPaddingX" min={8}   max={80}  def={48} />
+            <RangeCtrl label="عمودي (أعلى/أسفل)" fieldKey="cardPaddingY" min={8}  max={80}  def={48} />
+        </div>
+    );
+
+    const CARD = (
+        <div className="space-y-4">
+            <RangeCtrl
+                label="شفافية خلفية البطاقة (0 = شفاف تام)"
+                fieldKey="cardBgOpacity"
+                min={0} max={80} step={5} unit="%" def={40}
+            />
+            {/* Opacity preview swatch */}
+            <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 bg-slate-700">
+                <div
+                    className="w-12 h-8 rounded-lg border border-white/20"
+                    style={{ backgroundColor: `rgba(0,0,0,${Number(data.cardBgOpacity ?? 40) / 100})` }}
+                />
+                <span className="text-xs text-white/60">معاينة شفافية الخلفية</span>
+            </div>
+            <RangeCtrl
+                label="شدة تعتيم صورة الخلفية"
+                fieldKey="overlayOpacity"
+                min={0} max={95} step={5} unit="%" def={80}
+            />
+            <SelectCtrl label="تأثير الضبابية (Blur)" fieldKey="cardBlur" options={[
+                { l: "بدون",      v: "backdrop-blur-none" },
+                { l: "خفيف",     v: "backdrop-blur-sm" },
+                { l: "متوسط",    v: "backdrop-blur-md" },
+                { l: "قوي",       v: "backdrop-blur-xl" },
+                { l: "قوي جداً", v: "backdrop-blur-3xl" },
+            ]} />
+            <SelectCtrl label="انحناء الحواف" fieldKey="cardRounded" options={[
+                { l: "حاد",       v: "rounded-xl" },
+                { l: "متوسط",    v: "rounded-2xl" },
+                { l: "دائري",    v: "rounded-3xl" },
+                { l: "كبسول",    v: "rounded-[2rem]" },
+            ]} />
+            <ToggleCtrl label="إظهار حدود البطاقة" fieldKey="cardBorderEnabled"
+                sub="خط ناعم شبه شفاف حول البطاقة" />
+        </div>
+    );
+
+    const LAYOUT = (
+        <div className="space-y-5">
+            <SelectCtrl label="محاذاة النص" fieldKey="textAlign" options={[
+                { l: "يسار / بداية السطر", v: "text-start" },
+                { l: "وسط الصفحة",         v: "text-center" },
+            ]} />
+            <SelectCtrl label="أقصى عرض للبطاقة" fieldKey="cardMaxWidth" options={[
+                { l: "ضيق – 576px",    v: "max-w-xl" },
+                { l: "متوسط – 672px",  v: "max-w-2xl" },
+                { l: "واسع – 768px",   v: "max-w-3xl" },
+                { l: "أوسع – 896px",   v: "max-w-4xl" },
+                { l: "كامل العرض",     v: "max-w-full" },
+            ]} />
+            {/* Layout preview */}
+            <div className="rounded-xl border border-slate-200 overflow-hidden">
+                <div className="px-4 py-2 bg-slate-100 border-b border-slate-200">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">معاينة التوزيع</p>
+                </div>
+                <div className="p-4 bg-slate-700 flex">
+                    <div
+                        className={`bg-white/10 border border-white/20 rounded-xl p-3 ${
+                            (data.textAlign || "text-start") === "text-center"
+                                ? "mx-auto text-center"
+                                : "text-right"
+                        } ${
+                            (({ "max-w-xl": "w-1/2", "max-w-2xl": "w-2/3", "max-w-3xl": "w-3/4",
+                               "max-w-4xl": "w-5/6", "max-w-full": "w-full" } as Record<string, string>)[data.cardMaxWidth || "max-w-3xl"] || "w-3/4")
+                        }`}
+                    >
+                        <div className="text-white/80 text-xs font-bold">البطاقة</div>
+                        <div className="text-white/40 text-[10px] mt-0.5">محاذاة: {(data.textAlign || "text-start") === "text-center" ? "وسط" : "يسار"}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    const tabContent: Record<DesignTabId, React.ReactNode> = {
+        typography: TYPOGRAPHY,
+        colors:     COLORS,
+        spacing:    SPACING,
+        card:       CARD,
+        layout:     LAYOUT,
+    };
+
+    return (
+        <div className="rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            {/* ── Tab Bar ── */}
+            <div className="flex border-b border-slate-200 bg-slate-50 overflow-x-auto">
+                {DESIGN_TABS.map(t => {
+                    const Icon = t.icon;
+                    const active = tab === t.id;
+                    return (
+                        <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => setTab(t.id)}
+                            className={`flex items-center gap-1.5 px-4 py-3 text-xs font-bold whitespace-nowrap border-b-2 transition-all ${
+                                active
+                                    ? "border-green-500 text-green-700 bg-white"
+                                    : "border-transparent text-slate-400 hover:text-slate-600 hover:bg-white/60"
+                            }`}
+                        >
+                            <Icon className="w-4 h-4" />
+                            {t.label}
+                            {active && <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />}
+                        </button>
+                    );
+                })}
+            </div>
+
+            {/* ── Tab Content ── */}
+            <div className="p-5 bg-white min-h-[260px]">
+                {tabContent[tab]}
+            </div>
+
+            {/* ── Quick Stats Bar ── */}
+            <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 flex flex-wrap gap-4">
+                <span className="text-[10px] text-slate-400">العنوان: <span className="font-bold text-slate-600">{data.titleFontSize || "text-6xl"}</span></span>
+                <span className="text-[10px] text-slate-400">الوزن: <span className="font-bold text-slate-600">{data.titleFontWeight || "font-extrabold"}</span></span>
+                <span className="text-[10px] text-slate-400">التعتيم: <span className="font-bold text-slate-600">{data.overlayOpacity ?? 80}%</span></span>
+                <span className="text-[10px] text-slate-400">البطاقة: <span className="font-bold text-slate-600">{data.cardBgOpacity ?? 40}%</span></span>
+                <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 rounded-sm border border-slate-300" style={{ backgroundColor: data.titleColor || "#ffffff" }} />
+                    <div className="w-3 h-3 rounded-sm border border-slate-300" style={{ backgroundColor: data.titleLine2Color || "#34d399" }} />
+                    <div className="w-3 h-3 rounded-sm border border-slate-300" style={{ backgroundColor: data.subtitleColor || "#d1d5db" }} />
+                    <span className="text-[10px] text-slate-400">الألوان النشطة</span>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 
 function CollapsibleSection({
     title,
@@ -946,6 +1257,27 @@ export function VisualPageEditor({
                 <div className="space-y-4">
                     {sections.map((section, sIdx) => {
                         const sectionData = formData[section.id] || {};
+
+                        // ── Special: Hero Design Panel ──
+                        if (section.id === "heroDesign") {
+                            return (
+                                <CollapsibleSection
+                                    key={section.id}
+                                    title={section.title}
+                                    emoji={section.emoji}
+                                    description={section.description}
+                                    defaultOpen={true}
+                                >
+                                    <HeroDesignPanel
+                                        data={sectionData}
+                                        onChange={(key, value) =>
+                                            handleFieldChange(section.id, key, value)
+                                        }
+                                    />
+                                </CollapsibleSection>
+                            );
+                        }
+
                         return (
                             <CollapsibleSection
                                 key={section.id}
