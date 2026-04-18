@@ -34,7 +34,7 @@ export const InfiniteMarquee = ({ images, speed = 40, direction = "left" }: Marq
                 {duplicatedImages.map((img, index) => (
                     <div
                         key={index}
-                        className="relative w-40 h-20 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 flex-shrink-0 flex items-center justify-center"
+                        className="relative w-40 h-20 hover:scale-110 transition-transform duration-300 flex-shrink-0 flex items-center justify-center mix-blend-multiply"
                     >
                         <Image
                             src={img.src}
