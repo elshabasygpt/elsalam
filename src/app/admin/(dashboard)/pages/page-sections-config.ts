@@ -268,6 +268,31 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
         },
 
         {
+            id: "segments",
+            title: "قطاعات الأعمال المخصصة",
+            emoji: "🏢",
+            description: "تتحكم في قسم (نقدم حلول متخصصة لكل قطاع)",
+            fields: [
+                { key: "title", labelAr: "العنوان الرئيسي", labelEn: "Title", type: "text", bilingual: true, placeholder: "كيف يمكننا خدمتك؟" },
+                { key: "subtitle", labelAr: "الوصف الفرعي", labelEn: "Subtitle", type: "text", bilingual: true, placeholder: "نقدم حلولاً مخصصة لكل قطاع" },
+                {
+                    key: "items",
+                    labelAr: "قطاع",
+                    labelEn: "Segment",
+                    type: "list",
+                    bilingual: false,
+                    listFields: [
+                        { key: "title", labelAr: "عنوان القطاع", labelEn: "Segment Title", type: "text", bilingual: true, placeholder: "مصانع الأغذية" },
+                        { key: "desc", labelAr: "وصف القطاع", labelEn: "Description", type: "textarea", bilingual: true },
+                        { key: "cta", labelAr: "نص الزر", labelEn: "Button Text", type: "text", bilingual: true, placeholder: "طلب عرض سعر" },
+                        { key: "link", labelAr: "رابط الزر", labelEn: "Button Link", type: "text", bilingual: false, placeholder: "/b2b/quote" },
+                        { key: "image", labelAr: "صورة القطاع", labelEn: "Segment Image", type: "url", bilingual: false, placeholder: "/images/segment-1.jpg" },
+                    ],
+                },
+            ],
+        },
+
+        {
             id: "stats",
             title: "الإحصائيات والأرقام",
             emoji: "📊",
