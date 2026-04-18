@@ -59,12 +59,7 @@ export const ClientLogos = () => {
 
             <div className="flex flex-col gap-8">
                 {displayLogos.length > 0 ? (
-                    <>
-                        <InfiniteMarquee images={displayLogos} speed={50} direction="left" />
-                        <div className="hidden md:block">
-                            <InfiniteMarquee images={[...displayLogos].reverse()} speed={60} direction="right" />
-                        </div>
-                    </>
+                    <InfiniteMarquee images={displayLogos} speed={50} direction="left" />
                 ) : null}
             </div>
         </section>
