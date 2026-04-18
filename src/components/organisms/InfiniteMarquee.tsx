@@ -21,7 +21,7 @@ export const InfiniteMarquee = ({ images, speed = 40, direction = "left" }: Marq
             <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
             <motion.div
-                className="flex gap-16 min-w-max items-center"
+                className="flex min-w-max items-center"
                 animate={{
                     x: direction === "left" ? ["0%", "-50%"] : ["-50%", "0%"],
                 }}
@@ -34,7 +34,7 @@ export const InfiniteMarquee = ({ images, speed = 40, direction = "left" }: Marq
                 {duplicatedImages.map((img, index) => (
                     <div
                         key={index}
-                        className="relative w-40 h-20 hover:scale-110 transition-transform duration-300 flex-shrink-0 flex items-center justify-center mix-blend-multiply"
+                        className="mx-8 relative w-40 h-20 hover:scale-110 transition-transform duration-300 flex-shrink-0 flex items-center justify-center mix-blend-multiply"
                     >
                         <Image
                             src={img.src}

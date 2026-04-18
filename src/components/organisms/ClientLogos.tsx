@@ -34,10 +34,13 @@ export const ClientLogos = () => {
         }));
     }
 
-    // Duplicate logos if there are very few, to ensure the marquee flows endlessly without abrupt empty space
-    const displayLogos = clientsUrl.length > 0 && clientsUrl.length < 8
-        ? [...clientsUrl, ...clientsUrl, ...clientsUrl, ...clientsUrl, ...clientsUrl].slice(0, 10)
-        : clientsUrl;
+    // Duplicate logos until we have enough to fill ultra-wide screens seamlessly
+    let displayLogos = [...clientsUrl];
+    if (displayLogos.length > 0) {
+        while (displayLogos.length < 24) {
+            displayLogos = [...displayLogos, ...clientsUrl];
+        }
+    }
 
     return (
         <section className="py-24 bg-surface-soft relative overflow-hidden bg-organic-pattern">
