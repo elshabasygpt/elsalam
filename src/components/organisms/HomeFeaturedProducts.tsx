@@ -73,24 +73,25 @@ export const HomeFeaturedProducts = () => {
         <section className="py-16 md:py-24 bg-gray-50" id="products">
             <Container>
                 <ScrollReveal>
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 md:mb-12 gap-4">
-                        <div>
-                            <p className="text-green-700 font-bold text-sm mb-2">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-5 md:gap-4">
+                        <div className="max-w-xl">
+                            <p className="text-primary-green font-bold text-sm mb-3 tracking-widest uppercase flex items-center gap-2">
+                                <span className="w-6 h-[2px] bg-primary-green rounded-full"></span>
                                 {badge}
                             </p>
-                            <h2 className="text-2xl md:text-3xl font-black text-gray-900">
+                            <h2 className="text-3xl md:text-4xl font-black text-gray-900 leading-tight">
                                 {title}
                             </h2>
-                            <p className="text-gray-500 mt-2 text-sm md:text-base">
+                            <p className="text-gray-500 mt-3 text-sm md:text-base leading-relaxed">
                                 {subtitle}
                             </p>
                         </div>
                         <Link
                             href="/products"
-                            className="group inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-green-700 font-bold text-sm rounded-xl hover:border-green-600 hover:bg-green-50 shadow-sm transition-all duration-300"
+                            className="group flex w-full md:w-auto items-center justify-center gap-2 px-8 py-3.5 bg-white border-2 border-gray-100 text-primary-dark font-bold text-[15px] rounded-2xl hover:border-primary-green hover:bg-green-50 shadow-sm transition-all duration-300"
                         >
                             {viewAll}
-                            <ArrowLeft className={`w-5 h-5 group-hover:-translate-x-1 transition-transform ${!isRTL ? "rotate-180" : ""}`} />
+                            <ArrowLeft className={`w-5 h-5 group-hover:-translate-x-1.5 transition-transform ${!isRTL ? "rotate-180" : ""}`} />
                         </Link>
                     </div>
                 </ScrollReveal>
@@ -107,13 +108,13 @@ export const HomeFeaturedProducts = () => {
                 ) : (
                     <>
                         {/* ── Mobile: Horizontal Swipe Carousel ── */}
-                        <div className="block md:hidden">
+                        <div className="block md:hidden relative -mx-4 px-4 overflow-hidden">
                             <div
                                 ref={carouselRef}
                                 className="
-                                    flex gap-3 overflow-x-auto
+                                    flex gap-4 overflow-x-auto
                                     snap-carousel scrollbar-hide scroll-momentum-x
-                                    -mx-4 px-4 pb-2
+                                    pb-8 pt-2 items-stretch
                                 "
                             >
                                 {products.map((product) => {
@@ -123,19 +124,22 @@ export const HomeFeaturedProducts = () => {
                                         <div
                                             key={product.id}
                                             className="
-                                                flex-none w-[82vw] max-w-[300px]
-                                                snap-start
+                                                flex-none w-[85vw] sm:w-[320px] max-w-sm
+                                                snap-center h-auto
                                             "
                                         >
-                                            <ProductCard
-                                                id={product.slug}
-                                                title={title}
-                                                description={description ?? ""}
-                                                imageUrl={product.featured_image ?? "/images/placeholder.svg"}
-                                                isAvailableForExport={product.is_exportable}
-                                                gradientFrom={product.gradient_from ?? "from-green-700"}
-                                                gradientTo={product.gradient_to ?? "to-green-950"}
-                                            />
+                                            <div className="h-full">
+                                                <ProductCard
+                                                    id={product.slug}
+                                                    title={title}
+                                                    description={description ?? ""}
+                                                    imageUrl={product.featured_image ?? "/images/placeholder.svg"}
+                                                    isAvailableForExport={product.is_exportable}
+                                                    gradientFrom={product.gradient_from ?? "from-green-700"}
+                                                    gradientTo={product.gradient_to ?? "to-green-950"}
+                                                    className="w-full h-full"
+                                                />
+                                            </div>
                                         </div>
                                     );
                                 })}
@@ -144,7 +148,7 @@ export const HomeFeaturedProducts = () => {
                             </div>
 
                             {/* Dot indicators */}
-                            <div className="flex items-center justify-center gap-2 mt-4">
+                            <div className="flex items-center justify-center gap-2 mt-0 mb-2 relative z-10">
                                 {products.map((_, idx) => (
                                     <button
                                         key={idx}
