@@ -337,31 +337,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             ],
         },
 
-        // ── 4. Segments (كيف يمكننا خدمتك) ──
-        {
-            id: "segments",
-            title: "قطاعات الخدمة",
-            emoji: "🎯",
-            description: "القطاعات التي يخدمها المصنع (مصانع، فنادق/مطاعم، تصدير، تجزئة)",
-            fields: [
-                { key: "title", labelAr: "عنوان القسم", labelEn: "Section Title", type: "text", bilingual: true, placeholder: "كيف يمكننا خدمتك؟" },
-                { key: "subtitle", labelAr: "وصف القسم", labelEn: "Section Subtitle", type: "text", bilingual: true },
-                {
-                    key: "items",
-                    labelAr: "قطاع",
-                    labelEn: "Segment",
-                    type: "list",
-                    bilingual: false,
-                    listFields: [
-                        { key: "title", labelAr: "اسم القطاع", labelEn: "Segment Title", type: "text", bilingual: true, placeholder: "مصانع الأغذية" },
-                        { key: "desc", labelAr: "الوصف", labelEn: "Description", type: "textarea", bilingual: true },
-                        { key: "cta", labelAr: "نص الزر", labelEn: "Button Text", type: "text", bilingual: true, placeholder: "طلب عرض سعر" },
-                    ],
-                },
-            ],
-        },
 
-        // ── 5. Featured Products ──
         {
             id: "featuredProducts",
             title: "المنتجات المميزة",
