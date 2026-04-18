@@ -75,7 +75,12 @@ export const PackagingGuide = () => {
     const title = getBilingualValue(cms, "title", locale) ?? t.packaging.title;
     const subtitle = getBilingualValue(cms, "subtitle", locale) ?? t.packaging.subtitle;
     const types = (cms?.types && Array.isArray(cms.types) && cms.types.length > 0)
-        ? cms.types.map((p: any) => ({ title: getItemBilingual(p, "title", locale), sizes: getItemBilingual(p, "sizes", locale), description: getItemBilingual(p, "description", locale) }))
+        ? cms.types.map((p: any) => ({ 
+            title: getItemBilingual(p, "title", locale), 
+            sizes: getItemBilingual(p, "sizes", locale), 
+            description: getItemBilingual(p, "description", locale),
+            image: p.image 
+        }))
         : t.packaging.types;
 
     const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
@@ -114,7 +119,7 @@ export const PackagingGuide = () => {
                         // Extract CMS image or fallback to the premium generated image
                         const imageSrc = pkg.image && pkg.image !== "/images/packaging/pet.png" 
                             ? pkg.image 
-                            : `/images/packaging/${cfg.id}.png`;
+                            : `/images/packaging/${cfg.id === "bottles" ? "pet" : cfg.id}.png`;
 
                         return (
                             <StaggerItem key={cfg.id}>
