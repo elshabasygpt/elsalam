@@ -429,6 +429,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             fields: [
                 { key: "title", labelAr: "العنوان", labelEn: "Title", type: "text", bilingual: true },
                 { key: "subtitle", labelAr: "الوصف", labelEn: "Subtitle", type: "textarea", bilingual: true },
+                { key: "image", labelAr: "صورة الغلاف (Thumbnail)", labelEn: "Cover Image", type: "url", bilingual: false, placeholder: "/images/factory-interior.jpg" },
                 { key: "videoUrl", labelAr: "رابط الفيديو", labelEn: "Video URL", type: "url", bilingual: false, placeholder: "https://youtube.com/..." },
             ],
         },
