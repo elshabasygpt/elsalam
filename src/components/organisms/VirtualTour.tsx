@@ -12,11 +12,17 @@ export const VirtualTour = () => {
     const cms = usePageContent("virtualTour");
     const [isVideoOpen, setIsVideoOpen] = useState(false);
 
+    // Extract Dashboard state
     const sTitle = getBilingualValue(cms, "title", locale) || (locale === 'en' ? 'Experience Excellence' : 'اكتشف التميز من الداخل');
     const sSubtitle = getBilingualValue(cms, "subtitle", locale) || (locale === 'en'
         ? 'Take an exclusive virtual tour of our state-of-the-art facilities and witness the pure quality behind every drop.'
         : 'خذ جولة افتراضية حصرية داخل منشآتنا فائقة التطور، وشاهد بأم عينيك الجودة النقية وراء كل قطرة.');
     
+    // Check Visibility Toggle. Default to true if undefined.
+    const isVisible = cms?.isVisible !== undefined ? (cms.isVisible === true || cms.isVisible === "true") : true;
+
+    if (!isVisible) return null;
+
     // Fall back to our stunning generated factory interior image
     const sImage = cms?.image && cms.image !== "/images/placeholder.svg" ? cms.image : "/images/factory-interior.png";
     const sVideoUrl = cms?.videoUrl;

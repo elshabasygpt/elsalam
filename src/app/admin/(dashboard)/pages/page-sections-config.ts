@@ -427,6 +427,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             emoji: "🎥",
             description: "قسم الفيديو أو الجولة الافتراضية في المصنع",
             fields: [
+                { key: "isVisible", labelAr: "عرض القسم", labelEn: "Show Section", type: "toggle", bilingual: false },
                 { key: "title", labelAr: "العنوان", labelEn: "Title", type: "text", bilingual: true },
                 { key: "subtitle", labelAr: "الوصف", labelEn: "Subtitle", type: "textarea", bilingual: true },
                 { key: "image", labelAr: "صورة الغلاف (Thumbnail)", labelEn: "Cover Image", type: "url", bilingual: false, placeholder: "/images/factory-interior.jpg" },
