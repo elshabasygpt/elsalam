@@ -5,11 +5,11 @@ import { Container } from "@/components/atoms/Container";
 import { ScrollReveal } from "@/components/atoms/ScrollReveal";
 import { useLanguage } from "@/lib/i18n-context";
 import { InfiniteMarquee } from "@/components/organisms/InfiniteMarquee";
-import { usePageContent } from "@/lib/hooks/usePageContent";
+import { usePageContent, getBilingualValue } from "@/lib/page-content-context";
 
 export const ClientLogos = () => {
     const { t, locale } = useLanguage();
-    const { data: cmsSect } = usePageContent("clientLogos", "home");
+    const cmsSect = usePageContent("clientLogos");
 
     // Process CMS Data if available
     const hasCmsData = !!cmsSect;
