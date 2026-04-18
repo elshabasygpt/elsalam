@@ -105,65 +105,66 @@ export const PackagingGuide = () => {
                     </div>
                 </ScrollReveal>
 
-                {/* Cards Grid */}
-                <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-7">
+                {/* Premium Image-Based Cards Grid */}
+                <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
                     {types.map((pkg: any, i: number) => {
                         const cfg = PKG_CONFIG[i];
                         if (!cfg) return null;
-                        const Icon = cfg.icon;
+                        
+                        // Extract CMS image or fallback to the premium generated image
+                        const imageSrc = pkg.image && pkg.image !== "/images/packaging/pet.png" 
+                            ? pkg.image 
+                            : `/images/packaging/${cfg.id}.png`;
+
                         return (
                             <StaggerItem key={cfg.id}>
-                                <div className={`group relative bg-white rounded-3xl border ${cfg.borderColor} ${cfg.hoverBorder} shadow-sm hover:shadow-2xl ${cfg.glowColor} transition-all duration-500 h-full flex flex-col overflow-hidden hover:-translate-y-2`}>
-                                    {/* Top gradient accent bar */}
-                                    <div className={`h-1.5 w-full bg-gradient-to-r ${cfg.gradient} opacity-60 group-hover:opacity-100 transition-opacity duration-500`} />
-
-                                    {/* Card number + Icon header */}
-                                    <div className={`relative px-7 pt-8 pb-4`}>
-                                        {/* Subtle background pattern on hover */}
-                                        <div className={`absolute inset-0 bg-gradient-to-br ${cfg.lightGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-
-                                        <div className="relative z-10 flex items-start justify-between">
-                                            {/* Icon container */}
-                                            <div className={`w-20 h-20 rounded-2xl ${cfg.iconBg} ${cfg.iconColor} flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-sm`}>
-                                                <Icon className="w-10 h-10" strokeWidth={1.5} />
-                                            </div>
-
-                                            {/* Number badge */}
-                                            <span className={`text-4xl font-black text-gray-100 group-hover:text-gray-200 transition-colors duration-300 select-none leading-none`}>
-                                                {cfg.number}
-                                            </span>
+                                <div className={`group relative bg-white rounded-[2rem] border ${cfg.borderColor} hover:border-[#ccd5ae]/50 shadow-sm hover:shadow-2xl hover:shadow-[#e9edc9]/20 transition-all duration-700 h-full flex flex-col overflow-hidden hover:-translate-y-2`}>
+                                    
+                                    {/* Product Image Section */}
+                                    <div className="relative w-full aspect-[4/3] bg-gray-50 overflow-hidden">
+                                        <img 
+                                            src={imageSrc} 
+                                            alt={pkg.title} 
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms] ease-out brightness-95 group-hover:brightness-105"
+                                        />
+                                        
+                                        {/* Subtle overlay gradient to blend image with card */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent opacity-90" />
+                                        
+                                        {/* Elegant Numbering Tag */}
+                                        <div className="absolute top-5 right-5 bg-white/70 backdrop-blur-md px-3 py-1 rounded-full border border-white font-black text-gray-800 text-sm shadow-sm">
+                                            {cfg.number}
                                         </div>
                                     </div>
 
-                                    {/* Content */}
-                                    <div className="relative z-10 px-7 pb-4 flex-1 flex flex-col">
-                                        <h3 className="text-xl font-black text-gray-900 mb-3 group-hover:text-gray-800 transition-colors leading-tight">
+                                    {/* Content Section */}
+                                    <div className="relative px-8 pt-4 pb-8 flex-1 flex flex-col items-center text-center bg-white">
+                                        <h3 className="text-2xl font-black text-gray-900 mb-4 leading-tight group-hover:text-[#606c38] transition-colors duration-300">
                                             {pkg.title}
                                         </h3>
 
-                                        {/* Size badge */}
-                                        <div className="mb-4">
-                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ${cfg.badgeBg} border border-current/10`}>
-                                                <span className={`w-1.5 h-1.5 rounded-full ${cfg.accentDot}`} />
+                                        {/* Premium Sizes Badge */}
+                                        <div className="mb-5 inline-flex items-center justify-center">
+                                            <span className="bg-[#fefae0] text-[#606c38] px-4 py-1.5 rounded-full text-sm font-bold border border-[#e9edc9] shadow-sm">
                                                 {pkg.sizes}
                                             </span>
                                         </div>
 
-                                        <p className="text-gray-500 text-sm leading-relaxed flex-1 mb-5">
+                                        <p className="text-gray-500 text-[15px] leading-relaxed flex-1 mb-8">
                                             {pkg.description}
                                         </p>
 
                                         {/* Features indicators */}
-                                        <div className="flex items-center gap-2 text-xs text-gray-400 pt-4 border-t border-gray-100">
-                                            <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-                                            <span className="font-medium">
+                                        <div className="flex items-center justify-center gap-2 text-sm text-[#283618] pt-5 border-t border-gray-100 w-full">
+                                            <CheckCircle2 className="w-5 h-5 text-[#606c38] shrink-0" />
+                                            <span className="font-bold">
                                                 {locale === "ar" ? "متوفر حسب الطلب" : "Available on demand"}
                                             </span>
                                         </div>
                                     </div>
-
-                                    {/* Bottom hover reveal bar */}
-                                    <div className={`h-1 w-0 bg-gradient-to-r ${cfg.gradient} group-hover:w-full transition-all duration-700 ease-out`} />
+                                    
+                                    {/* Bottom premium border reveal */}
+                                    <div className="h-1.5 w-0 bg-gradient-to-r from-[#d4a373] to-[#ccd5ae] group-hover:w-full transition-all duration-700 ease-out absolute bottom-0 left-0" />
                                 </div>
                             </StaggerItem>
                         );
