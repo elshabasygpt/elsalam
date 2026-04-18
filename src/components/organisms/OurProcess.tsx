@@ -59,6 +59,11 @@ export const OurProcess = () => {
 
     const progressHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
+    // Check Visibility Toggle. Default to true if undefined.
+    const isVisible = cmsSect?.isVisible !== undefined ? (cmsSect.isVisible === true || cmsSect.isVisible === "true") : true;
+
+    if (!isVisible) return null;
+
     const badge = locale === 'en' ? (cmsSect?.badge_en || 'Our Process') : (cmsSect?.badge_ar || 'آلية الإنتاج والجودة');
     const title = locale === 'en' ? (cmsSect?.title_en || 'From Seed to Shelf') : (cmsSect?.title_ar || 'من البذرة إلى المائدة.. رحلة الجودة');
     const subtitle = locale === 'en' 

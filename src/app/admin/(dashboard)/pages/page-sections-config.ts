@@ -372,6 +372,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             emoji: "⚙️",
             description: "خطوات الإنتاج من البذرة إلى المائدة",
             fields: [
+                { key: "isVisible", labelAr: "عرض القسم", labelEn: "Show Section", type: "toggle", bilingual: false },
                 { key: "badge", labelAr: "شارة القسم", labelEn: "Badge", type: "text", bilingual: true, placeholder: "آلية الإنتاج والجودة" },
                 { key: "title", labelAr: "العنوان", labelEn: "Title", type: "text", bilingual: true, placeholder: "من البذرة إلى المائدة" },
                 { key: "subtitle", labelAr: "الوصف", labelEn: "Subtitle", type: "textarea", bilingual: true },
