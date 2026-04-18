@@ -45,13 +45,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             )}
         >
             {/* ── Image & Header Container ── */}
-            <div className="relative h-[280px] w-full bg-slate-50/50 overflow-hidden flex items-center justify-center p-8 group-hover:bg-slate-100/50 transition-colors duration-500">
+            <div className="relative h-[180px] sm:h-[220px] md:h-[280px] w-full bg-slate-50/50 overflow-hidden flex items-center justify-center p-4 md:p-8 group-hover:bg-slate-100/50 transition-colors duration-500">
                 {/* Decorative background blur */}
                 <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl ${gradientFrom} ${gradientTo} rounded-full blur-[80px] opacity-10 group-hover:opacity-20 transition-opacity duration-700`} />
                 <div className={`absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr ${gradientFrom} ${gradientTo} rounded-full blur-[60px] opacity-10 group-hover:opacity-20 transition-opacity duration-700`} />
 
                 {/* Main Visual */}
-                <div className="relative z-10 w-full h-full flex items-center justify-center mt-4">
+                <div className="relative z-10 w-full h-full flex items-center justify-center mt-2 md:mt-4">
                     {hasImage ? (
                         <div className="relative w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out">
                             <img
@@ -91,25 +91,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </div>
 
             {/* ── Content ── */}
-            <div className="p-8 flex flex-col flex-grow bg-white relative z-20">
+            <div className="p-5 md:p-8 flex flex-col flex-grow bg-white relative z-20">
                 {/* Title & Subtitle */}
-                <div className="mb-4">
+                <div className="mb-3 md:mb-4">
                     {subtitle && (
-                        <p className="text-green-600 text-[11px] font-black mb-1.5 tracking-widest uppercase">{subtitle}</p>
+                        <p className="text-green-600 text-[10px] md:text-[11px] font-black mb-1.5 tracking-widest uppercase">{subtitle}</p>
                     )}
-                    <h3 className="font-extrabold text-slate-800 text-[22px] leading-tight group-hover:text-green-700 transition-colors">{title}</h3>
+                    <h3 className="font-extrabold text-slate-800 text-lg md:text-[22px] leading-tight group-hover:text-green-700 transition-colors">{title}</h3>
                 </div>
 
                 {/* Description */}
-                <p className="text-slate-500 text-sm leading-relaxed mb-8 line-clamp-3">{description}</p>
+                <p className="text-slate-500 text-[13px] md:text-sm leading-relaxed mb-5 md:mb-8 line-clamp-2 md:line-clamp-3">{description}</p>
 
-                <div className="mt-auto pt-5 border-t border-slate-100 outline-none">
+                <div className="mt-auto pt-4 md:pt-5 border-t border-slate-100 outline-none">
                     <Link
                         href={`/products/${id}`}
-                        className="group/btn w-full flex items-center justify-between px-6 py-4 bg-slate-50 text-green-700 hover:text-white font-[900] text-[15px] rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all duration-300 shadow-sm border border-slate-100"
+                        className="group/btn w-full flex items-center justify-between px-4 md:px-6 py-3 md:py-4 bg-slate-50 text-green-700 hover:text-white font-[900] text-sm md:text-[15px] rounded-[14px] md:rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all duration-300 shadow-sm border border-slate-100"
                     >
                         <span className="relative z-10">{t.featuredProducts.productDetails}</span>
-                        <ArrowIcon className="relative z-10 w-6 h-6 group-hover/btn:-translate-x-2 transition-all duration-300 drop-shadow-sm" strokeWidth={3} />
+                        <ArrowIcon className="relative z-10 w-5 h-5 md:w-6 md:h-6 group-hover/btn:-translate-x-1.5 md:group-hover/btn:-translate-x-2 transition-all duration-300 drop-shadow-sm" strokeWidth={3} />
                     </Link>
                 </div>
             </div>
