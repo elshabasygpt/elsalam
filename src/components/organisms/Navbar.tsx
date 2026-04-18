@@ -114,12 +114,20 @@ export const Navbar = () => {
                                 <Leaf className={cn("w-6 h-6", isSolid ? "text-primary-green" : "text-white")} />
                             )}
                         </div>
-                        <Typography variant="h4" as="span" weight="bold" className={cn(
-                            "transition-colors duration-300 font-bold tracking-tight",
-                            isSolid ? "text-primary-dark" : "text-white drop-shadow-md"
-                        )}>
-                            {t.nav.brand}
-                        </Typography>
+                        <div className="flex flex-col justify-center">
+                            <Typography variant="h4" as="span" weight="bold" className={cn(
+                                "transition-colors duration-300 font-black tracking-tight leading-none",
+                                isSolid ? "text-primary-dark" : "text-white drop-shadow-md"
+                            )}>
+                                {t.nav.brand}
+                            </Typography>
+                            <span className={cn(
+                                "text-[9px] sm:text-[10px] font-bold mt-1 tracking-wide opacity-90 hidden sm:block",
+                                isSolid ? "text-primary-green" : "text-white/90"
+                            )}>
+                                {isRTL ? "لعصر وإستخلاص الزيوت النباتية" : "For Extracting Vegetable Oils"}
+                            </span>
+                        </div>
                     </Link>
 
                     {/* Center Desktop Navigation */}
@@ -299,9 +307,14 @@ export const Navbar = () => {
                                             <Leaf className="w-6 h-6 text-primary-green" />
                                         </div>
                                     )}
-                                    <span className="bg-gradient-to-r from-primary-dark to-primary-green bg-clip-text text-transparent">
-                                        {t.nav.brand}
-                                    </span>
+                                    <div className="flex flex-col justify-center">
+                                        <span className="bg-gradient-to-r from-primary-dark to-primary-green bg-clip-text text-transparent leading-none">
+                                            {t.nav.brand}
+                                        </span>
+                                        <span className="text-[9px] sm:text-[10px] font-bold mt-1 tracking-wide text-primary-green/80">
+                                            {isRTL ? "لعصر وإستخلاص الزيوت النباتية" : "For Extracting Vegetable Oils"}
+                                        </span>
+                                    </div>
                                 </Link>
                                 <button
                                     onClick={() => setIsOpen(false)}
