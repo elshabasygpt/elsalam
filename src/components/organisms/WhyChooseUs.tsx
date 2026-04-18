@@ -41,7 +41,7 @@ export const WhyChooseUs = () => {
                             {badge}
                         </span>
                         <h2 className="text-3xl md:text-5xl font-black text-text-dark mb-5 leading-tight">
-                            {title} <span className="text-primary-green">{titleHL}</span>؟
+                            {title} <span className="text-primary-green">{titleHL}</span>{locale === 'ar' ? '؟' : '?'}
                         </h2>
                         <p className="text-gray-400 text-lg max-w-xl mx-auto">
                             {subtitle}

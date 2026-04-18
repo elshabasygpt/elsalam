@@ -1,4 +1,8 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/public";
+// Use absolute URL on client to prevent routing fetch issues
+const API_BASE = typeof window !== "undefined"
+    ? `${window.location.origin}/api/public`
+    : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/public");
+
 
 export interface NewsItem {
     id: number;
@@ -44,8 +48,7 @@ export async function getNewsList(params?: {
     if (params?.page) searchParams.set("page", params.page.toString());
 
     const res = await fetch(`${API_BASE}/news?${searchParams.toString()}`, {
-        next: { revalidate: 60 },
-        signal: AbortSignal.timeout(5000),
+        cache: "no-store"
     });
 
     if (!res.ok) throw new Error("Failed to fetch news");
@@ -54,8 +57,7 @@ export async function getNewsList(params?: {
 
 export async function getFeaturedNews(): Promise<NewsItem[]> {
     const res = await fetch(`${API_BASE}/news/featured`, {
-        next: { revalidate: 60 },
-        signal: AbortSignal.timeout(5000),
+        cache: "no-store"
     });
 
     if (!res.ok) throw new Error("Failed to fetch featured news");
@@ -65,8 +67,7 @@ export async function getFeaturedNews(): Promise<NewsItem[]> {
 
 export async function getNewsArticle(slug: string): Promise<NewsDetail> {
     const res = await fetch(`${API_BASE}/news/${slug}`, {
-        next: { revalidate: 60 },
-        signal: AbortSignal.timeout(5000),
+        cache: "no-store"
     });
 
     if (!res.ok) throw new Error("Failed to fetch article");

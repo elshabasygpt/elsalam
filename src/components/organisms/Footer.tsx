@@ -6,6 +6,8 @@ import { ScrollReveal } from "@/components/atoms/ScrollReveal";
 import { MapPin, Phone, Mail, Leaf, Facebook, Linkedin, Instagram, ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n-context";
+import { usePageContent, getBilingualValue } from "@/lib/page-content-context";
+import { useEffect, useState } from "react";
 
 const QUICK_LINK_HREFS = ["/", "/about", "/quality", "/production", "/media", "/contact"];
 const PRODUCT_LINK_HREFS = ["/products", "/products", "/products", "/b2b", "/export"];
@@ -17,7 +19,52 @@ const SOCIAL_LINKS = [
 ];
 
 export const Footer = () => {
-    const { t, isRTL } = useLanguage();
+    const { t, isRTL, locale } = useLanguage();
+    const cmsFooter = usePageContent("footer");
+    const [settings, setSettings] = useState<any>(null);
+
+    useEffect(() => {
+        fetch("/api/public/settings", { cache: "no-store" })
+            .then(res => res.json())
+            .then(data => {
+                if (data && !data.error) {
+                    setSettings(data);
+                }
+            })
+            .catch(err => console.error("Failed to fetch settings config:", err));
+    }, []);
+
+    // Merge settings into display variables
+    // Priority: 1. CMS Footer Section -> 2. Global Site Settings -> 3. Fallback Translation
+    const displayPhone = cmsFooter?.phone || settings?.contactPhone || t.footer.phone;
+    const displayEmail = cmsFooter?.email || settings?.contactEmail || t.footer.email;
+    
+    // Address is bilingual
+    const cmsAddress = getBilingualValue(cmsFooter, "address", locale);
+    const settingsAddress = locale === 'ar' ? settings?.addressAr : settings?.addressEn;
+    const displayAddress = cmsAddress || settingsAddress || t.footer.address;
+
+    // Description is bilingual
+    const displayDescription = getBilingualValue(cmsFooter, "description", locale) || t.footer.description;
+
+    // Copyright is bilingual
+    const displayCopyright = getBilingualValue(cmsFooter, "copyright", locale) || t.footer.copyright;
+
+    // Social Links (Priority: 1. CMS Footer Section -> 2. Global Site Settings)
+    const displayFacebook = cmsFooter?.facebook || settings?.facebookUrl || "https://facebook.com/elsalamoils";
+    const displayInstagram = cmsFooter?.instagram || settings?.instagramUrl || "https://instagram.com/elsalamoils";
+    const displayLinkedin = cmsFooter?.linkedin || settings?.linkedinUrl || "https://linkedin.com/company/elsalamoils";
+
+    // Brand and Logo
+    const displayBrandName = locale === 'ar' ? (cmsFooter?.brandName || t.nav.brand) : (cmsFooter?.brandEn || t.nav.brand);
+    const displayBrandSub = locale === 'ar' ? "Elsalam Oils" : "Elsalam Oils"; // Keep static sub, or make it dynamic if needed
+    const displayLogoStr = cmsFooter?.logo;
+
+    const DYNAMIC_SOCIAL_LINKS = [
+        { icon: <Facebook className="w-5 h-5" strokeWidth={1.5} />, href: displayFacebook, label: "Facebook", hoverBg: "hover:bg-blue-600" },
+        { icon: <Instagram className="w-5 h-5" strokeWidth={1.5} />, href: displayInstagram, label: "Instagram", hoverBg: "hover:bg-pink-600" },
+        { icon: <Linkedin className="w-5 h-5" strokeWidth={1.5} />, href: displayLinkedin, label: "LinkedIn", hoverBg: "hover:bg-sky-600" },
+    ];
 
     return (
         <footer className="relative bg-gradient-to-b from-gray-950 via-green-950 to-gray-950 text-white mt-0">
@@ -46,20 +93,24 @@ export const Footer = () => {
                         {/* Column 1: About + Social */}
                         <div className="lg:col-span-1 space-y-5">
                             <div className="flex items-center gap-3 mb-2">
-                                <span className="w-11 h-11 rounded-xl bg-green-500/20 flex items-center justify-center">
-                                    <Leaf className="w-6 h-6 text-green-400" strokeWidth={1.5} />
-                                </span>
+                                {displayLogoStr ? (
+                                    <img src={displayLogoStr} alt={displayBrandName} className="w-11 h-11 object-contain" />
+                                ) : (
+                                    <span className="w-11 h-11 rounded-xl bg-green-500/20 flex items-center justify-center">
+                                        <Leaf className="w-6 h-6 text-green-400" strokeWidth={1.5} />
+                                    </span>
+                                )}
                                 <div>
-                                    <p className="text-white font-black text-lg leading-tight">{t.nav.brand}</p>
-                                    <p className="text-green-400/70 text-xs font-semibold tracking-wider uppercase font-english">Elsalam Oils</p>
+                                    <p className="text-white font-black text-lg leading-tight">{displayBrandName}</p>
+                                    <p className="text-green-400/70 text-xs font-semibold tracking-wider uppercase font-english">{displayBrandSub}</p>
                                 </div>
                             </div>
-                            <p className="text-white/50 text-sm leading-relaxed">
-                                {t.footer.description}
+                            <p className="text-white/50 text-sm leading-relaxed whitespace-pre-line">
+                                {displayDescription}
                             </p>
 
                             <div className="flex items-center gap-2 pt-1">
-                                {SOCIAL_LINKS.map((social, i) => (
+                                {DYNAMIC_SOCIAL_LINKS.filter(s => s.href).map((social, i) => (
                                     <a
                                         key={i}
                                         href={social.href}
@@ -127,7 +178,7 @@ export const Footer = () => {
                                     </span>
                                     <div>
                                         <p className="text-white/80 text-sm font-medium">{t.footer.addressTitle}</p>
-                                        <p className="text-white/50 text-xs">{t.footer.address}</p>
+                                        <p className="text-white/50 text-xs">{displayAddress}</p>
                                     </div>
                                 </li>
                                 <li className="flex items-start gap-3">
@@ -136,7 +187,7 @@ export const Footer = () => {
                                     </span>
                                     <div>
                                         <p className="text-white/80 text-sm font-medium">{t.contact.phone}</p>
-                                        <p className="text-white/50 text-xs font-english" dir="ltr">{t.footer.phone}</p>
+                                        <p className="text-white/50 text-xs font-english" dir="ltr">{displayPhone}</p>
                                     </div>
                                 </li>
                                 <li className="flex items-start gap-3">
@@ -145,7 +196,7 @@ export const Footer = () => {
                                     </span>
                                     <div>
                                         <p className="text-white/80 text-sm font-medium">{t.contact.emailLabel}</p>
-                                        <p className="text-white/50 text-xs font-english">{t.footer.email}</p>
+                                        <p className="text-white/50 text-xs font-english">{displayEmail}</p>
                                     </div>
                                 </li>
                             </ul>
@@ -156,7 +207,7 @@ export const Footer = () => {
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-white/30 text-xs">
                         <div className="flex items-center gap-2">
                             <Leaf className="w-5 h-5 text-green-600" />
-                            <p>© {new Date().getFullYear()} {t.footer.copyright}</p>
+                            <p>© {new Date().getFullYear()} {displayCopyright}</p>
                         </div>
                         <div className="flex gap-6">
                             <Link href="/privacy" className="hover:text-white/60 transition-colors">{t.footer.privacy}</Link>

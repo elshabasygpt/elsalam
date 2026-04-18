@@ -21,7 +21,7 @@ export const HomeSegments = () => {
 
     const sTitle = getBilingualValue(cmsSect, "title", locale) || (locale === 'en' ? "How can we serve you?" : "كيف يمكننا خدمتك؟");
     const sSubtitle = getBilingualValue(cmsSect, "subtitle", locale) || (locale === 'en' ? "Tailored solutions for every sector" : "نقدم حلولاً مخصصة لكل قطاع");
-    
+
     const items = (cmsSect?.items && Array.isArray(cmsSect.items) && cmsSect.items.length > 0)
         ? cmsSect.items.map((s: any, i: number) => ({
             title: locale === 'en' ? s.title_en : s.title_ar,
@@ -63,16 +63,16 @@ export const HomeSegments = () => {
                 <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {items.map((seg, i) => (
                         <StaggerItem key={i}>
-                            <Link 
-                                href={seg.link} 
+                            <Link
+                                href={seg.link}
                                 className="group flex flex-col bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 h-full border border-slate-100"
                             >
                                 {/* Top Image Area */}
                                 <div className="relative h-[200px] lg:h-[220px] 2xl:h-[240px] w-full overflow-hidden bg-slate-100 group-hover:shadow-[inset_0_-10px_20px_rgba(0,0,0,0.05)] transition-shadow duration-500">
                                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                                    <img 
-                                        src={seg.image || "/images/placeholder.svg"} 
-                                        alt={seg.title} 
+                                    <img
+                                        src={seg.image || "/images/placeholder.svg"}
+                                        alt={seg.title}
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                                     />
                                 </div>
@@ -87,7 +87,7 @@ export const HomeSegments = () => {
                                             {seg.desc}
                                         </p>
                                     </div>
-                                    
+
                                     <div className="inline-flex items-center gap-2 font-bold text-green-700 bg-green-50 px-5 py-2.5 rounded-xl group-hover:bg-green-600 group-hover:text-white transition-colors duration-300 w-full justify-center">
                                         <span>{seg.cta}</span>
                                         <ArrowLeft className={`w-5 h-5 group-hover:-translate-x-1 transition-transform ${!isRTL ? "rotate-180" : ""}`} />

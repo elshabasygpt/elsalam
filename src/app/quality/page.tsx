@@ -3,7 +3,7 @@
 import { Navbar } from "@/components/organisms/Navbar";
 import { Footer } from "@/components/organisms/Footer";
 import { CertificationsBanner } from "@/components/organisms/CertificationsBanner";
-import { TimelineSection } from "@/components/organisms/TimelineSection";
+import { OurProcess } from "@/components/organisms/OurProcess";
 import { Container } from "@/components/atoms/Container";
 import { Typography } from "@/components/atoms/Typography";
 import { SectionHeader } from "@/components/molecules/SectionHeader";
@@ -106,7 +106,7 @@ export default function QualityPage() {
                 </Container>
             </section>
 
-            <TimelineSection />
+            <OurProcess />
 
             {/* Download CTA */}
             <section className="py-16 bg-surface-soft">
