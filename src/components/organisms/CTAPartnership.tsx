@@ -10,7 +10,7 @@ import { useLanguage } from "@/lib/i18n-context";
 import { usePageContent, getBilingualValue } from "@/lib/page-content-context";
 
 export const CTAPartnership = () => {
-    const { t, locale } = useLanguage();
+    const { t, locale, isRTL } = useLanguage();
     const cms = usePageContent("ctaPartnership");
 
     const title = getBilingualValue(cms, "title", locale) ?? t.cta.title;
