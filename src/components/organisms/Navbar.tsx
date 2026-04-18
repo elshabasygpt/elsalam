@@ -15,6 +15,7 @@ export const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+    const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>("products");
     const [logoUrl, setLogoUrl] = useState<string | null>(null);
     const pathname = usePathname();
     const isHome = pathname === "/";
@@ -46,7 +47,12 @@ export const Navbar = () => {
             id: "products",
             label: t.nav.products,
             href: "/products",
-            hasMegaDropdown: true
+            hasMegaDropdown: true,
+            subLinks: [
+                { label: t.nav.menuOils || "زيوت الطعام", href: "/products", icon: Droplets },
+                { label: t.nav.menuGhee || "السمن النباتي", href: "/products", icon: CakeSlice },
+                { label: t.nav.menuShortening || "الشورتنج", href: "/products", icon: Flame },
+            ]
         },
         {
             id: "quality_production",
@@ -317,24 +323,50 @@ export const Navbar = () => {
                                         >
                                             {link.subLinks ? (
                                                 <div className="p-1 mb-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                                                    <div className="px-5 py-4 text-[17px] font-black text-primary-dark border-b border-gray-50 bg-gray-50/50">
-                                                        {link.label}
-                                                    </div>
-                                                    <div className="p-2 space-y-1">
-                                                        {link.subLinks.map((sub, i) => (
-                                                            <Link 
-                                                                key={i} 
-                                                                href={sub.href} 
-                                                                onClick={() => setIsOpen(false)}
-                                                                className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 font-bold hover:bg-green-50 hover:text-green-700 transition-colors"
+                                                    <button 
+                                                        onClick={() => setExpandedMobileMenu(expandedMobileMenu === link.id ? null : link.id)}
+                                                        className="w-full flex items-center justify-between px-5 py-4 text-[17px] font-black text-primary-dark bg-gray-50/50 hover:bg-gray-100/50 transition-colors focus:outline-none"
+                                                    >
+                                                        <span>{link.label}</span>
+                                                        <ChevronDown className={cn("w-5 h-5 text-gray-500 transition-transform duration-300", expandedMobileMenu === link.id ? "rotate-180 text-primary-green" : "")} />
+                                                    </button>
+                                                    <AnimatePresence>
+                                                        {expandedMobileMenu === link.id && (
+                                                            <motion.div
+                                                                initial={{ height: 0, opacity: 0 }}
+                                                                animate={{ height: "auto", opacity: 1 }}
+                                                                exit={{ height: 0, opacity: 0 }}
+                                                                transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                                className="overflow-hidden border-t border-gray-50"
                                                             >
-                                                                <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                                                                    <sub.icon className="w-4 h-4 text-green-700" />
+                                                                <div className="p-2 space-y-1 bg-white">
+                                                                    <Link 
+                                                                        href={link.href} 
+                                                                        onClick={() => setIsOpen(false)}
+                                                                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-green-700 font-bold hover:bg-green-50 transition-colors"
+                                                                    >
+                                                                        <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                                                                            <ArrowLeft className={cn("w-4 h-4 text-green-700", isRTL ? "" : "rotate-180")} />
+                                                                        </div>
+                                                                        {t.nav.menuViewAll || "عرض كل " + link.label}
+                                                                    </Link>
+                                                                    {link.subLinks.map((sub, i) => (
+                                                                        <Link 
+                                                                            key={i} 
+                                                                            href={sub.href} 
+                                                                            onClick={() => setIsOpen(false)}
+                                                                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 font-bold hover:bg-green-50 hover:text-green-700 transition-colors"
+                                                                        >
+                                                                            <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+                                                                                <sub.icon className="w-4 h-4 text-green-700" />
+                                                                            </div>
+                                                                            {sub.label}
+                                                                        </Link>
+                                                                    ))}
                                                                 </div>
-                                                                {sub.label}
-                                                            </Link>
-                                                        ))}
-                                                    </div>
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
                                                 </div>
                                             ) : (
                                                 <Link
