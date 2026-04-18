@@ -69,8 +69,8 @@ export const GlobalFootprint = () => {
                                 <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary-green/10 rounded-full blur-3xl group-hover:bg-primary-green/30 transition-all duration-500" />
                                 
                                 <div className="relative z-10 flex flex-col items-center">
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-green/30 to-primary-green/10 flex items-center justify-center text-[#52b788] mb-6 border border-primary-green/20 shadow-[0_0_15px_rgba(82,183,136,0.2)]">
-                                        <Navigation strokeWidth={2.5} className="w-8 h-8 group-hover:-translate-y-2 group-hover:rotate-12 transition-transform duration-500" />
+                                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-[1.5rem] bg-gradient-to-br from-primary-green/30 to-primary-green/10 flex items-center justify-center text-[#52b788] mb-6 border border-primary-green/20 shadow-[0_0_15px_rgba(82,183,136,0.2)]">
+                                        <Navigation strokeWidth={2.5} className="w-10 h-10 md:w-12 md:h-12 group-hover:-translate-y-2 group-hover:rotate-12 transition-transform duration-500" />
                                     </div>
                                     <h4 className="text-5xl md:text-6xl font-black mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70 drop-shadow-sm">
                                         {stat1Value}
@@ -89,8 +89,8 @@ export const GlobalFootprint = () => {
                                 <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-accent-gold/10 rounded-full blur-3xl group-hover:bg-accent-gold/30 transition-all duration-500" />
                                 
                                 <div className="relative z-10 flex flex-col items-center">
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-gold/30 to-accent-gold/10 flex items-center justify-center text-accent-gold mb-6 border border-accent-gold/20 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
-                                        <TrendingUp strokeWidth={2.5} className="w-8 h-8 group-hover:-translate-y-2 group-hover:rotate-6 transition-transform duration-500" />
+                                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-[1.5rem] bg-gradient-to-br from-accent-gold/30 to-accent-gold/10 flex items-center justify-center text-accent-gold mb-6 border border-accent-gold/20 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+                                        <TrendingUp strokeWidth={2.5} className="w-10 h-10 md:w-12 md:h-12 group-hover:-translate-y-2 group-hover:rotate-6 transition-transform duration-500" />
                                     </div>
                                     <h4 className="text-5xl md:text-6xl font-black mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70 drop-shadow-sm">
                                         {stat2Value}
