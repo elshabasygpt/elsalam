@@ -104,50 +104,55 @@ export const OurProcess = () => {
                         />
                     </div>
 
-                    <div className="space-y-16 md:space-y-24">
+                    <div className="space-y-24 md:space-y-32">
                         {steps.map((step: any, index: number) => {
                             const isEven = index % 2 === 0;
-                            // Fallback icons mapped by index if the dynamic array steps > what we hardcoded
+                            // Fallback icons mapped by index
                             const Icon = step.icon || PROCESS_STEPS[index % PROCESS_STEPS.length].icon;
-                            const grad = step.grad || PROCESS_STEPS[index % PROCESS_STEPS.length].grad;
 
                             return (
-                                <div key={index} className="relative flex flex-col md:flex-row items-center gap-8 md:gap-0">
+                                <div key={index} className="relative flex flex-col md:flex-row items-center group">
 
-                                    {/* Center Node (Desktop) */}
-                                    <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white border-4 border-surface-soft shadow-lg items-center justify-center z-10 transition-transform duration-500 hover:scale-125">
-                                        <div className="w-4 h-4 rounded-full bg-primary-green animate-pulse" />
+                                    {/* Center Animated Node (Desktop) */}
+                                    <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-white border border-slate-100 shadow-[0_0_40px_rgba(34,197,94,0.15)] items-center justify-center z-20 transition-all duration-700 group-hover:scale-110 group-hover:shadow-[0_0_60px_rgba(34,197,94,0.3)]">
+                                        <div className="w-5 h-5 rounded-full bg-green-500 animate-pulse outline outline-4 outline-green-100 outline-offset-0" />
                                     </div>
 
-                                    {/* Image Layout */}
-                                    <div className={`w-full md:w-1/2 ${isEven ? 'md:pe-16 lg:pe-24' : 'md:ps-16 lg:ps-24 md:order-last'}`}>
+                                    {/* Image Layout - Bright and Crisp */}
+                                    <div className={`w-full md:w-1/2 relative z-10 ${isEven ? 'md:pe-12 lg:pe-20' : 'md:ps-12 lg:ps-20 md:order-last'}`}>
                                         <ScrollReveal direction={isEven ? "right" : "left"} delay={0.1}>
-                                            <div className="relative group rounded-3xl overflow-hidden shadow-2xl aspect-[4/3]">
-                                                <div className="absolute inset-0 bg-primary-dark/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
+                                            <div className="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-green-900/10 aspect-[5/4] md:aspect-[4/3] bg-slate-50 border border-white/50">
                                                 <img
                                                     src={step.image || "/images/placeholder.svg"}
                                                     alt={locale === 'en' ? step.title_en : step.title_ar}
-                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 bg-slate-100"
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                                                 />
-                                                <div className={`absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t ${grad} opacity-60 mix-blend-multiply z-20`} />
-                                                <div className="absolute bottom-6 left-6 z-30">
-                                                    <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/30">
-                                                        <Icon strokeWidth={1.5} className="w-7 h-7" />
+                                                {/* Floating Elegant Icon Badge on the image */}
+                                                <div className={`absolute top-6 ${isEven ? 'right-6' : 'left-6'} z-30`}>
+                                                    <div className="w-14 h-14 bg-white/90 backdrop-blur-md rounded-2xl flex items-center justify-center text-green-700 shadow-xl border border-white/50 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500">
+                                                        <Icon strokeWidth={2} className="w-6 h-6" />
                                                     </div>
                                                 </div>
                                             </div>
                                         </ScrollReveal>
                                     </div>
 
-                                    {/* Text Layout */}
-                                    <div className={`w-full md:w-1/2 ${isEven ? 'md:ps-16 lg:ps-24' : 'md:pe-16 lg:pe-24 md:-me-1'}`}>
+                                    {/* Text Layout - Modern Glassy Card overlaps image slightly */}
+                                    <div className={`w-full md:w-1/2 relative z-20 -mt-10 md:mt-0 ${isEven ? 'md:ps-12 lg:ps-20' : 'md:pe-12 lg:pe-20 md:-me-4'} `}>
                                         <ScrollReveal direction={isEven ? "left" : "right"} delay={0.2}>
-                                            <div className="text-start">
-                                                <span className="text-6xl font-black text-surface-light opacity-50 block mb-2 font-english">0{index + 1}</span>
-                                                <h3 className="text-2xl md:text-3xl font-bold text-primary-dark mb-4 drop-shadow-sm">
+                                            <div className="bg-white/80 backdrop-blur-xl p-8 md:p-10 rounded-[2rem] shadow-xl shadow-slate-200/50 border border-white/60 text-start group-hover:-translate-y-2 transition-transform duration-700">
+                                                {/* Step Number Badge */}
+                                                <div className="flex items-center gap-4 mb-6">
+                                                    <span className="flex items-center justify-center w-12 h-12 rounded-xl bg-green-50 text-green-700 font-black text-xl font-english shadow-inner border border-green-100/50">
+                                                        0{index + 1}
+                                                    </span>
+                                                    <div className="h-0.5 flex-grow bg-gradient-to-r from-green-100 to-transparent"></div>
+                                                </div>
+                                                
+                                                <h3 className="text-2xl md:text-3xl font-extrabold text-slate-800 mb-4 leading-tight">
                                                     {locale === 'en' ? step.title_en : step.title_ar}
                                                 </h3>
-                                                <p className="text-text-dark/70 leading-relaxed text-lg whitespace-pre-line">
+                                                <p className="text-slate-600 leading-relaxed text-[15px] md:text-base whitespace-pre-line font-medium opacity-90">
                                                     {locale === 'en' ? step.description_en : step.description_ar}
                                                 </p>
                                             </div>
