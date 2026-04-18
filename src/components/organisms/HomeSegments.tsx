@@ -68,7 +68,7 @@ export const HomeSegments = () => {
                                 className="group flex flex-col bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 h-full border border-slate-100"
                             >
                                 {/* Top Image Area */}
-                                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 group-hover:shadow-[inset_0_-10px_20px_rgba(0,0,0,0.05)] transition-shadow duration-500">
+                                <div className="relative h-[200px] lg:h-[220px] 2xl:h-[240px] w-full overflow-hidden bg-slate-100 group-hover:shadow-[inset_0_-10px_20px_rgba(0,0,0,0.05)] transition-shadow duration-500">
                                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                                     <img 
                                         src={seg.image || "/images/placeholder.svg"} 
