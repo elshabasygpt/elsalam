@@ -41,49 +41,58 @@ export const HomeSegments = () => {
         }));
 
     return (
-        <section className="py-24 bg-surface-soft relative overflow-hidden">
-            {/* Background Decor */}
-            <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-white to-transparent opacity-60 z-0" />
+        <section className="py-24 bg-surface-soft/50 relative overflow-hidden">
             <Container className="relative z-10">
+                {/* ── Professional Section Header ── */}
                 <ScrollReveal>
-                    <SectionHeader title={sTitle} subtitle={sSubtitle} />
+                    <div className="text-center max-w-3xl mx-auto mb-16 px-4">
+                        <span className="inline-block py-1.5 px-4 rounded-full bg-green-100 text-green-700 text-sm font-bold mb-6 border border-green-200 shadow-sm">
+                            {locale === 'en' ? 'Our Segments' : 'قطاعات الأعمال'}
+                        </span>
+                        <h2 className="text-4xl md:text-5xl font-black mb-6 text-slate-900 leading-tight">
+                            {sTitle}
+                        </h2>
+                        <div className="w-24 h-1.5 bg-gradient-to-r from-green-500 to-green-700 mx-auto rounded-full mb-6"></div>
+                        <p className="text-lg text-slate-600 font-medium">
+                            {sSubtitle}
+                        </p>
+                    </div>
                 </ScrollReveal>
 
-                <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+                {/* ── Non-Overlapping Grid Layout ── */}
+                <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {items.map((seg, i) => (
                         <StaggerItem key={i}>
                             <Link 
                                 href={seg.link} 
-                                className="group relative block rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-green-900/10 transition-all duration-500 h-[380px] bg-white border border-white"
+                                className="group flex flex-col bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 h-full border border-slate-100"
                             >
-                                {/* Background Image */}
-                                <div className="absolute inset-0 bg-slate-100">
-                                    <img 
-                                        src={seg.image || "/images/placeholder.svg"} 
-                                        alt={seg.title} 
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
+                                {/* Top Image Area */}
+                                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 p-2">
+                                    <div className="relative w-full h-full rounded-2xl overflow-hidden">
+                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                        <img 
+                                            src={seg.image || "/images/placeholder.svg"} 
+                                            alt={seg.title} 
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                                        />
+                                    </div>
                                 </div>
 
-                                {/* Content Layer */}
-                                <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
-                                    {/* Text Content */}
-                                    <div className="relative z-20 transform transition-transform duration-500 group-hover:-translate-y-4">
-                                        <h3 className={`font-black text-white text-2xl md:text-3xl mb-2 transition-colors duration-300 ${seg.color}`}>
+                                {/* Bottom Content Area (Non-Overlapping) */}
+                                <div className="p-6 md:p-8 flex flex-col flex-grow text-center items-center justify-between">
+                                    <div>
+                                        <h3 className="font-extrabold text-slate-800 text-xl md:text-2xl mb-3 group-hover:text-green-700 transition-colors duration-300">
                                             {seg.title}
                                         </h3>
-                                        <p className="text-white/80 text-sm md:text-base leading-relaxed line-clamp-2">
+                                        <p className="text-slate-500 text-sm md:text-base leading-relaxed line-clamp-2 md:line-clamp-3 mb-6">
                                             {seg.desc}
                                         </p>
                                     </div>
                                     
-                                    {/* Hidden CTA Button that appears on hover */}
-                                    <div className="absolute bottom-6 left-6 right-6 translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 z-20">
-                                        <span className="flex items-center justify-between px-5 py-3.5 bg-white/10 backdrop-blur-md rounded-2xl text-white font-bold text-sm border border-white/20 hover:bg-white hover:text-green-800 transition-colors">
-                                            {seg.cta}
-                                            <ArrowLeft className={`w-5 h-5 ${!isRTL ? "rotate-180" : ""}`} />
-                                        </span>
+                                    <div className="inline-flex items-center gap-2 font-bold text-green-700 bg-green-50 px-5 py-2.5 rounded-xl group-hover:bg-green-600 group-hover:text-white transition-colors duration-300 w-full justify-center">
+                                        <span>{seg.cta}</span>
+                                        <ArrowLeft className={`w-5 h-5 group-hover:-translate-x-1 transition-transform ${!isRTL ? "rotate-180" : ""}`} />
                                     </div>
                                 </div>
                             </Link>
