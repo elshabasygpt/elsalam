@@ -241,11 +241,11 @@ export const Navbar = () => {
                         </Link>
                     </div>
 
-                    {/* Mobile Toggle — hidden on small mobile (uses BottomNav), visible on tablet */}
+                    {/* Mobile Toggle — visible on all mobile and tablet sizes */}
                     {!isOpen && (
                         <button
                             className={cn(
-                                "hidden md:flex lg:hidden p-2 rounded-lg transition-colors relative z-50",
+                                "flex lg:hidden p-2 rounded-lg transition-colors relative z-50",
                                 isSolid ? "text-primary-dark hover:bg-surface-soft" : "text-white bg-white/10 backdrop-blur-sm hover:bg-white/20"
                             )}
                             onClick={() => setIsOpen(true)}
