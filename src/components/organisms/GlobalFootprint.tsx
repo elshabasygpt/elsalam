@@ -16,8 +16,8 @@ export const GlobalFootprint = () => {
         ? 'Elsalam Factory is not just a local leader; we are a trusted partner in over 15 countries across the Middle East, Africa, and Europe, adhering to strict international trade and quality standards.' 
         : 'مصنع السلام ليس مجرد رائد محلي؛ بل نحن شريك موثوق في أكثر من 15 دولة عبر الشرق الأوسط وأفريقيا وأوروبا، ملتزمون بأعلى معايير الجودة والتجارة الدولية.');
     
-    // Default to our generated premium map image if none is set in CMS
-    const sImage = cms?.image || "/images/global-map-bg.png";
+    // Ensure we use the generated premium map if the CMS is empty or using the old placeholder
+    const sImage = cms?.image && cms.image !== "/images/placeholder.svg" ? cms.image : "/images/global-map-bg.png";
 
     const stat1Value = cms?.stat1Value || "15+";
     const stat1Label = getBilingualValue(cms, "stat1Label", locale) || (locale === 'en' ? 'Export Countries' : 'دولة تصدير');
