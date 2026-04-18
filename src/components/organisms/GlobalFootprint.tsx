@@ -5,6 +5,7 @@ import { Container } from "@/components/atoms/Container";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/atoms/ScrollReveal";
 import { useLanguage } from "@/lib/i18n-context";
 import { Globe2, MapPin, Navigation, TrendingUp } from "lucide-react";
+import { usePageContent, getBilingualValue } from "@/lib/page-content-context";
 
 const REGIONS = [
     { nameEn: "Middle East", nameAr: "الشرق الأوسط", top: "45%", left: "55%", delay: "0s" },
@@ -14,7 +15,20 @@ const REGIONS = [
 ];
 
 export const GlobalFootprint = () => {
-    const { locale, t } = useLanguage();
+    const { locale } = useLanguage();
+    const cms = usePageContent("globalFootprint");
+
+    const sTitle = getBilingualValue(cms, "title", locale) || (locale === 'en' ? 'Exporting Excellence Worldwide' : 'نصدر الجودة إلى جميع أنحاء العالم');
+    const sSubtitle = getBilingualValue(cms, "subtitle", locale) || (locale === 'en' 
+        ? 'Elsalam Factory is not just a local leader; we are a trusted partner in over 15 countries across the Middle East, Africa, and Europe, adhering to strict international trade and quality standards.' 
+        : 'مصنع السلام ليس مجرد رائد محلي؛ بل نحن شريك موثوق في أكثر من 15 دولة عبر الشرق الأوسط وأفريقيا وأوروبا، ملتزمون بأعلى معايير الجودة والتجارة الدولية.');
+    const sImage = cms?.image || "/images/placeholder.svg";
+
+    const stat1Value = cms?.stat1Value || "15+";
+    const stat1Label = getBilingualValue(cms, "stat1Label", locale) || (locale === 'en' ? 'Export Countries' : 'دولة تصدير');
+    
+    const stat2Value = cms?.stat2Value || (locale === 'en' ? '20,000 MT' : '20,000 طن');
+    const stat2Label = getBilingualValue(cms, "stat2Label", locale) || (locale === 'en' ? 'Annual Export Volume' : 'حجم التصدير السنوي');
 
     return (
         <section className="py-24 bg-primary-dark relative overflow-hidden text-white" id="global-reach">
@@ -27,38 +41,38 @@ export const GlobalFootprint = () => {
                     {/* Left/Right Text Content */}
                     <div>
                         <ScrollReveal>
-                            <span className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-primary-green/20 text-primary-green text-sm font-bold mb-6 border border-primary-green/30 backdrop-blur-sm">
+                            <span className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-primary-green/20 text-primary-green text-sm font-bold mb-6 border border-primary-green/30 backdrop-blur-sm shadow-sm hover:bg-primary-green/30 transition-colors">
                                 <Globe2 className="w-5 h-5" />
                                 {locale === 'en' ? 'Global Footprint' : 'التواجد العالمي'}
                             </span>
 
                             <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">
-                                {locale === 'en' ? 'Exporting Excellence Worldwide' : 'نصدر الجودة إلى جميع أنحاء العالم'}
+                                {sTitle}
                             </h2>
 
-                            <p className="text-white/70 text-lg leading-relaxed mb-10">
-                                {locale === 'en'
-                                    ? 'Elsalam Factory is not just a local leader; we are a trusted partner in over 15 countries across the Middle East, Africa, and Europe, adhering to strict international trade and quality standards.'
-                                    : 'مصنع السلام ليس مجرد رائد محلي؛ بل نحن شريك موثوق في أكثر من 15 دولة عبر الشرق الأوسط وأفريقيا وأوروبا، ملتزمون بأعلى معايير الجودة والتجارة الدولية.'}
+                            <p className="text-white/80 text-lg md:text-xl leading-relaxed mb-10 font-medium">
+                                {sSubtitle}
                             </p>
 
                             <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <StaggerItem>
-                                    <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 transition-colors">
-                                        <div className="w-12 h-12 rounded-xl bg-primary-green/20 flex items-center justify-center text-primary-green mb-4">
-                                            <Navigation strokeWidth={1.5} className="w-6 h-6" />
+                                    <div className="p-6 md:p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 shadow-xl relative overflow-hidden group">
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary-green/10 rounded-full blur-2xl group-hover:bg-primary-green/20 transition-all duration-500"></div>
+                                        <div className="w-14 h-14 rounded-2xl bg-primary-green/20 flex items-center justify-center text-primary-green mb-5 border border-primary-green/20">
+                                            <Navigation strokeWidth={2} className="w-7 h-7 group-hover:rotate-12 transition-transform duration-300" />
                                         </div>
-                                        <h4 className="text-3xl font-black mb-1">15+</h4>
-                                        <p className="text-white/60 text-sm">{locale === 'en' ? 'Export Countries' : 'دولة تصدير'}</p>
+                                        <h4 className="text-4xl font-black mb-2 tracking-tight">{stat1Value}</h4>
+                                        <p className="text-white/70 font-semibold">{stat1Label}</p>
                                     </div>
                                 </StaggerItem>
                                 <StaggerItem>
-                                    <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 transition-colors">
-                                        <div className="w-12 h-12 rounded-xl bg-accent-gold/20 flex items-center justify-center text-accent-gold mb-4">
-                                            <TrendingUp strokeWidth={1.5} className="w-6 h-6" />
+                                    <div className="p-6 md:p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 shadow-xl relative overflow-hidden group">
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-accent-gold/10 rounded-full blur-2xl group-hover:bg-accent-gold/20 transition-all duration-500"></div>
+                                        <div className="w-14 h-14 rounded-2xl bg-accent-gold/20 flex items-center justify-center text-accent-gold mb-5 border border-accent-gold/20">
+                                            <TrendingUp strokeWidth={2} className="w-7 h-7 group-hover:-translate-y-1 transition-transform duration-300" />
                                         </div>
-                                        <h4 className="text-3xl font-black mb-1">20,000<span className="text-lg text-accent-gold font-bold"> MT</span></h4>
-                                        <p className="text-white/60 text-sm">{locale === 'en' ? 'Annual Export Volume' : 'حجم التصدير السنوي'}</p>
+                                        <h4 className="text-4xl font-black mb-2 tracking-tight">{stat2Value}</h4>
+                                        <p className="text-white/70 font-semibold">{stat2Label}</p>
                                     </div>
                                 </StaggerItem>
                             </StaggerContainer>
@@ -66,20 +80,21 @@ export const GlobalFootprint = () => {
                     </div>
 
                     {/* Right/Left Interactive Map Display */}
-                    <div className="relative w-full aspect-square md:aspect-[4/3] lg:aspect-square bg-white/5 rounded-3xl border border-white/10 overflow-hidden flex items-center justify-center backdrop-blur-sm">
+                    <div className="relative w-full aspect-square md:aspect-[4/3] lg:aspect-square bg-slate-900/50 rounded-[2.5rem] border-2 border-white/10 overflow-hidden flex items-center justify-center shadow-2xl group">
 
-                        {/* Abstract World Map Placeholder (Stylized Image) */}
-                        <div className="absolute inset-4 opacity-30 mix-blend-screen">
+                        {/* Crisp Real Image Display */}
+                        <div className="absolute inset-0">
                             <img
-                                src="/images/placeholder.svg"
-                                alt="World Map"
-                                className="w-full h-full object-cover rounded-2xl opacity-50 grayscale"
+                                src={sImage}
+                                alt="Global Map"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
                             />
+                            <div className="absolute inset-0 bg-gradient-to-tr from-slate-900/80 via-transparent to-slate-900/40 pointer-events-none" />
                         </div>
 
-                        {/* Animated Grid Lines */}
-                        <div className="absolute inset-0" style={{
-                            backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)',
+                        {/* Geometric Technical Grid Layer */}
+                        <div className="absolute inset-0 opacity-40 pointer-events-none" style={{
+                            backgroundImage: 'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',
                             backgroundSize: '40px 40px'
                         }} />
 

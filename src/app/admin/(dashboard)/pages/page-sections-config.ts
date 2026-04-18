@@ -399,6 +399,11 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             fields: [
                 { key: "title", labelAr: "العنوان", labelEn: "Title", type: "text", bilingual: true, placeholder: "بصمتنا العالمية" },
                 { key: "subtitle", labelAr: "الوصف", labelEn: "Subtitle", type: "textarea", bilingual: true },
+                { key: "image", labelAr: "صورة الخريطة / الخلفية", labelEn: "Map/Background Image", type: "url", bilingual: false, placeholder: "/images/placeholder.svg" },
+                { key: "stat1Value", labelAr: "رقم الإحصائية الأولى", labelEn: "Stat 1 Value", type: "text", bilingual: false, placeholder: "15+" },
+                { key: "stat1Label", labelAr: "اسم الإحصائية الأولى", labelEn: "Stat 1 Label", type: "text", bilingual: true, placeholder: "دولة تصدير" },
+                { key: "stat2Value", labelAr: "رقم الإحصائية الثانية", labelEn: "Stat 2 Value", type: "text", bilingual: false, placeholder: "20,000 MT" },
+                { key: "stat2Label", labelAr: "اسم الإحصائية الثانية", labelEn: "Stat 2 Label", type: "text", bilingual: true, placeholder: "حجم التصدير" },
             ],
         },
 
