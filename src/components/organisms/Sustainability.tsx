@@ -5,6 +5,7 @@ import { Container } from "@/components/atoms/Container";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/atoms/ScrollReveal";
 import { useLanguage } from "@/lib/i18n-context";
 import { Recycle, Sun, Leaf, Droplets } from "lucide-react";
+import { usePageContent, getBilingualValue } from "@/lib/page-content-context";
 
 const SUSTAINABILITY_FEATURES = [
     {
@@ -39,6 +40,15 @@ const SUSTAINABILITY_FEATURES = [
 
 export const Sustainability = () => {
     const { locale, isRTL } = useLanguage();
+    const cms = usePageContent("sustainability");
+
+    const sTitle = getBilingualValue(cms, "title", locale) || (locale === 'en' ? 'Brewing a Greener Future' : 'نصنع مستقبلاً أكثر اخضراراً');
+    const sSubtitle = getBilingualValue(cms, "subtitle", locale) || (locale === 'en'
+        ? 'At Elsalam Factory, we believe that world-class quality should never come at the expense of our planet. We integrate deeply sustainable practices into every stage of our supply chain and manufacturing process.'
+        : 'في مصنع السلام، نؤمن بأن الجودة العالمية لا يجب أن تأتي على حساب كوكبنا. نحن ندمج الممارسات المستدامة بعمق في كل مرحلة من مراحل سلسلة التوريد وعمليات التصنيع.');
+    
+    // Default to the placeholder if no CMS image is uploaded
+    const sImage = cms?.image || "/images/placeholder.svg";
 
     return (
         <section className="py-24 bg-white relative overflow-hidden" id="sustainability">
@@ -59,13 +69,11 @@ export const Sustainability = () => {
                             </span>
 
                             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6 leading-tight">
-                                {locale === 'en' ? 'Brewing a Greener Future' : 'نصنع مستقبلاً أكثر اخضراراً'}
+                                {sTitle}
                             </h2>
 
                             <p className="text-gray-600 text-lg leading-relaxed mb-10">
-                                {locale === 'en'
-                                    ? 'At Elsalam Factory, we believe that world-class quality should never come at the expense of our planet. We integrate deeply sustainable practices into every stage of our supply chain and manufacturing process.'
-                                    : 'في مصنع السلام، نؤمن بأن الجودة العالمية لا يجب أن تأتي على حساب كوكبنا. نحن ندمج الممارسات المستدامة بعمق في كل مرحلة من مراحل سلسلة التوريد وعمليات التصنيع.'}
+                                {sSubtitle}
                             </p>
 
                             <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-10">
@@ -96,7 +104,7 @@ export const Sustainability = () => {
                         <ScrollReveal direction={isRTL ? "left" : "right"}>
                             <div className="relative rounded-[2rem] overflow-hidden aspect-[4/5] shadow-2xl group">
                                 <img
-                                    src="/images/placeholder.svg"
+                                    src={sImage}
                                     alt="Sustainability"
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]"
                                 />

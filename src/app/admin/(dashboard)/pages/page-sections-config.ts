@@ -412,10 +412,11 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             id: "sustainability",
             title: "الاستدامة والمسؤولية البيئية",
             emoji: "🌱",
-            description: "نصوص قسم الاستدامة وحماية البيئة",
+            description: "نصوص قسم الاستدامة وحماية البيئة وصورة القسم",
             fields: [
                 { key: "title", labelAr: "العنوان", labelEn: "Title", type: "text", bilingual: true },
                 { key: "subtitle", labelAr: "الوصف", labelEn: "Subtitle", type: "textarea", bilingual: true },
+                { key: "image", labelAr: "الصورة الرئيسية", labelEn: "Main Image", type: "url", bilingual: false, placeholder: "/images/placeholder.svg" },
             ],
         },
 
