@@ -251,61 +251,86 @@ export const Navbar = () => {
                 </div>
             </Container>
 
-            {/* Premium Mobile Menu Drawer */}
+            {/* Premium Cinematic Mobile Menu */}
             <AnimatePresence>
                 {isOpen && (
                     <>
-                        {/* Backdrop */}
+                        {/* Immersive Glass Backdrop */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-primary-dark/60 backdrop-blur-md z-[90] lg:hidden"
+                            exit={{ opacity: 0, transition: { delay: 0.2 } }}
+                            className="fixed inset-0 bg-black/60 backdrop-blur-xl z-[90] lg:hidden"
                             onClick={() => setIsOpen(false)}
                         />
 
-                        {/* Drawer */}
+                        {/* Beautiful Floating Drawer */}
                         <motion.div
-                            initial={{ x: isRTL ? "100%" : "-100%" }}
-                            animate={{ x: 0 }}
-                            exit={{ x: isRTL ? "100%" : "-100%" }}
-                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                            initial={{ x: isRTL ? "100%" : "-100%", opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: isRTL ? "100%" : "-100%", opacity: 0 }}
+                            transition={{ type: "spring", damping: 28, stiffness: 200 }}
                             className={cn(
-                                "fixed top-0 h-full w-[85vw] max-w-sm bg-white shadow-2xl z-[100] lg:hidden flex flex-col",
-                                isRTL ? "right-0" : "left-0"
+                                "fixed top-0 h-full w-[85vw] max-w-sm bg-surface-soft shadow-[0_0_80px_rgba(40,54,24,0.3)] z-[100] lg:hidden flex flex-col",
+                                isRTL ? "right-0 rounded-l-[3rem]" : "left-0 rounded-r-[3rem]"
                             )}
                         >
+                            {/* Decorative Background Elements */}
+                            <div className="absolute -top-32 -left-32 w-64 h-64 bg-primary-green/20 blur-[80px] rounded-full pointer-events-none" />
+                            <div className="absolute -bottom-32 -right-32 w-80 h-80 bg-accent-gold/20 blur-[80px] rounded-full pointer-events-none" />
+
                             {/* Mobile Header */}
-                            <div className="flex items-center justify-between p-6 border-b border-surface-light">
-                                <span className="font-bold text-lg text-primary-dark flex items-center gap-2">
+                            <div className="flex items-center justify-between p-6 relative z-10">
+                                <Link 
+                                    href="/"
+                                    onClick={() => setIsOpen(false)}
+                                    className="font-black text-xl text-primary-dark flex items-center gap-2 drop-shadow-sm"
+                                >
                                     {logoUrl ? (
-                                        <img src={logoUrl} alt="Logo" className="w-6 h-6 object-contain" />
+                                        <img src={logoUrl} alt="Logo" className="w-8 h-8 object-contain drop-shadow-sm" />
                                     ) : (
-                                        <Leaf className="w-5 h-5 text-primary-green" />
+                                        <div className="w-10 h-10 bg-white shadow-xl rounded-xl flex items-center justify-center border border-white/50">
+                                            <Leaf className="w-6 h-6 text-primary-green" />
+                                        </div>
                                     )}
-                                    {t.nav.brand}
-                                </span>
+                                    <span className="bg-gradient-to-r from-primary-dark to-primary-green bg-clip-text text-transparent">
+                                        {t.nav.brand}
+                                    </span>
+                                </Link>
                                 <button
                                     onClick={() => setIsOpen(false)}
-                                    className="p-2 rounded-full bg-surface-soft text-text-dark hover:bg-surface-light transition-colors"
+                                    className="p-3 rounded-full bg-white text-gray-500 hover:text-red-500 hover:bg-red-50 transition-all shadow-md active:scale-95"
                                 >
-                                    <X className="w-5 h-5" />
+                                    <X className="w-6 h-6" strokeWidth={2.5} />
                                 </button>
                             </div>
 
-                            {/* Mobile Links */}
-                            <div className="flex-1 overflow-y-auto p-6">
-                                <ul className="flex flex-col gap-2">
-                                    {navLinks.map((link) => (
-                                        <li key={link.id}>
+                            {/* Staggered Mobile Links */}
+                            <div className="flex-1 overflow-y-auto px-6 py-4 relative z-10 custom-scrollbar">
+                                <ul className="flex flex-col gap-3">
+                                    {navLinks.map((link, idx) => (
+                                        <motion.li 
+                                            key={link.id}
+                                            initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.1 + idx * 0.05 }}
+                                        >
                                             {link.subLinks ? (
-                                                <div className="p-2 space-y-1">
-                                                    <div className={cn("block px-4 py-2 rounded-xl text-lg font-bold text-primary-dark cursor-pointer")}>
+                                                <div className="p-1 mb-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                                                    <div className="px-5 py-4 text-[17px] font-black text-primary-dark border-b border-gray-50 bg-gray-50/50">
                                                         {link.label}
                                                     </div>
-                                                    <div className="pl-6 space-y-2 border-l-2 border-surface-light ml-4">
+                                                    <div className="p-2 space-y-1">
                                                         {link.subLinks.map((sub, i) => (
-                                                            <Link key={i} href={sub.href} className="block py-2 text-text-dark font-medium hover:text-primary-green transition-colors">
+                                                            <Link 
+                                                                key={i} 
+                                                                href={sub.href} 
+                                                                onClick={() => setIsOpen(false)}
+                                                                className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 font-bold hover:bg-green-50 hover:text-green-700 transition-colors"
+                                                            >
+                                                                <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+                                                                    <sub.icon className="w-4 h-4 text-green-700" />
+                                                                </div>
                                                                 {sub.label}
                                                             </Link>
                                                         ))}
@@ -314,32 +339,43 @@ export const Navbar = () => {
                                             ) : (
                                                 <Link
                                                     href={link.href}
+                                                    onClick={() => setIsOpen(false)}
                                                     className={cn(
-                                                        "block p-4 rounded-xl text-lg transition-colors border border-transparent",
+                                                        "block px-5 py-4 rounded-2xl text-[17px] transition-all shadow-sm border",
                                                         isActive(link.href)
-                                                            ? "bg-primary-green/5 text-primary-green border-primary-green/10 font-bold"
-                                                            : "text-primary-dark hover:bg-surface-soft hover:border-surface-light font-medium"
+                                                            ? "bg-gradient-to-r from-primary-green to-[#3a4d23] text-white border-transparent font-black shadow-lg shadow-green-900/20"
+                                                            : "bg-white text-gray-700 hover:bg-green-50 hover:text-green-800 border-gray-100 font-black"
                                                     )}
                                                 >
                                                     {link.label}
                                                 </Link>
                                             )}
-                                        </li>
+                                        </motion.li>
                                     ))}
                                 </ul>
                             </div>
 
                             {/* Mobile Footer */}
-                            <div className="p-5 border-t border-surface-light bg-surface-soft mt-auto space-y-3 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
-                                <LanguageSwitcher currentLocale={locale} onChange={setLocale} />
-                                <Link
-                                    href="/contact"
-                                    className="flex items-center justify-center gap-2.5 w-full p-3.5 rounded-xl bg-green-700 text-white font-bold hover:bg-green-800 transition-colors shadow-md active:scale-[0.97] text-base"
-                                >
-                                    <span>{t.nav.getQuote}</span>
-                                    <ArrowLeft className={cn("w-5 h-5 transition-transform", isRTL ? "" : "rotate-180")} strokeWidth={2.5} />
-                                </Link>
-                            </div>
+                            <motion.div 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4 }}
+                                className="p-6 bg-white/60 backdrop-blur-md border-t border-surface-light mt-auto relative z-10 pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
+                            >
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex items-center justify-center p-2 rounded-xl bg-white shadow-sm border border-gray-100">
+                                        <LanguageSwitcher currentLocale={locale} onChange={setLocale} />
+                                    </div>
+                                    <Link
+                                        href="/contact"
+                                        onClick={() => setIsOpen(false)}
+                                        className="flex items-center justify-center gap-3 w-full p-4 rounded-xl bg-accent-gold text-[#283618] font-black hover:bg-[#ebbb78] transition-all shadow-lg shadow-accent-gold/30 active:scale-[0.98] text-lg border border-accent-light"
+                                    >
+                                        <span>{t.nav.getQuote}</span>
+                                        <ArrowLeft className={cn("w-5 h-5 transition-transform", isRTL ? "" : "rotate-180")} strokeWidth={3} />
+                                    </Link>
+                                </div>
+                            </motion.div>
                         </motion.div>
                     </>
                 )}
