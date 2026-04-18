@@ -512,29 +512,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             ],
         },
 
-        // ── 13. Timeline (مسار الإنتاج) ──
-        {
-            id: "timeline",
-            title: "مسار الإنتاج (Timeline)",
-            emoji: "🔄",
-            description: "خطوات رحلة المنتج من الطبيعة إلى المائدة",
-            fields: [
-                { key: "badge", labelAr: "شارة القسم", labelEn: "Badge", type: "text", bilingual: true, placeholder: "مراحل الإنتاج" },
-                { key: "title", labelAr: "العنوان", labelEn: "Title", type: "text", bilingual: true },
-                { key: "subtitle", labelAr: "الوصف", labelEn: "Subtitle", type: "textarea", bilingual: true },
-                {
-                    key: "steps",
-                    labelAr: "مرحلة",
-                    labelEn: "Step",
-                    type: "list",
-                    bilingual: false,
-                    listFields: [
-                        { key: "title", labelAr: "اسم المرحلة", labelEn: "Step Title", type: "text", bilingual: true, placeholder: "استلام وتجهيز البذور" },
-                        { key: "description", labelAr: "الوصف", labelEn: "Description", type: "textarea", bilingual: true },
-                    ],
-                },
-            ],
-        },
+
 
         // ── 14. FAQ (الأسئلة الشائعة) ──
         {

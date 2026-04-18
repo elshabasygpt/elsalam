@@ -7,7 +7,6 @@ import { StatsCounter } from "@/components/organisms/StatsCounter";
 import { WhyChooseUs } from "@/components/organisms/WhyChooseUs";
 import { PackagingGuide } from "@/components/organisms/PackagingGuide";
 import { CertificationsBanner } from "@/components/organisms/CertificationsBanner";
-import { TimelineSection } from "@/components/organisms/TimelineSection";
 import { ClientLogos } from "@/components/organisms/ClientLogos";
 import { CTAPartnership } from "@/components/organisms/CTAPartnership";
 import { Footer } from "@/components/organisms/Footer";
@@ -64,7 +63,6 @@ export function HomePageClient({ cmsContent: initialContent }: HomePageClientPro
                 <PackagingGuide />
                 <CertificationsBanner />
                 <Testimonials />
-                <TimelineSection />
                 <FAQ />
                 <CTAPartnership />
                 <ClientLogos />
