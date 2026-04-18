@@ -96,7 +96,7 @@ export const Navbar = () => {
             <Container className="max-w-7xl">
                 <div
                     className={cn(
-                        "flex items-center justify-between h-14 sm:h-16 md:h-20 px-4 sm:px-6 rounded-2xl transition-all duration-500 relative",
+                        "flex items-center justify-between min-h-[3.5rem] sm:min-h-[4rem] md:h-20 px-4 sm:px-6 py-2 md:py-0 rounded-2xl transition-all duration-500 relative",
                         isSolid
                             ? "bg-white shadow-lg border border-gray-200"
                             : "bg-black/20 backdrop-blur-md border border-white/20 shadow-md"
@@ -122,7 +122,7 @@ export const Navbar = () => {
                                 {t.nav.brand}
                             </Typography>
                             <span className={cn(
-                                "text-[9px] sm:text-[10px] font-bold mt-1 tracking-wide opacity-90 hidden sm:block",
+                                "text-[10px] leading-tight font-bold mt-1 tracking-wide opacity-90 block",
                                 isSolid ? "text-primary-green" : "text-white/90"
                             )}>
                                 {isRTL ? "لعصر وإستخلاص الزيوت النباتية" : "For Extracting Vegetable Oils"}
@@ -131,7 +131,7 @@ export const Navbar = () => {
                     </Link>
 
                     {/* Center Desktop Navigation */}
-                    <nav className="hidden lg:flex items-center justify-center flex-1 mx-1 xl:mx-4 h-full">
+                    <nav className="hidden xl:flex items-center justify-center flex-1 mx-1 xl:mx-4 h-full">
                         <ul className="flex items-center gap-0.5 xl:gap-1">
                             {navLinks.map((link) => (
                                 <li
@@ -228,7 +228,7 @@ export const Navbar = () => {
                     </nav>
 
                     {/* Right Call-to-Action & Utils */}
-                    <div className="hidden lg:flex items-center gap-2 xl:gap-4 shrink-0 relative z-50">
+                    <div className="hidden xl:flex items-center gap-2 xl:gap-4 shrink-0 relative z-50">
                         <div className={cn(
                             "flex items-center pl-2 xl:pl-4 border-l transition-colors duration-300",
                             isSolid ? "border-surface-light text-text-dark" : "border-white/20 text-white"
@@ -249,11 +249,11 @@ export const Navbar = () => {
                         </Link>
                     </div>
 
-                    {/* Mobile Toggle — visible on all mobile and tablet sizes */}
+                    {/* Mobile Toggle — visible on all mobile and tablet sizes up to xl */}
                     {!isOpen && (
                         <button
                             className={cn(
-                                "flex lg:hidden p-2 rounded-lg transition-colors relative z-50",
+                                "flex xl:hidden p-2 rounded-lg transition-colors relative z-50",
                                 isSolid ? "text-primary-dark hover:bg-surface-soft" : "text-white bg-white/10 backdrop-blur-sm hover:bg-white/20"
                             )}
                             onClick={() => setIsOpen(true)}
@@ -285,7 +285,7 @@ export const Navbar = () => {
                             exit={{ x: isRTL ? "100%" : "-100%", opacity: 0 }}
                             transition={{ type: "spring", damping: 28, stiffness: 200 }}
                             className={cn(
-                                "fixed top-0 h-full w-[85vw] max-w-sm bg-surface-soft shadow-[0_0_80px_rgba(40,54,24,0.3)] z-[100] lg:hidden flex flex-col",
+                                "fixed top-0 h-full w-[85vw] max-w-sm bg-surface-soft shadow-[0_0_80px_rgba(40,54,24,0.3)] z-[100] xl:hidden flex flex-col",
                                 isRTL ? "right-0 rounded-l-[3rem]" : "left-0 rounded-r-[3rem]"
                             )}
                         >
