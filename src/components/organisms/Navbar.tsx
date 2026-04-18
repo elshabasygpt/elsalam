@@ -151,10 +151,13 @@ export const Navbar = () => {
                                     >
                                         {link.label}
                                         {(link.hasMegaDropdown || link.hasSimpleDropdown) && (
-                                            <ChevronDown className={cn(
-                                                "w-4 h-4 transition-transform duration-300",
-                                                activeDropdown === link.id ? "rotate-180" : ""
-                                            )} />
+                                            <ChevronDown 
+                                                className={cn(
+                                                    "w-[18px] h-[18px] transition-transform duration-300",
+                                                    activeDropdown === link.id ? "rotate-180" : ""
+                                                )} 
+                                                strokeWidth={2.5}
+                                            />
                                         )}
                                     </Link>
 
