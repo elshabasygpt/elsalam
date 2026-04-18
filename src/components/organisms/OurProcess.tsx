@@ -6,6 +6,7 @@ import { ScrollReveal } from "@/components/atoms/ScrollReveal";
 import { useLanguage } from "@/lib/i18n-context";
 import { Leaf, Droplets, ShieldCheck, PackageCheck } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { usePageContent } from "@/lib/page-content-context";
 
 const PROCESS_STEPS = [
     {
@@ -48,6 +49,7 @@ const PROCESS_STEPS = [
 
 export const OurProcess = () => {
     const { locale, isRTL } = useLanguage();
+    const cmsSect = usePageContent("ourProcess");
     const containerRef = useRef<HTMLDivElement>(null);
 
     const { scrollYProgress } = useScroll({
@@ -56,6 +58,22 @@ export const OurProcess = () => {
     });
 
     const progressHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+
+    const badge = locale === 'en' ? (cmsSect?.badge_en || 'Our Process') : (cmsSect?.badge_ar || 'آلية الإنتاج والجودة');
+    const title = locale === 'en' ? (cmsSect?.title_en || 'From Seed to Shelf') : (cmsSect?.title_ar || 'من البذرة إلى المائدة.. رحلة الجودة');
+    const subtitle = locale === 'en' 
+        ? (cmsSect?.subtitle_en || 'We operate one of the most technologically advanced automated facilities in the region, ensuring every drop meets global benchmarks.')
+        : (cmsSect?.subtitle_ar || 'نميز أنفسنا بتشغيل أحد أكثر المنشآت تطوراً وأتمتة في المنطقة، لنضمن أن كل قطرة مطابقة للمعايير العالمية.');
+
+    const steps = (cmsSect?.steps && Array.isArray(cmsSect.steps) && cmsSect.steps.length > 0)
+        ? cmsSect.steps
+        : PROCESS_STEPS.map(p => ({
+            title_en: p.titleEn, title_ar: p.titleAr,
+            description_en: p.descEn, description_ar: p.descAr,
+            image: p.image,
+            icon: p.icon,
+            grad: p.grad
+        }));
 
     return (
         <section className="py-24 bg-surface-soft relative overflow-hidden text-text-dark" ref={containerRef}>
@@ -66,15 +84,13 @@ export const OurProcess = () => {
                 <ScrollReveal>
                     <div className="text-center max-w-3xl mx-auto mb-20">
                         <span className="inline-block py-1.5 px-4 rounded-full bg-primary-green/10 text-primary-green text-sm font-bold mb-6 border border-primary-green/20">
-                            {locale === 'en' ? 'Our Process' : 'آلية الإنتاج والجودة'}
+                            {badge}
                         </span>
                         <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">
-                            {locale === 'en' ? 'From Seed to Shelf' : 'من البذرة إلى المائدة.. رحلة الجودة'}
+                            {title}
                         </h2>
                         <p className="text-lg text-text-dark/70">
-                            {locale === 'en'
-                                ? 'We operate one of the most technologically advanced automated facilities in the region, ensuring every drop meets global benchmarks.'
-                                : 'نميز أنفسنا بتشغيل أحد أكثر المنشآت تطوراً وأتمتة في المنطقة، لنضمن أن كل قطرة مطابقة للمعايير العالمية.'}
+                            {subtitle}
                         </p>
                     </div>
                 </ScrollReveal>
@@ -89,9 +105,11 @@ export const OurProcess = () => {
                     </div>
 
                     <div className="space-y-16 md:space-y-24">
-                        {PROCESS_STEPS.map((step, index) => {
+                        {steps.map((step: any, index: number) => {
                             const isEven = index % 2 === 0;
-                            const Icon = step.icon;
+                            // Fallback icons mapped by index if the dynamic array steps > what we hardcoded
+                            const Icon = step.icon || PROCESS_STEPS[index % PROCESS_STEPS.length].icon;
+                            const grad = step.grad || PROCESS_STEPS[index % PROCESS_STEPS.length].grad;
 
                             return (
                                 <div key={index} className="relative flex flex-col md:flex-row items-center gap-8 md:gap-0">
@@ -107,11 +125,11 @@ export const OurProcess = () => {
                                             <div className="relative group rounded-3xl overflow-hidden shadow-2xl aspect-[4/3]">
                                                 <div className="absolute inset-0 bg-primary-dark/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
                                                 <img
-                                                    src={step.image}
-                                                    alt={locale === 'en' ? step.titleEn : step.titleAr}
-                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                                    src={step.image || "/images/placeholder.svg"}
+                                                    alt={locale === 'en' ? step.title_en : step.title_ar}
+                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 bg-slate-100"
                                                 />
-                                                <div className={`absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t ${step.grad} opacity-60 mix-blend-multiply z-20`} />
+                                                <div className={`absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t ${grad} opacity-60 mix-blend-multiply z-20`} />
                                                 <div className="absolute bottom-6 left-6 z-30">
                                                     <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/30">
                                                         <Icon strokeWidth={1.5} className="w-7 h-7" />
@@ -127,10 +145,10 @@ export const OurProcess = () => {
                                             <div className="text-start">
                                                 <span className="text-6xl font-black text-surface-light opacity-50 block mb-2 font-english">0{index + 1}</span>
                                                 <h3 className="text-2xl md:text-3xl font-bold text-primary-dark mb-4 drop-shadow-sm">
-                                                    {locale === 'en' ? step.titleEn : step.titleAr}
+                                                    {locale === 'en' ? step.title_en : step.title_ar}
                                                 </h3>
-                                                <p className="text-text-dark/70 leading-relaxed text-lg">
-                                                    {locale === 'en' ? step.descEn : step.descAr}
+                                                <p className="text-text-dark/70 leading-relaxed text-lg whitespace-pre-line">
+                                                    {locale === 'en' ? step.description_en : step.description_ar}
                                                 </p>
                                             </div>
                                         </ScrollReveal>
