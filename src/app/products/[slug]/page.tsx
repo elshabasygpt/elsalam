@@ -19,7 +19,8 @@ import { getProductDetail, type ProductDetail } from "@/lib/products-api";
 import {
     Check, Package, Globe, ShieldCheck,
     Droplets, CakeSlice, Flame, Loader2,
-    FileText, ArrowLeft, ArrowRight, Sparkles, Settings, ShoppingBag, ShoppingCart, CreditCard
+    FileText, ArrowLeft, ArrowRight, Sparkles, Settings, ShoppingBag, ShoppingCart, CreditCard,
+    Lock, Truck, Handshake
 } from "lucide-react";
 import { useCartStore } from "@/lib/store/useCartStore";
 import { cn } from "@/utils/classnames";
@@ -50,6 +51,7 @@ export default function ProductDetailPage() {
     const [activeImage, setActiveImage] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [activeTab, setActiveTab] = useState("description");
     
     const router = useRouter();
     const { addItem, setIsOpen: setCartOpen } = useCartStore();
@@ -120,190 +122,25 @@ export default function ProductDetailPage() {
     const promoBadge = activePromo ? (locale === "ar" ? activePromo.badge_ar : activePromo.badge_en) : null;
 
     return (
-        <main className={`min-h-screen bg-surface-soft ${isRTL ? "font-arabic" : ""}`} dir={isRTL ? "rtl" : "ltr"}>
+        <main className={`min-h-screen bg-slate-50 ${isRTL ? "font-arabic" : ""}`} dir={isRTL ? "rtl" : "ltr"}>
             <Navbar />
 
-            {/* ─── Premium B2B Product Hero ─── */}
-            <section className={`relative pt-40 sm:pt-44 pb-24 lg:pt-48 lg:pb-32 bg-gradient-to-br ${product.gradient_from || "from-green-700"} ${product.gradient_to || "to-green-950"} overflow-x-hidden overflow-y-visible`}>
-
-                {/* Dynamic Glow Backgrounds */}
-                <div className="absolute inset-0 opacity-40 mix-blend-screen pointer-events-none">
-                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/20 blur-[120px] rounded-full" />
-                    <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-white/10 blur-[150px] rounded-full" />
-                </div>
-
-                {/* Curved bottom edge */}
-                <div className="absolute bottom-0 left-0 right-0 h-16 bg-surface-soft" style={{ clipPath: "ellipse(100% 100% at 50% 100%)" }} />
-
-                <Container className="relative z-10">
-                    <ScrollReveal>
-                        <Breadcrumbs items={[
-                            { label: locale === "ar" ? "الرئيسية" : "Home", href: "/" },
-                            { label: locale === "ar" ? "منتجاتنا" : "Products", href: "/products" },
-                            { label: title },
-                        ]} variant="light" className="mb-2" />
-                    </ScrollReveal>
-
-                    <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-                        {/* Text Content */}
-                        <ScrollReveal>
-                            <div className={`text-center ${isRTL ? "lg:text-right" : "lg:text-left"}`}>
-                                <div className="flex flex-wrap items-center gap-3 mb-6 justify-center lg:justify-start">
-                                    <span className="px-4 py-1.5 bg-white/20 backdrop-blur-md text-white border border-white/20 text-sm font-bold rounded-full">{categoryName}</span>
-                                    {product.is_exportable && (
-                                        <span className="px-4 py-1.5 bg-green-400/20 backdrop-blur-md border border-green-400/30 text-green-100 text-sm font-bold rounded-full flex items-center gap-1.5 shadow-[0_0_15px_rgba(74,222,128,0.2)]">
-                                            <Globe className="w-5 h-5" />
-                                            {locale === "ar" ? "متاح للتصدير" : "Available for Export"}
-                                        </span>
-                                    )}
-                                    {promoBadge && (
-                                        <span className="px-4 py-1.5 bg-red-500/90 text-white text-sm font-bold rounded-full flex items-center gap-1 animate-pulse shadow-lg shadow-red-500/30">
-                                            <Sparkles className="w-5 h-5" />
-                                            {promoBadge}
-                                        </span>
-                                    )}
-                                </div>
-
-                                <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white mb-6 drop-shadow-xl leading-snug">{title}</h1>
-                                <p className="text-white/70 text-sm md:text-base font-bold tracking-[0.2em] uppercase font-english mb-8">{subtitle}</p>
-                                <p className="text-white/90 text-lg md:text-xl max-w-2xl leading-relaxed mb-10">{description}</p>
-
-                                {/* Price block with CTA */}
-                                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 justify-center lg:justify-start p-5 sm:p-6 rounded-3xl bg-black/10 backdrop-blur-md border border-white/10 shadow-2xl w-full sm:w-auto mt-6">
-                                    <div className="w-full sm:w-auto flex justify-center sm:block">
-                                        <PriceTag
-                                            price={product.price || (product.packagings?.length > 0 ? product.packagings[0].price : null)}
-                                            originalPrice={activePromo?.original_price}
-                                            promoPrice={activePromo?.promo_price}
-                                            unitAr={product.price_unit_ar || undefined}
-                                            unitEn={product.price_unit_en || undefined}
-                                            size="lg"
-                                            className="text-white drop-shadow-md align-middle [&_span]:text-white [&_span]:!text-white/70"
-                                        />
-                                    </div>
-                                    <div className="w-full h-px sm:w-px sm:h-16 bg-white/20"></div>
-                                    
-                                    <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-3">
-                                        <button
-                                            onClick={() => {
-                                                const finalPrice = activePromo?.promo_price || product.price || (product.packagings?.length > 0 ? product.packagings[0].price : 0) || 0;
-                                                addItem({
-                                                    id: product.id.toString(),
-                                                    productId: product.id,
-                                                    name_ar: product.name_ar,
-                                                    name_en: product.name_en,
-                                                    price: finalPrice,
-                                                    quantity: 1,
-                                                    image: product.featured_image || "/images/placeholder.svg",
-                                                    slug: product.slug
-                                                });
-                                                setCartOpen(true);
-                                            }}
-                                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 sm:py-4 bg-green-500 text-white font-black rounded-2xl hover:scale-105 hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:bg-green-400 transition-all text-sm sm:text-base"
-                                        >
-                                            <ShoppingCart className="w-5 h-5 shrink-0" />
-                                            {locale === "ar" ? "أضف للسلة" : "Add to Cart"}
-                                        </button>
-                                        
-                                        <button
-                                            onClick={() => {
-                                                const finalPrice = activePromo?.promo_price || product.price || (product.packagings?.length > 0 ? product.packagings[0].price : 0) || 0;
-                                                addItem({
-                                                    id: product.id.toString(),
-                                                    productId: product.id,
-                                                    name_ar: product.name_ar,
-                                                    name_en: product.name_en,
-                                                    price: finalPrice,
-                                                    quantity: 1,
-                                                    image: product.featured_image || "/images/placeholder.svg",
-                                                    slug: product.slug
-                                                });
-                                                router.push("/checkout");
-                                            }}
-                                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 sm:py-4 bg-yellow-500 text-slate-900 font-black rounded-2xl hover:scale-105 hover:shadow-[0_0_20px_rgba(234,179,8,0.4)] hover:bg-yellow-400 transition-all text-sm sm:text-base"
-                                        >
-                                            <CreditCard className="w-5 h-5 shrink-0" />
-                                            {locale === "ar" ? "شراء مباشر" : "Buy Now"}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </ScrollReveal>
-
-                        {/* 3D Floating Product Image & Badges */}
-                        <ScrollReveal delay={0.2} className="relative flex flex-col justify-center lg:justify-end items-center min-h-[400px] lg:min-h-[550px] mt-10 lg:mt-16">
-                            {/* Floating image wrapper */}
-                            <motion.div
-                                className="relative z-20 w-full max-w-[320px] lg:max-w-[400px] aspect-[3/4]"
-                                animate={{ y: [-15, 15, -15] }}
-                                transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-                            >
-                                <img
-                                    src={activeImage || product.featured_image || "/images/placeholder.svg"}
-                                    alt={title}
-                                    className="w-full h-full object-contain filter drop-shadow-[0_30px_50px_rgba(0,0,0,0.5)] hover:scale-[1.03] transition-transform duration-500 cursor-crosshair"
-                                />
-                                {/* Bottom shadow reflection */}
-                                <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-3/4 h-10 bg-black/50 blur-2xl rounded-full" />
-                            </motion.div>
-
-                            {/* Image Thumbnails */}
-                            {(product.images && product.images.length > 0) && (
-                                <div className="relative mt-8 flex justify-center flex-wrap items-center gap-4 w-full px-4 shrink-0">
-                                    <div
-                                        role="button"
-                                        onClick={() => setActiveImage(product.featured_image || "/images/placeholder.svg")}
-                                        className={cn("relative flex items-center justify-center overflow-hidden w-[70px] h-[70px] sm:w-[85px] sm:h-[85px] rounded-xl bg-white border-2 transition-all cursor-pointer p-1.5 shrink-0 shadow-sm", (!activeImage || activeImage === product.featured_image) ? "border-green-600 shadow-md scale-105" : "border-gray-200/60 hover:border-green-400 opacity-80 hover:opacity-100")}
-                                    >
-                                        <img src={product.featured_image || "/images/placeholder.svg"} className="max-w-full max-h-full object-contain mix-blend-multiply" alt="Main" />
-                                    </div>
-                                    {product.images.map((img, i) => (
-                                        <div
-                                            role="button"
-                                            key={i}
-                                            onClick={() => setActiveImage(img.url)}
-                                            className={cn("relative flex items-center justify-center overflow-hidden w-[70px] h-[70px] sm:w-[85px] sm:h-[85px] rounded-xl bg-white border-2 transition-all cursor-pointer p-1.5 shrink-0 shadow-sm", activeImage === img.url ? "border-green-600 shadow-md scale-105" : "border-gray-200/60 hover:border-green-400 opacity-80 hover:opacity-100")}
-                                        >
-                                            <img src={img.url} className="max-w-full max-h-full object-contain mix-blend-multiply" alt={`Gallery ${i}`} />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Floating Badges */}
-                            <motion.div
-                                animate={{ y: [0, -15, 0] }}
-                                transition={{ repeat: Infinity, duration: 5, delay: 1, ease: "easeInOut" }}
-                                className={`absolute top-5 sm:top-10 ${isRTL ? 'right-2 sm:right-10' : 'left-2 sm:left-10'} z-30 bg-white/10 backdrop-blur-xl border border-white/20 p-2 sm:p-4 rounded-2xl sm:rounded-3xl shadow-2xl flex items-center gap-2 sm:gap-4`}
-                            >
-                                <ShieldCheck className="w-7 h-7 sm:w-10 sm:h-10 text-yellow-300 drop-shadow-md shrink-0" />
-                                <div className="text-start">
-                                    <p className="text-white font-black text-xs sm:text-sm lg:text-base leading-tight">ISO 22000</p>
-                                    <p className="text-white/80 text-[10px] sm:text-xs font-medium">Certified Facility</p>
-                                </div>
-                            </motion.div>
-
-                            <motion.div
-                                animate={{ y: [0, 15, 0] }}
-                                transition={{ repeat: Infinity, duration: 7, delay: 0.5, ease: "easeInOut" }}
-                                className={`absolute bottom-5 sm:bottom-20 ${isRTL ? 'left-2 sm:left-10' : 'right-2 sm:right-10'} z-30 bg-white/10 backdrop-blur-xl border border-white/20 p-2 sm:p-4 rounded-2xl sm:rounded-3xl shadow-2xl flex items-center gap-2 sm:gap-4`}
-                            >
-                                <Sparkles className="w-7 h-7 sm:w-10 sm:h-10 text-green-300 drop-shadow-md shrink-0" />
-                                <div className="text-start">
-                                    <p className="text-white font-black text-xs sm:text-sm lg:text-base leading-tight whitespace-nowrap">100%</p>
-                                    <p className="text-white/80 text-[10px] sm:text-xs font-medium whitespace-nowrap">{locale === 'ar' ? 'نقي وطبيعي' : 'Pure & Natural'}</p>
-                                </div>
-                            </motion.div>
-                        </ScrollReveal>
-                    </div>
+            {/* Flat Header Background spacing + Breadcrumbs */}
+            <div className="bg-white border-b border-gray-100 pt-32 pb-6">
+                <Container>
+                    <Breadcrumbs items={[
+                        { label: locale === "ar" ? "الرئيسية" : "Home", href: "/" },
+                        { label: locale === "ar" ? "منتجاتنا" : "Products", href: "/products" },
+                        { label: title },
+                    ]} variant="dark" />
                 </Container>
-            </section>
+            </div>
 
-            {/* Active Promotion Banner */}
-            {activePromo && (
-                <section className="-mt-6 relative z-10">
-                    <Container className="max-w-4xl">
-                        <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
+            <section className="py-8 lg:py-12 relative z-10">
+                <Container>
+                    {/* Active Promotion Banner */}
+                    {activePromo && (
+                        <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-5 mb-8 flex flex-col md:flex-row items-center justify-between gap-4 shadow-md border border-red-500">
                             <div className="flex items-center gap-3 text-white">
                                 <Sparkles className="w-6 h-6 text-yellow-300" />
                                 <div>
@@ -314,192 +151,323 @@ export default function ProductDetailPage() {
                             </div>
                             <CountdownTimer endDate={activePromo.ends_at} />
                         </div>
-                    </Container>
-                </section>
-            )}
+                    )}
 
-            {/* Content Grid */}
-            <section className="py-16">
-                <Container>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Main Content */}
-                        <div className="lg:col-span-2 space-y-8">
-                            {/* About */}
-                            {longDesc && (
-                                <ScrollReveal>
-                                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                                        <h2 className="text-xl font-black text-gray-900 mb-4">
-                                            {locale === "ar" ? "عن المنتج" : "About Product"}
-                                        </h2>
-                                        <p className="text-gray-600 leading-relaxed text-base">{longDesc}</p>
+                    {/* Upper Product Purchase Fold (Dense Split Layout) */}
+                    <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden mb-12 flex flex-col lg:flex-row">
+                        {/* —— LEFT COLUMN: Sticky Image Gallery —— */}
+                        <div className="w-full lg:w-[45%] xl:w-[40%] bg-slate-50/60 p-6 sm:p-10 border-b lg:border-b-0 lg:border-l border-gray-200 flex flex-col items-center relative overflow-hidden">
+                            {/* Decorative soft glow */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white rounded-full blur-[60px] pointer-events-none" />
+                            
+                            <motion.div
+                                className="relative z-20 w-full max-w-[320px] aspect-square flex items-center justify-center mt-4 sm:mt-8"
+                                animate={{ y: [-8, 8, -8] }}
+                                transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+                            >
+                                <img
+                                    src={activeImage || product.featured_image || "/images/placeholder.svg"}
+                                    alt={title}
+                                    className="w-full h-full object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.15)] mix-blend-multiply cursor-crosshair"
+                                />
+                                
+                                {/* Inner Floating Box Badges */}
+                                <div className={`absolute top-0 ${isRTL ? '-right-4' : '-left-4'} bg-white shadow-lg p-2.5 rounded-2xl flex flex-col items-center gap-1 border border-gray-100 scale-90 sm:scale-100 z-30`}>
+                                    <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7 text-green-600" />
+                                    <span className="text-[10px] font-black uppercase text-gray-800 leading-tight text-center">ISO<br/>22000</span>
+                                </div>
+                                <div className={`absolute bottom-4 ${isRTL ? '-left-6' : '-right-6'} bg-white shadow-lg px-3 py-2 rounded-xl flex items-center justify-center gap-2 border border-gray-100 scale-90 sm:scale-100 z-30`}>
+                                    <Sparkles className="w-5 h-5 text-yellow-500 shrink-0" />
+                                    <span className="text-xs font-black text-gray-800 leading-none">100%<br/><span className="text-[9px] text-gray-500 font-medium">{locale === "ar" ? "طبيعي ونقي" : "Pure & Natural"}</span></span>
+                                </div>
+                            </motion.div>
+
+                            {/* Image Thumbnails Gallery */}
+                            {(product.images && product.images.length > 0) && (
+                                <div className="relative z-20 mt-10 md:mt-16 mb-4 flex justify-center flex-wrap items-center gap-2 sm:gap-3 w-full shrink-0">
+                                    <div
+                                        role="button"
+                                        onClick={() => setActiveImage(product.featured_image || "/images/placeholder.svg")}
+                                        className={cn("w-[65px] h-[65px] sm:w-[75px] sm:h-[75px] rounded-xl bg-white border-2 transition-all cursor-pointer p-1 shrink-0 flex items-center justify-center shadow-sm", (!activeImage || activeImage === product.featured_image) ? "border-green-600 scale-105 shadow-md" : "border-gray-200 hover:border-green-400 opacity-80 hover:opacity-100")}
+                                    >
+                                        <img src={product.featured_image || "/images/placeholder.svg"} className="max-w-full max-h-full object-contain mix-blend-multiply" alt="Main" />
                                     </div>
-                                </ScrollReveal>
-                            )}
-
-                            {/* Features */}
-                            {features && features.length > 0 && (
-                                <ScrollReveal delay={0.1}>
-                                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                                        <h2 className="text-xl font-black text-gray-900 mb-6">
-                                            {locale === "ar" ? "المميزات" : "Features"}
-                                        </h2>
-                                        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                            {features.map((feature, i) => (
-                                                <StaggerItem key={i}>
-                                                    <div className="flex items-center gap-3 p-3 bg-green-50/50 rounded-xl border border-green-100/50">
-                                                        <Check className="w-5 h-5 text-green-600 shrink-0" />
-                                                        <span className="text-gray-700 text-sm font-medium">{feature}</span>
-                                                    </div>
-                                                </StaggerItem>
-                                            ))}
-                                        </StaggerContainer>
-                                    </div>
-                                </ScrollReveal>
-                            )}
-
-                            {/* Specs Table */}
-                            {product.specs && product.specs.length > 0 && (
-                                <ScrollReveal delay={0.2}>
-                                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                                        <h2 className="text-xl font-black text-gray-900 mb-6">
-                                            {locale === "ar" ? "المواصفات الفنية" : "Technical Specifications"}
-                                        </h2>
-                                        <div className="overflow-hidden rounded-xl border border-gray-100">
-                                            <table className="w-full">
-                                                <tbody>
-                                                    {product.specs.map((spec, i) => (
-                                                        <tr key={i} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
-                                                            <td className="px-5 py-4 text-sm font-bold text-gray-900 w-1/3">
-                                                                {locale === "ar" ? spec.label_ar : spec.label_en}
-                                                            </td>
-                                                            <td className="px-5 py-4 text-sm text-gray-600">
-                                                                {locale === "ar" ? spec.value_ar : spec.value_en}
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
+                                    {product.images.map((img, i) => (
+                                        <div
+                                            role="button"
+                                            key={i}
+                                            onClick={() => setActiveImage(img.url)}
+                                            className={cn("w-[65px] h-[65px] sm:w-[75px] sm:h-[75px] rounded-xl bg-white border-2 transition-all cursor-pointer p-1 shrink-0 flex items-center justify-center shadow-sm", activeImage === img.url ? "border-green-600 scale-105 shadow-md" : "border-gray-200 hover:border-green-400 opacity-80 hover:opacity-100")}
+                                        >
+                                            <img src={img.url} className="max-w-full max-h-full object-contain mix-blend-multiply" alt={`Gallery ${i}`} />
                                         </div>
-                                    </div>
-                                </ScrollReveal>
+                                    ))}
+                                </div>
                             )}
                         </div>
 
-                        {/* Sidebar */}
-                        <div className="space-y-6">
-                            {/* Technical Specs Table */}
-                            {product.technical_specs && product.technical_specs.length > 0 && (
-                                <ScrollReveal delay={0.2}>
-                                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                                        <h2 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
-                                            <Settings className="w-5 h-5 text-green-600" />
-                                            {locale === "ar" ? "المواصفات الفنية التفصيلية" : "Detailed Technical Specs"}
-                                        </h2>
-                                        <div className="overflow-hidden rounded-xl border border-gray-100">
-                                            <table className="w-full text-start" dir={isRTL ? "rtl" : "ltr"}>
-                                                <thead className="bg-gray-50 text-xs uppercase text-gray-500 font-bold border-b border-gray-100">
-                                                    <tr>
-                                                        <th className="px-5 py-3 text-start">{locale === "ar" ? "الخاصية" : "Property"}</th>
-                                                        <th className="px-5 py-3 text-start">{locale === "ar" ? "القيمة" : "Value"}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {product.technical_specs.map((spec, i) => (
-                                                        <tr key={i} className={`border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors ${i % 2 === 0 ? "bg-white" : "bg-gray-50/30"}`}>
-                                                            <td className={`px-5 py-4 text-sm font-bold text-gray-900 w-1/2 ${isRTL ? "border-l" : "border-r"} border-gray-50`}>
-                                                                {locale === "ar" ? spec.property_ar : spec.property_en}
-                                                            </td>
-                                                            <td className="px-5 py-4 text-sm text-gray-600 font-medium">
-                                                                {locale === "ar" ? spec.value_ar : spec.value_en}
-                                                                {spec.unit_ar && locale === "ar" && <span className="text-xs text-gray-400 mr-1">{spec.unit_ar}</span>}
-                                                                {spec.unit_en && locale === "en" && <span className="text-xs text-gray-400 ml-1">{spec.unit_en}</span>}
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </ScrollReveal>
+                        {/* —— RIGHT COLUMN: Product Information —— */}
+                        <div className="w-full lg:w-[55%] xl:w-[60%] p-6 sm:p-10 xl:p-12 text-start flex flex-col">
+                            <div className="flex flex-wrap items-center gap-2 mb-4">
+                                <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg">{categoryName}</span>
+                                {product.is_exportable && (
+                                    <span className="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-lg flex items-center gap-1.5 border border-green-200">
+                                        <Globe className="w-4 h-4" />
+                                        {locale === "ar" ? "متاح للتصدير" : "Export Available"}
+                                    </span>
+                                )}
+                            </div>
+
+                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-2 leading-tight drop-shadow-sm">{title}</h1>
+                            <p className="text-gray-400 text-sm md:text-base font-bold tracking-[0.2em] uppercase font-english mb-6">{subtitle}</p>
+
+                            <div className="mb-8">
+                                <PriceTag
+                                    price={product.price || (product.packagings?.length > 0 ? product.packagings[0].price : null)}
+                                    originalPrice={activePromo?.original_price}
+                                    promoPrice={activePromo?.promo_price}
+                                    unitAr={product.price_unit_ar || undefined}
+                                    unitEn={product.price_unit_en || undefined}
+                                    size="lg"
+                                    className="!text-green-700 font-black text-3xl sm:text-4xl"
+                                />
+                                <p className="text-xs font-bold text-gray-400 mt-2">{locale === "ar" ? "الأسعار شاملة ضريبة القيمة المضافة (VAT)" : "Prices are VAT inclusive"}</p>
+                            </div>
+
+                            <p className="text-gray-600 text-base md:text-lg leading-relaxed mb-6 block border-b border-gray-100 pb-6">{description}</p>
+                            
+                            {features && features.length > 0 && (
+                                <ul className="flex flex-col gap-3 mb-8">
+                                    {features.map((feature, i) => (
+                                        <li key={i} className="flex items-start gap-3">
+                                            <div className="w-6 h-6 rounded-full bg-green-100 border border-green-200 flex items-center justify-center shrink-0 mt-0.5">
+                                                <Check className="w-4 h-4 text-green-700" />
+                                            </div>
+                                            <span className="text-gray-800 font-medium text-sm sm:text-base leading-snug">{feature}</span>
+                                        </li>
+                                    ))}
+                                </ul>
                             )}
 
-                            {/* Packaging & Prices */}
-                            {product.packagings && product.packagings.length > 0 && (
-                                <ScrollReveal delay={0.1}>
-                                    <PackagingPriceTable packagings={product.packagings} />
-                                </ScrollReveal>
-                            )}
-
-                            {/* Certifications */}
-                            {certifications.length > 0 && (
-                                <ScrollReveal delay={0.2}>
-                                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                                        <div className="flex items-center gap-2 mb-5">
-                                            <ShieldCheck className="w-5 h-5 text-green-600" />
-                                            <h3 className="font-bold text-gray-900">
-                                                {locale === "ar" ? "شهادات الجودة" : "Quality Certifications"}
-                                            </h3>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {certifications.map((cert, i) => (
-                                                <span key={i} className="px-4 py-2 bg-green-50 text-green-700 text-sm font-bold rounded-xl border border-green-100">
-                                                    {cert}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </ScrollReveal>
-                            )}
-
-                            {/* PDF Datasheet */}
-                            {product.pdf_datasheet && (
-                                <ScrollReveal delay={0.25}>
-                                    <a
-                                        href={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"}/products/${product.slug}/pdf`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-3 bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:border-green-200 transition-colors group"
-                                    >
-                                        <FileText className="w-8 h-8 text-red-500 shrink-0" />
-                                        <div>
-                                            <h4 className="font-bold text-gray-900 group-hover:text-green-700 transition-colors">
-                                                {locale === "ar" ? "تنزيل البيانات الفنية (TDS)" : "Download TDS (PDF)"}
-                                            </h4>
-                                            <p className="text-xs text-gray-400">{locale === "ar" ? "اضغط للتحميل" : "Click to download"}</p>
-                                        </div>
-                                    </a>
-                                </ScrollReveal>
-                            )}
-
-                            {/* CTA */}
-                            <ScrollReveal delay={0.3}>
-                                <div className="bg-gradient-to-br from-green-700 to-green-900 rounded-2xl p-6 text-white text-center">
-                                    <h3 className="font-bold text-lg mb-2">
-                                        {locale === "ar" ? "مهتم بهذا المنتج؟" : "Interested in this product?"}
-                                    </h3>
-                                    <p className="text-white/70 text-sm mb-5">
-                                        {locale === "ar" ? "تواصل معنا للحصول على عرض سعر مخصص" : "Contact us for a custom price quote"}
-                                    </p>
+                            {/* Purchase CTA Box */}
+                            <div className="bg-slate-50/80 border border-slate-200 rounded-2xl p-5 sm:p-6 mt-auto shrink-0 shadow-inner">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                        <button
+                                            onClick={() => {
+                                                const finalPrice = activePromo?.promo_price || product.price || (product.packagings?.length > 0 ? product.packagings[0].price : 0) || 0;
+                                                addItem({
+                                                    id: product.id.toString(), productId: product.id, name_ar: product.name_ar, name_en: product.name_en,
+                                                    price: finalPrice, quantity: 1, image: product.featured_image || "/images/placeholder.svg", slug: product.slug
+                                                });
+                                                setCartOpen(true);
+                                            }}
+                                            className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-green-700 text-white font-black rounded-xl hover:scale-[1.02] hover:bg-green-800 transition-all shadow-[0_4px_15px_rgba(22,163,74,0.3)] text-sm sm:text-base"
+                                        >
+                                            <ShoppingCart className="w-5 h-5 shrink-0" />
+                                            {locale === "ar" ? "أضف للسلة" : "Add to Cart"}
+                                        </button>
+                                        
+                                        <button
+                                            onClick={() => {
+                                                const finalPrice = activePromo?.promo_price || product.price || (product.packagings?.length > 0 ? product.packagings[0].price : 0) || 0;
+                                                addItem({
+                                                    id: product.id.toString(), productId: product.id, name_ar: product.name_ar, name_en: product.name_en,
+                                                    price: finalPrice, quantity: 1, image: product.featured_image || "/images/placeholder.svg", slug: product.slug
+                                                });
+                                                router.push("/checkout");
+                                            }}
+                                            className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-yellow-400 text-slate-900 font-black rounded-xl hover:scale-[1.02] hover:bg-yellow-500 transition-all shadow-[0_4px_15px_rgba(250,204,21,0.2)] text-sm sm:text-base"
+                                        >
+                                            <CreditCard className="w-5 h-5 shrink-0" />
+                                            {locale === "ar" ? "شراء مباشر سريع" : "Fast Buy Now"}
+                                        </button>
+                                </div>
+                                <div className="mt-4 pt-4 border-t border-slate-200">
                                     <Link
                                         href="/contact"
-                                        data-analytics="sidebar_quote_click"
-                                        className="inline-flex items-center gap-2 w-full justify-center px-6 py-3 bg-white text-green-800 font-bold rounded-xl hover:bg-gray-50 transition-all text-sm"
+                                        className="inline-flex items-center justify-center gap-2 w-full px-6 py-3.5 bg-white border border-slate-300 text-slate-700 font-bold rounded-xl hover:bg-slate-100 hover:text-green-800 transition-all text-sm"
                                     >
-                                        {locale === "ar" ? "اطلب تسعير" : "Request Quote"}
-                                        <BackArrow className="w-5 h-5" />
+                                        <Handshake className="w-4.5 h-4.5" />
+                                        {locale === "ar" ? "طلب تسعير جملة B2B" : "Request Bulk B2B Quote"}
                                     </Link>
-                                    {product.is_exportable && (
-                                        <Link
-                                            href="/b2b"
-                                            data-analytics="sidebar_export_click"
-                                            className="inline-flex items-center gap-2 w-full justify-center mt-3 px-6 py-3 bg-white/10 border border-white/20 text-white font-bold rounded-xl hover:bg-white/20 transition-all text-sm"
-                                        >
-                                            <Globe className="w-5 h-5" />
-                                            {locale === "ar" ? "استفسار تصدير" : "Export Inquiry"}
-                                        </Link>
+                                </div>
+                            </div>
+
+                            {/* Trust Elements Footer */}
+                            <div className="mt-5 flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 text-xs sm:text-sm text-gray-500 font-bold">
+                                <span className="flex items-center gap-1.5"><Lock className="w-4 h-4 text-green-600" /> {locale === "ar" ? "دفع آمن 100%" : "Secure Checkout"}</span>
+                                <span className="flex items-center gap-1.5"><Truck className="w-4 h-4 text-green-600" /> {locale === "ar" ? "توصيل سريع متاح" : "Fast Delivery"}</span>
+                                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-600" /> {locale === "ar" ? "جودة مضمونة" : "Quality Guaranteed"}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ─── TECHNICAL TABS SECTION ─── */}
+                    <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden mb-8" id="product-details-tabs">
+                        {/* Interactive Tab Headers */}
+                        <div className="flex flex-nowrap items-center gap-2 border-b border-gray-200 bg-slate-50/50 p-3 sm:p-5 overflow-x-auto custom-scrollbar" role="tablist">
+                            {[
+                                { id: "description", label: locale === "ar" ? "الوصف التفصيلي" : "Description", icon: FileText },
+                                { id: "specs", label: locale === "ar" ? "المواصفات الفنية" : "Specifications", icon: Settings, condition: product.technical_specs?.length > 0 || product.specs?.length > 0 },
+                                { id: "packaging", label: locale === "ar" ? "خيارات التعبئة" : "Packaging Options", icon: Package, condition: product.packagings?.length > 0 },
+                                { id: "downloads", label: locale === "ar" ? "الشهادات والملفات" : "Quality & Downloads", icon: ShieldCheck, condition: product.pdf_datasheet || certifications.length > 0 }
+                            ].filter(t => t.condition !== false).map(tab => {
+                                const Icon = tab.icon;
+                                const isActive = activeTab === tab.id;
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        role="tab"
+                                        aria-selected={isActive}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={cn(
+                                            "flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all focus:outline-none shrink-0",
+                                            isActive ? "bg-green-700 text-white shadow-md shadow-green-700/20" : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                                        )}
+                                    >
+                                        <Icon className="w-4.5 h-4.5 shrink-0" />
+                                        <span>{tab.label}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        
+                        {/* Dynamic Content Panel */}
+                        <div className="p-6 sm:p-8 md:p-12 min-h-[350px]">
+                            {/* Panel: Description */}
+                            {activeTab === "description" && (
+                                <div className="max-w-4xl animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                    <h3 className="text-xl sm:text-2xl font-black text-gray-900 mb-6 flex items-center gap-3">
+                                        <FileText className="w-6 h-6 text-green-600" />
+                                        {locale === "ar" ? "الوصف الشامل للمنتج" : "Comprehensive Description"}
+                                    </h3>
+                                    {longDesc ? (
+                                        <p className="whitespace-pre-line leading-relaxed text-gray-600 text-base sm:text-lg">{longDesc}</p>
+                                    ) : (
+                                        <p className="text-gray-400 italic font-medium">{locale === "ar" ? "لا يوجد وصف مطول متاح." : "No long description available."}</p>
                                     )}
                                 </div>
-                            </ScrollReveal>
+                            )}
+
+                            {/* Panel: Specifications */}
+                            {activeTab === "specs" && (
+                                <div className="max-w-4xl space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                    {product.technical_specs && product.technical_specs.length > 0 && (
+                                        <div>
+                                            <h3 className="text-lg sm:text-xl font-black text-gray-900 mb-6 border-b border-gray-100 pb-4">{locale === "ar" ? "المواصفات الفنية التفصيلية" : "Detailed Technical Specs"}</h3>
+                                            <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+                                                <table className="w-full text-start" dir={isRTL ? "rtl" : "ltr"}>
+                                                    <thead className="bg-slate-50 text-xs uppercase text-gray-500 font-bold border-b border-gray-200">
+                                                        <tr>
+                                                            <th className="px-5 py-4 text-start">{locale === "ar" ? "الخاصية" : "Property"}</th>
+                                                            <th className="px-5 py-4 text-start">{locale === "ar" ? "القيمة" : "Value"}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {product.technical_specs.map((spec, i) => (
+                                                            <tr key={i} className={`border-b border-gray-50 last:border-0 hover:bg-green-50/30 transition-colors ${i % 2 === 0 ? "bg-white" : "bg-gray-50/20"}`}>
+                                                                <td className={`px-5 py-4 text-sm font-bold text-gray-800 w-1/2`}>
+                                                                    {locale === "ar" ? spec.property_ar : spec.property_en}
+                                                                </td>
+                                                                <td className="px-5 py-4 text-sm text-gray-600 font-medium border-x border-gray-100">
+                                                                    {locale === "ar" ? spec.value_ar : spec.value_en}
+                                                                    {spec.unit_ar && locale === "ar" && <span className="text-xs text-gray-400 font-bold mr-1">{spec.unit_ar}</span>}
+                                                                    {spec.unit_en && locale === "en" && <span className="text-xs text-gray-400 font-bold ml-1">{spec.unit_en}</span>}
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Brief Specs Table (Basic) */}
+                                    {product.specs && product.specs.length > 0 && (
+                                        <div>
+                                            <h3 className="text-lg sm:text-xl font-black text-gray-900 mb-6 border-b border-gray-100 pb-4">{locale === "ar" ? "الخصائص الأساسية" : "Basic Characteristics"}</h3>
+                                            <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+                                                <table className="w-full text-start" dir={isRTL ? "rtl" : "ltr"}>
+                                                    <tbody>
+                                                        {product.specs.map((spec, i) => (
+                                                            <tr key={i} className="border-b border-gray-100 bg-white hover:bg-green-50/30 transition-colors">
+                                                                <td className="px-5 py-3 text-sm font-bold text-gray-800 bg-slate-50/50 w-1/3">
+                                                                    {locale === "ar" ? spec.label_ar : spec.label_en}
+                                                                </td>
+                                                                <td className="px-5 py-3 text-sm text-gray-600 font-medium">
+                                                                    {locale === "ar" ? spec.value_ar : spec.value_en}
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Panel: Packaging */}
+                            {activeTab === "packaging" && (
+                                <div className="max-w-4xl animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                    <h3 className="text-lg sm:text-xl font-black text-gray-900 mb-6 pb-4 flex items-center gap-2">
+                                        <Package className="w-6 h-6 text-green-600" />
+                                        {locale === "ar" ? "خيارات التعبئة والأوزان" : "Packaging Options"}
+                                    </h3>
+                                    <PackagingPriceTable packagings={product.packagings} />
+                                    
+                                    {product.is_exportable && (
+                                        <div className="mt-8 bg-blue-50 border border-blue-100 rounded-xl p-5 flex items-start gap-4">
+                                            <Globe className="w-6 h-6 text-blue-600 shrink-0 mt-0.5" />
+                                            <div>
+                                                <h4 className="font-bold text-blue-900 mb-1">{locale === "ar" ? "مخارج الشحن والتصدير" : "Shipping & Export Logistics"}</h4>
+                                                <p className="text-sm text-blue-800/80 leading-relaxed max-w-2xl">{locale === "ar" ? "يتم ترتيب باليتات التحميل وفق المعايير الدولية للشحن البحري (20ft / 40ft containers). نرجو التواصل مع قسم المبيعات لتنسيق حمولة الحاويات." : "Loading pallets are arranged according to international sea freight standards. Please contact sales to coordinate container loads."}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Panel: Downloads & Certs */}
+                            {activeTab === "downloads" && (
+                                <div className="max-w-4xl space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                    {certifications.length > 0 && (
+                                        <div>
+                                            <h3 className="text-lg sm:text-xl font-black text-gray-900 mb-6 border-b border-gray-100 pb-4">{locale === "ar" ? "شهادات واعتمادات الجودة" : "Quality Credentials"}</h3>
+                                            <div className="flex flex-wrap gap-3">
+                                                {certifications.map((cert, i) => (
+                                                    <span key={i} className="px-5 py-3 bg-white text-gray-800 text-sm font-bold rounded-xl border-2 border-gray-200 shadow-sm flex items-center gap-2 hover:border-green-500 hover:text-green-700 transition-colors">
+                                                        <ShieldCheck className="w-5 h-5 text-green-500" />
+                                                        {cert}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {product.pdf_datasheet && (
+                                        <div>
+                                            <h3 className="text-lg sm:text-xl font-black text-gray-900 mb-6 border-b border-gray-100 pb-4">{locale === "ar" ? "الملفات المرفقة التقنية" : "Technical Attachments"}</h3>
+                                            <a
+                                                href={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"}/products/${product.slug}/pdf`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-4 bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:border-green-400 hover:shadow-md transition-all group max-w-md w-full"
+                                            >
+                                                <div className="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center shrink-0 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                                                    <FileText className="w-6 h-6" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-black text-gray-900 group-hover:text-green-700 transition-colors">
+                                                        {locale === "ar" ? "تنزيل البيانات الفنية (TDS)" : "Download Tech Data (TDS)"}
+                                                    </h4>
+                                                    <p className="text-xs text-gray-500 mt-1 font-medium">{locale === "ar" ? "ملف PDF قابل للطباعة" : "Printable PDF document"}</p>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </Container>
