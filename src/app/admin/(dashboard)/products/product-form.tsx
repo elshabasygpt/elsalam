@@ -50,13 +50,13 @@ interface ProductFormProps {
 function FormSection({ title, icon: Icon, children }: { title: string; icon?: any; children: React.ReactNode }) {
     return (
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-            <div className="px-6 py-4 border-b border-gray-50 flex items-center gap-2.5">
+            <div className="px-6 py-4 border-b border-gray-50 flex items-center gap-3">
                 {Icon && (
-                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                        <Icon className="w-4.5 h-4.5 text-slate-500" />
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
+                        <Icon className="w-5 h-5 text-slate-500" />
                     </div>
                 )}
-                <h2 className="font-bold text-sm text-slate-800">{title}</h2>
+                <h2 className="font-bold text-base text-slate-800">{title}</h2>
             </div>
             <div className="p-6 space-y-5">{children}</div>
         </div>
@@ -69,7 +69,9 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
     const [error, setError] = useState("");
     const [imageUploading, setImageUploading] = useState(false);
     const [dragOver, setDragOver] = useState(false);
+    const [galleryUploading, setGalleryUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const galleryInputRef = useRef<HTMLInputElement>(null);
 
     const [form, setForm] = useState({
         name_ar: initialData?.name_ar || "",
@@ -137,6 +139,24 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
         setDragOver(false);
         const file = e.dataTransfer.files[0];
         if (file) handleImageUpload(file);
+    };
+
+    const handleGalleryUpload = async (file: File) => {
+        if (!file) return;
+        setGalleryUploading(true);
+        setError("");
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+            if (res.ok) {
+                const data = await res.json();
+                setImages(prev => [...prev, { url: data.url }]);
+            } else {
+                setError("فشل رفع الصورة الإضافية");
+            }
+        } catch { setError("حدث خطأ أثناء الرفع"); }
+        finally { setGalleryUploading(false); }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -286,8 +306,8 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
                         <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                             <img src={form.featured_image} alt="Preview" className="w-full max-h-52 rounded-lg object-contain" onError={(e) => { (e.target as HTMLImageElement).src = ''; }} />
                         </div>
-                        <button type="button" onClick={() => setForm({ ...form, featured_image: "" })} className="absolute top-2 left-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600">
-                            <X className="w-5 h-5" />
+                        <button type="button" onClick={() => setForm({ ...form, featured_image: "" })} className="absolute top-2 left-2 p-2 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600">
+                            <X className="w-6 h-6" />
                         </button>
                         <p className="text-[10px] text-slate-400 mt-2 text-center truncate" dir="ltr">{form.featured_image}</p>
                     </div>
@@ -307,8 +327,8 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
                             </div>
                         ) : (
                             <div className="flex flex-col items-center gap-3">
-                                <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
-                                    <Upload className="w-6 h-6 text-slate-400" />
+                                <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center">
+                                    <Upload className="w-8 h-8 text-slate-400" />
                                 </div>
                                 <div>
                                     <p className="text-sm font-bold text-slate-600">اضغط أو اسحب صورة هنا</p>
@@ -341,16 +361,32 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
                                     placeholder="/images/example.jpg"
                                 />
                             )}
-                            <button type="button" onClick={() => setImages(images.filter((_, j) => j !== i))} className="absolute top-1 right-1 p-1 bg-white text-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow hover:bg-red-50">
-                                <X className="w-4 h-4" />
+                            <button type="button" onClick={() => setImages(images.filter((_, j) => j !== i))} className="absolute top-2 right-2 p-1.5 bg-white text-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow hover:bg-red-50">
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
                     ))}
                     
-                    <button type="button" onClick={() => setImages([...images, { url: "" }])} className="aspect-square rounded-xl border-2 border-dashed border-slate-200 hover:border-green-300 hover:bg-green-50/50 flex flex-col items-center justify-center gap-2 text-slate-400 hover:text-green-600 transition-all">
-                        <Plus className="w-6 h-6" />
-                        <span className="text-xs font-bold font-arabic">إضافة صورة</span>
-                    </button>
+                    <div 
+                        onClick={() => !galleryUploading && galleryInputRef.current?.click()} 
+                        className={`aspect-square rounded-xl border-2 border-dashed border-slate-200 hover:border-green-300 hover:bg-green-50/50 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer ${galleryUploading ? "opacity-50 pointer-events-none" : "text-slate-400 hover:text-green-600"}`}
+                    >
+                        <input 
+                            ref={galleryInputRef} 
+                            type="file" 
+                            accept="image/jpeg,image/png,image/webp,image/svg+xml" 
+                            className="hidden" 
+                            onChange={(e) => { const file = e.target.files?.[0]; if (file) handleGalleryUpload(file); e.target.value = ""; }} 
+                        />
+                        {galleryUploading ? (
+                            <Loader2 className="w-8 h-8 animate-spin text-green-500" />
+                        ) : (
+                            <>
+                                <Plus className="w-8 h-8" />
+                                <span className="text-sm font-bold font-arabic">إضافة صورة</span>
+                            </>
+                        )}
+                    </div>
                 </div>
             </FormSection>
 
@@ -375,13 +411,13 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
                                 placeholder="Feature (English)"
                             />
                         </div>
-                        <button type="button" onClick={() => setFeatures(features.filter((_, j) => j !== i))} className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0 mt-0.5">
-                            <Trash2 className="w-5 h-5" />
+                        <button type="button" onClick={() => setFeatures(features.filter((_, j) => j !== i))} className="p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0 mt-0.5">
+                            <Trash2 className="w-6 h-6" />
                         </button>
                     </div>
                 ))}
                 <button type="button" onClick={() => setFeatures([...features, { feature_ar: "", feature_en: "" }])} className="inline-flex items-center gap-2 text-sm font-bold text-green-600 hover:text-green-700 px-3 py-2 rounded-lg hover:bg-green-50 transition-all">
-                    <Plus className="w-5 h-5" /> إضافة ميزة
+                    <Plus className="w-6 h-6" /> إضافة ميزة
                 </button>
             </FormSection>
 
@@ -420,13 +456,13 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
                                 placeholder="Value (EN)"
                             />
                         </div>
-                        <button type="button" onClick={() => setSpecs(specs.filter((_, j) => j !== i))} className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0 mt-0.5">
-                            <Trash2 className="w-5 h-5" />
+                        <button type="button" onClick={() => setSpecs(specs.filter((_, j) => j !== i))} className="p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0 mt-0.5">
+                            <Trash2 className="w-6 h-6" />
                         </button>
                     </div>
                 ))}
                 <button type="button" onClick={() => setSpecs([...specs, { property_ar: "", property_en: "", value_ar: "", value_en: "" }])} className="inline-flex items-center gap-2 text-sm font-bold text-green-600 hover:text-green-700 px-3 py-2 rounded-lg hover:bg-green-50 transition-all">
-                    <Plus className="w-5 h-5" /> إضافة مواصفة
+                    <Plus className="w-6 h-6" /> إضافة مواصفة
                 </button>
             </FormSection>
 
@@ -458,13 +494,13 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
                                 placeholder="السعر (ج.م)"
                             />
                         </div>
-                        <button type="button" onClick={() => setPackagings(packagings.filter((_, j) => j !== i))} className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0 mt-0.5">
-                            <Trash2 className="w-5 h-5" />
+                        <button type="button" onClick={() => setPackagings(packagings.filter((_, j) => j !== i))} className="p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0 mt-0.5">
+                            <Trash2 className="w-6 h-6" />
                         </button>
                     </div>
                 ))}
                 <button type="button" onClick={() => setPackagings([...packagings, { size_ar: "", size_en: "", price: "" }])} className="inline-flex items-center gap-2 text-sm font-bold text-green-600 hover:text-green-700 px-3 py-2 rounded-lg hover:bg-green-50 transition-all">
-                    <Plus className="w-5 h-5" /> إضافة حجم تعبئة
+                    <Plus className="w-6 h-6" /> إضافة حجم تعبئة
                 </button>
             </FormSection>
 
@@ -482,13 +518,13 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
                                 placeholder="ISO ..."
                             />
                             <button type="button" onClick={() => setCertifications(certifications.filter((_, j) => j !== i))} className="text-green-400 hover:text-red-500 transition-colors">
-                                <X className="w-4.5 h-4.5" />
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
                     ))}
                 </div>
                 <button type="button" onClick={() => setCertifications([...certifications, { name: "" }])} className="inline-flex items-center gap-2 text-sm font-bold text-green-600 hover:text-green-700 px-3 py-2 rounded-lg hover:bg-green-50 transition-all">
-                    <Plus className="w-5 h-5" /> إضافة شهادة
+                    <Plus className="w-6 h-6" /> إضافة شهادة
                 </button>
             </FormSection>
 

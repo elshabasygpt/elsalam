@@ -111,9 +111,9 @@ export default function WebOrdersPage() {
                 </div>
                 <button 
                     onClick={fetchOrders}
-                    className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 rounded-xl transition-colors font-bold text-sm"
+                    className="flex items-center justify-center gap-2.5 px-5 py-2.5 bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 rounded-xl transition-colors font-bold text-sm"
                 >
-                    <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
+                    <RefreshCw className={`shrink-0 w-5 h-5 ${refreshing ? "animate-spin" : ""}`} strokeWidth={2.5} />
                     تحديث
                 </button>
             </div>

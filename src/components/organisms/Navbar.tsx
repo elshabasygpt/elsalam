@@ -112,16 +112,19 @@ export const Navbar = () => {
 
     return (
         <header className={cn(
-            "fixed top-0 w-full transition-all duration-500 pt-3 px-3 sm:px-4 lg:px-6",
+            "fixed top-0 w-full transition-all duration-500",
+            scrolled ? "bg-white/95 backdrop-blur-xl shadow-sm border-b border-gray-200" : "pt-2 sm:pt-3 px-2 sm:px-4 lg:px-6",
             isOpen ? "z-[100]" : "z-50"
         )}>
             <Container className="max-w-[1480px]">
                 <div
                     className={cn(
-                        "flex items-center justify-between min-h-[3.5rem] sm:min-h-[4rem] md:h-[4.5rem] lg:h-[4.5rem] px-3 sm:px-4 lg:px-6 py-2 md:py-0 rounded-[1.25rem] transition-all duration-500 relative",
-                        isSolid
-                            ? "bg-white shadow-lg border border-gray-200"
-                            : "bg-black/20 backdrop-blur-md border border-white/20 shadow-md"
+                        "flex items-center justify-between min-h-[3.5rem] sm:min-h-[4rem] md:h-[4.5rem] lg:h-[4.5rem] py-2 md:py-0 transition-all duration-500 relative",
+                        !scrolled 
+                            ? (isSolid 
+                                ? "bg-white shadow-lg border border-gray-200 rounded-[1.25rem] px-3 sm:px-4 lg:px-6" 
+                                : "bg-black/20 backdrop-blur-md border border-white/20 shadow-md rounded-[1.25rem] px-3 sm:px-4 lg:px-6")
+                            : "px-2 lg:px-0"
                     )}
                 >
                     {/* Logo Section */}

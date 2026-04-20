@@ -15,6 +15,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
             technical_specs: true,
             packagings: true,
             certifications: true,
+            images: true,
         },
     });
 
@@ -45,6 +46,9 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
                     is_featured: product.is_featured,
                     is_exportable: product.is_exportable,
                     featured_image: product.featured_image || "",
+                    price: product.price?.toString() || "",
+                    price_unit_ar: product.price_unit_ar || "",
+                    price_unit_en: product.price_unit_en || "",
                     features: product.features.map(f => ({
                         feature_ar: f.feature_ar,
                         feature_en: f.feature_en,
@@ -62,6 +66,9 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
                     })),
                     certifications: product.certifications.map(c => ({
                         name: c.name,
+                    })),
+                    images: product.images.map(img => ({
+                        url: img.url,
                     })),
                 }}
             />

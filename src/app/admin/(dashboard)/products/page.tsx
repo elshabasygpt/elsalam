@@ -69,9 +69,13 @@ export default async function AdminProductsPage() {
                                         <tr key={product.id} className="group hover:bg-green-50/30 transition-colors">
                                             <td className="px-5 py-3.5">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center shrink-0 border border-green-100/50 group-hover:border-green-200 transition-colors">
-                                                        <Package className="w-5 h-5 text-green-600" />
-                                                    </div>
+                                                    {product.featured_image ? (
+                                                        <img src={product.featured_image} alt={product.name_ar} className="w-10 h-10 rounded-xl object-cover shrink-0 border border-gray-100 group-hover:border-green-200 transition-colors" />
+                                                    ) : (
+                                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center shrink-0 border border-green-100/50 group-hover:border-green-200 transition-colors">
+                                                            <Package className="w-5 h-5 text-green-600" />
+                                                        </div>
+                                                    )}
                                                     <div className="min-w-0">
                                                         <div className="font-bold text-slate-800 text-sm truncate">{product.name_ar}</div>
                                                         <div className="text-[11px] text-slate-400 truncate">{product.name_en}</div>

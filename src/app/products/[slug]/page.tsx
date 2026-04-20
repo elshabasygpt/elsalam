@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/organisms/Navbar";
 import { Footer } from "@/components/organisms/Footer";
@@ -19,7 +19,7 @@ import { getProductDetail, type ProductDetail } from "@/lib/products-api";
 import {
     Check, Package, Globe, ShieldCheck,
     Droplets, CakeSlice, Flame, Loader2,
-    FileText, ArrowLeft, ArrowRight, Sparkles, Settings, ShoppingBag
+    FileText, ArrowLeft, ArrowRight, Sparkles, Settings, ShoppingBag, ShoppingCart, CreditCard
 } from "lucide-react";
 import { useCartStore } from "@/lib/store/useCartStore";
 import { cn } from "@/utils/classnames";
@@ -51,7 +51,8 @@ export default function ProductDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     
-    const addItem = useCartStore((state) => state.addItem);
+    const router = useRouter();
+    const { addItem, setIsOpen: setCartOpen } = useCartStore();
 
     const BackArrow = isRTL ? ArrowRight : ArrowLeft;
     const CtaArrow = isRTL ? ArrowLeft : ArrowRight;
@@ -123,7 +124,7 @@ export default function ProductDetailPage() {
             <Navbar />
 
             {/* ─── Premium B2B Product Hero ─── */}
-            <section className={`relative pt-32 pb-24 lg:pt-40 lg:pb-32 bg-gradient-to-br ${product.gradient_from || "from-green-700"} ${product.gradient_to || "to-green-950"} overflow-hidden`}>
+            <section className={`relative pt-40 sm:pt-44 pb-24 lg:pt-48 lg:pb-32 bg-gradient-to-br ${product.gradient_from || "from-green-700"} ${product.gradient_to || "to-green-950"} overflow-x-hidden overflow-y-visible`}>
 
                 {/* Dynamic Glow Backgrounds */}
                 <div className="absolute inset-0 opacity-40 mix-blend-screen pointer-events-none">
@@ -140,7 +141,7 @@ export default function ProductDetailPage() {
                             { label: locale === "ar" ? "الرئيسية" : "Home", href: "/" },
                             { label: locale === "ar" ? "منتجاتنا" : "Products", href: "/products" },
                             { label: title },
-                        ]} variant="light" />
+                        ]} variant="light" className="mb-2" />
                     </ScrollReveal>
 
                     <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
@@ -168,54 +169,72 @@ export default function ProductDetailPage() {
                                 <p className="text-white/90 text-lg md:text-xl max-w-2xl leading-relaxed mb-10">{description}</p>
 
                                 {/* Price block with CTA */}
-                                <div className="inline-flex flex-col sm:flex-row items-center gap-4 sm:gap-6 justify-center lg:justify-start p-4 sm:p-5 rounded-3xl bg-black/10 backdrop-blur-md border border-white/10 shadow-2xl">
-                                    <PriceTag
-                                        price={product.price || (product.packagings?.length > 0 ? product.packagings[0].price : null)}
-                                        originalPrice={activePromo?.original_price}
-                                        promoPrice={activePromo?.promo_price}
-                                        unitAr={product.price_unit_ar || undefined}
-                                        unitEn={product.price_unit_en || undefined}
-                                        size="lg"
-                                        className="text-white drop-shadow-md [&_span]:text-white [&_span]:!text-white/70"
-                                    />
-                                    <div className="w-px h-12 bg-white/20 hidden sm:block"></div>
-                                    <button
-                                        onClick={() => {
-                                            const finalPrice = activePromo?.promo_price || product.price || (product.packagings?.length > 0 ? product.packagings[0].price : 0) || 0;
-                                            addItem({
-                                                id: product.id.toString(),
-                                                productId: product.id,
-                                                name_ar: product.name_ar,
-                                                name_en: product.name_en,
-                                                price: finalPrice,
-                                                quantity: 1,
-                                                image: product.featured_image || "/images/placeholder.svg",
-                                                slug: product.slug
-                                            });
-                                        }}
-                                        className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-green-500 text-white font-black rounded-2xl hover:scale-105 hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:bg-green-400 transition-all"
-                                    >
-                                        <ShoppingBag className="w-5 h-5" />
-                                        {locale === "ar" ? "أضف للسلة" : "Add to Cart"}
-                                    </button>
-
-                                    <Link
-                                        href="/contact"
-                                        data-analytics="product_quote_click"
-                                        className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-white text-green-900 font-black rounded-2xl hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all"
-                                    >
-                                        {locale === "ar" ? "تسعير جملة" : "Bulk Quote"}
-                                        <CtaArrow className="w-5 h-5" />
-                                    </Link>
+                                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 justify-center lg:justify-start p-5 sm:p-6 rounded-3xl bg-black/10 backdrop-blur-md border border-white/10 shadow-2xl w-full sm:w-auto mt-6">
+                                    <div className="w-full sm:w-auto flex justify-center sm:block">
+                                        <PriceTag
+                                            price={product.price || (product.packagings?.length > 0 ? product.packagings[0].price : null)}
+                                            originalPrice={activePromo?.original_price}
+                                            promoPrice={activePromo?.promo_price}
+                                            unitAr={product.price_unit_ar || undefined}
+                                            unitEn={product.price_unit_en || undefined}
+                                            size="lg"
+                                            className="text-white drop-shadow-md align-middle [&_span]:text-white [&_span]:!text-white/70"
+                                        />
+                                    </div>
+                                    <div className="w-full h-px sm:w-px sm:h-16 bg-white/20"></div>
+                                    
+                                    <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-3">
+                                        <button
+                                            onClick={() => {
+                                                const finalPrice = activePromo?.promo_price || product.price || (product.packagings?.length > 0 ? product.packagings[0].price : 0) || 0;
+                                                addItem({
+                                                    id: product.id.toString(),
+                                                    productId: product.id,
+                                                    name_ar: product.name_ar,
+                                                    name_en: product.name_en,
+                                                    price: finalPrice,
+                                                    quantity: 1,
+                                                    image: product.featured_image || "/images/placeholder.svg",
+                                                    slug: product.slug
+                                                });
+                                                setCartOpen(true);
+                                            }}
+                                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 sm:py-4 bg-green-500 text-white font-black rounded-2xl hover:scale-105 hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:bg-green-400 transition-all text-sm sm:text-base"
+                                        >
+                                            <ShoppingCart className="w-5 h-5 shrink-0" />
+                                            {locale === "ar" ? "أضف للسلة" : "Add to Cart"}
+                                        </button>
+                                        
+                                        <button
+                                            onClick={() => {
+                                                const finalPrice = activePromo?.promo_price || product.price || (product.packagings?.length > 0 ? product.packagings[0].price : 0) || 0;
+                                                addItem({
+                                                    id: product.id.toString(),
+                                                    productId: product.id,
+                                                    name_ar: product.name_ar,
+                                                    name_en: product.name_en,
+                                                    price: finalPrice,
+                                                    quantity: 1,
+                                                    image: product.featured_image || "/images/placeholder.svg",
+                                                    slug: product.slug
+                                                });
+                                                router.push("/checkout");
+                                            }}
+                                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 sm:py-4 bg-yellow-500 text-slate-900 font-black rounded-2xl hover:scale-105 hover:shadow-[0_0_20px_rgba(234,179,8,0.4)] hover:bg-yellow-400 transition-all text-sm sm:text-base"
+                                        >
+                                            <CreditCard className="w-5 h-5 shrink-0" />
+                                            {locale === "ar" ? "شراء مباشر" : "Buy Now"}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </ScrollReveal>
 
                         {/* 3D Floating Product Image & Badges */}
-                        <ScrollReveal delay={0.2} className="relative flex justify-center lg:justify-end items-center h-[400px] lg:h-[550px] mt-10 lg:mt-0">
+                        <ScrollReveal delay={0.2} className="relative flex flex-col justify-center lg:justify-end items-center min-h-[400px] lg:min-h-[550px] mt-10 lg:mt-16">
                             {/* Floating image wrapper */}
                             <motion.div
-                                className="relative z-20 w-full max-w-[350px] lg:max-w-[450px] aspect-[3/4]"
+                                className="relative z-20 w-full max-w-[320px] lg:max-w-[400px] aspect-[3/4]"
                                 animate={{ y: [-15, 15, -15] }}
                                 transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
                             >
@@ -230,47 +249,49 @@ export default function ProductDetailPage() {
 
                             {/* Image Thumbnails */}
                             {(product.images && product.images.length > 0) && (
-                                <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 flex justify-center flex-wrap items-center gap-2 lg:gap-3 z-40 w-full px-4">
-                                    <button
+                                <div className="relative mt-8 flex justify-center flex-wrap items-center gap-4 w-full px-4 shrink-0">
+                                    <div
+                                        role="button"
                                         onClick={() => setActiveImage(product.featured_image || "/images/placeholder.svg")}
-                                        className={cn("w-14 h-14 lg:w-16 lg:h-16 rounded-xl bg-white/10 backdrop-blur-md border p-1.5 transition-all outline-none", (!activeImage || activeImage === product.featured_image) ? "border-green-400 shadow-[0_0_20px_rgba(74,222,128,0.4)] bg-white/20 scale-110" : "border-white/20 hover:bg-white/20")}
+                                        className={cn("relative flex items-center justify-center overflow-hidden w-[70px] h-[70px] sm:w-[85px] sm:h-[85px] rounded-xl bg-white border-2 transition-all cursor-pointer p-1.5 shrink-0 shadow-sm", (!activeImage || activeImage === product.featured_image) ? "border-green-600 shadow-md scale-105" : "border-gray-200/60 hover:border-green-400 opacity-80 hover:opacity-100")}
                                     >
-                                        <img src={product.featured_image || "/images/placeholder.svg"} className="w-full h-full object-contain drop-shadow-md" alt="Main" />
-                                    </button>
+                                        <img src={product.featured_image || "/images/placeholder.svg"} className="max-w-full max-h-full object-contain mix-blend-multiply" alt="Main" />
+                                    </div>
                                     {product.images.map((img, i) => (
-                                        <button
+                                        <div
+                                            role="button"
                                             key={i}
                                             onClick={() => setActiveImage(img.url)}
-                                            className={cn("w-14 h-14 lg:w-16 lg:h-16 rounded-xl bg-white/10 backdrop-blur-md border p-1.5 transition-all outline-none", activeImage === img.url ? "border-green-400 shadow-[0_0_20px_rgba(74,222,128,0.4)] bg-white/20 scale-110" : "border-white/20 hover:bg-white/20")}
+                                            className={cn("relative flex items-center justify-center overflow-hidden w-[70px] h-[70px] sm:w-[85px] sm:h-[85px] rounded-xl bg-white border-2 transition-all cursor-pointer p-1.5 shrink-0 shadow-sm", activeImage === img.url ? "border-green-600 shadow-md scale-105" : "border-gray-200/60 hover:border-green-400 opacity-80 hover:opacity-100")}
                                         >
-                                            <img src={img.url} className="w-full h-full object-contain drop-shadow-md" alt={`Gallery ${i}`} />
-                                        </button>
+                                            <img src={img.url} className="max-w-full max-h-full object-contain mix-blend-multiply" alt={`Gallery ${i}`} />
+                                        </div>
                                     ))}
                                 </div>
                             )}
 
                             {/* Floating Badges */}
                             <motion.div
-                                animate={{ y: [0, -20, 0] }}
+                                animate={{ y: [0, -15, 0] }}
                                 transition={{ repeat: Infinity, duration: 5, delay: 1, ease: "easeInOut" }}
-                                className={`absolute top-10 ${isRTL ? 'right-0 lg:right-10' : 'left-0 lg:left-10'} z-30 bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-3xl shadow-2xl flex items-center gap-4`}
+                                className={`absolute top-5 sm:top-10 ${isRTL ? 'right-2 sm:right-10' : 'left-2 sm:left-10'} z-30 bg-white/10 backdrop-blur-xl border border-white/20 p-2 sm:p-4 rounded-2xl sm:rounded-3xl shadow-2xl flex items-center gap-2 sm:gap-4`}
                             >
-                                <ShieldCheck className="w-10 h-10 text-yellow-300 drop-shadow-md" />
-                                <div className="text-left">
-                                    <p className="text-white font-black text-sm lg:text-base leading-tight">ISO 22000</p>
-                                    <p className="text-white/80 text-xs font-medium">Certified Facility</p>
+                                <ShieldCheck className="w-7 h-7 sm:w-10 sm:h-10 text-yellow-300 drop-shadow-md shrink-0" />
+                                <div className="text-start">
+                                    <p className="text-white font-black text-xs sm:text-sm lg:text-base leading-tight">ISO 22000</p>
+                                    <p className="text-white/80 text-[10px] sm:text-xs font-medium">Certified Facility</p>
                                 </div>
                             </motion.div>
 
                             <motion.div
-                                animate={{ y: [0, 20, 0] }}
+                                animate={{ y: [0, 15, 0] }}
                                 transition={{ repeat: Infinity, duration: 7, delay: 0.5, ease: "easeInOut" }}
-                                className={`absolute bottom-20 ${isRTL ? 'left-0 lg:left-10' : 'right-0 lg:right-10'} z-30 bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-3xl shadow-2xl flex items-center gap-4`}
+                                className={`absolute bottom-5 sm:bottom-20 ${isRTL ? 'left-2 sm:left-10' : 'right-2 sm:right-10'} z-30 bg-white/10 backdrop-blur-xl border border-white/20 p-2 sm:p-4 rounded-2xl sm:rounded-3xl shadow-2xl flex items-center gap-2 sm:gap-4`}
                             >
-                                <Sparkles className="w-10 h-10 text-green-300 drop-shadow-md" />
-                                <div className="text-left">
-                                    <p className="text-white font-black text-sm lg:text-base leading-tight">100%</p>
-                                    <p className="text-white/80 text-xs font-medium">{locale === 'ar' ? 'نقي وطبيعي' : 'Pure & Natural'}</p>
+                                <Sparkles className="w-7 h-7 sm:w-10 sm:h-10 text-green-300 drop-shadow-md shrink-0" />
+                                <div className="text-start">
+                                    <p className="text-white font-black text-xs sm:text-sm lg:text-base leading-tight whitespace-nowrap">100%</p>
+                                    <p className="text-white/80 text-[10px] sm:text-xs font-medium whitespace-nowrap">{locale === 'ar' ? 'نقي وطبيعي' : 'Pure & Natural'}</p>
                                 </div>
                             </motion.div>
                         </ScrollReveal>
