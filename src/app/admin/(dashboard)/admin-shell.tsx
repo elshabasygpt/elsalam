@@ -34,7 +34,7 @@ const NAV_ITEMS: NavItem[] = [
     { id: "settings", label: "إعدادات عامة", href: "/admin/settings", icon: Settings, roles: ["ADMIN"] },
 ];
 
-export function AdminShell({ children, userName, userRole = "USER" }: { children: ReactNode; userName: string; userRole?: string }) {
+export function AdminShell({ children, userName, userRole = "USER", pendingOrdersCount = 0, newMessagesCount = 0 }: { children: ReactNode; userName: string; userRole?: string; pendingOrdersCount?: number; newMessagesCount?: number; }) {
     const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -68,6 +68,9 @@ export function AdminShell({ children, userName, userRole = "USER" }: { children
         const active = isActive(item.href, item.exact);
         const childActive = item.children?.some(c => isActive(c.href));
         const isHighlighted = active || childActive;
+        let badgeCount = 0;
+        if (item.id === "web_orders") badgeCount = pendingOrdersCount;
+        if (item.id === "inbox") badgeCount = newMessagesCount;
 
         if (hasChildren) {
             return (
@@ -128,17 +131,25 @@ export function AdminShell({ children, userName, userRole = "USER" }: { children
             <Link
                 href={item.href}
                 className={`
-                    flex items-center gap-3 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200 group relative
+                    flex items-center justify-between px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200 group relative
                     ${active
                         ? "bg-gradient-to-l from-green-500/15 to-green-500/5 text-white shadow-sm"
                         : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
                     }
                 `}
             >
-                {active && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-green-500 rounded-l-full" />}
-                <item.icon className={`w-[18px] h-[18px] transition-colors ${active ? "text-green-400" : "text-slate-500 group-hover:text-slate-400"}`} />
-                <span>{item.label}</span>
-                {active && <div className="mr-auto w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />}
+                <div className="flex items-center gap-3">
+                    {active && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-green-500 rounded-l-full" />}
+                    <item.icon className={`w-[18px] h-[18px] transition-colors ${active ? "text-green-400" : "text-slate-500 group-hover:text-slate-400"}`} />
+                    <span>{item.label}</span>
+                </div>
+                {badgeCount > 0 ? (
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${active ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
+                        {badgeCount}
+                    </span>
+                ) : (
+                    active && <div className="mr-auto w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                )}
             </Link>
         );
     };
@@ -149,6 +160,9 @@ export function AdminShell({ children, userName, userRole = "USER" }: { children
         const active = isActive(item.href, item.exact);
         const childActive = item.children?.some(c => isActive(c.href));
         const isHighlighted = active || childActive;
+        let badgeCount = 0;
+        if (item.id === "web_orders") badgeCount = pendingOrdersCount;
+        if (item.id === "inbox") badgeCount = newMessagesCount;
 
         if (hasChildren) {
             return (
@@ -198,12 +212,19 @@ export function AdminShell({ children, userName, userRole = "USER" }: { children
             <Link
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all relative
+                className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all relative
                     ${active ? "bg-green-500/10 text-white" : "text-slate-400 hover:bg-slate-800/60 hover:text-white"}`}
             >
-                {active && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-green-500 rounded-l-full" />}
-                <item.icon className={`w-5 h-5 ${active ? "text-green-400" : "text-slate-500"}`} />
-                <span>{item.label}</span>
+                <div className="flex items-center gap-3">
+                    {active && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-green-500 rounded-l-full" />}
+                    <item.icon className={`w-5 h-5 ${active ? "text-green-400" : "text-slate-500"}`} />
+                    <span>{item.label}</span>
+                </div>
+                {badgeCount > 0 && (
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${active ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
+                        {badgeCount}
+                    </span>
+                )}
             </Link>
         );
     };

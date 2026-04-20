@@ -15,6 +15,10 @@ export default async function AdminDashboardPage() {
     const totalProducts = await prisma.product.count();
     const totalCategories = await prisma.category.count();
     const totalPages = await prisma.pageContent.count();
+    const totalWebOrders = await prisma.webOrder.count();
+    const totalMessages = await prisma.message.count({ where: { status: "new" } });
+    const totalClients = await prisma.client.count();
+
     const recentProducts = await prisma.product.findMany({
         take: 5,
         orderBy: { updatedAt: "desc" },
@@ -51,6 +55,26 @@ export default async function AdminDashboardPage() {
             text: "text-violet-600",
             ring: "ring-violet-500/10",
             href: "/admin/pages",
+        },
+        {
+            label: "طلبات المتجر",
+            value: totalWebOrders,
+            icon: Package,
+            color: "orange",
+            bg: "bg-orange-50",
+            text: "text-orange-600",
+            ring: "ring-orange-500/10",
+            href: "/admin/web-orders",
+        },
+        {
+            label: "رسائل جديدة",
+            value: totalMessages,
+            icon: Newspaper,
+            color: "red",
+            bg: "bg-red-50",
+            text: "text-red-600",
+            ring: "ring-red-500/10",
+            href: "/admin/inbox",
         },
     ];
 
