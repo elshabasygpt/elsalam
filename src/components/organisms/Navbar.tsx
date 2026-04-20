@@ -10,22 +10,36 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/lib/i18n-context";
+import { useCartStore } from "@/lib/store/useCartStore";
+import { CartDrawer } from "@/components/organisms/CartDrawer";
+import { ShoppingBag } from "lucide-react";
 
 export const Navbar = () => {
+
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>("products");
     const [logoUrl, setLogoUrl] = useState<string | null>(null);
+    const [fetchedCategories, setFetchedCategories] = useState<any[]>([]);
+    const [isMounted, setIsMounted] = useState(false);
     const pathname = usePathname();
     const isHome = pathname === "/";
     const { locale, setLocale, t, isRTL } = useLanguage();
+    const { getTotalItems, setIsOpen: setCartOpen } = useCartStore();
 
     useEffect(() => {
         fetch("/api/site-logo")
             .then(r => r.json())
             .then(d => { if (d.logoUrl) setLogoUrl(d.logoUrl); })
             .catch(() => {});
+            
+        fetch("/api/public/categories")
+            .then(r => r.json())
+            .then(d => { if (d.data) setFetchedCategories(d.data); })
+            .catch(() => {});
+            
+        setIsMounted(true);
     }, []);
 
     useEffect(() => {
@@ -48,11 +62,19 @@ export const Navbar = () => {
             label: t.nav.products,
             href: "/products",
             hasMegaDropdown: true,
-            subLinks: [
-                { label: t.nav.menuOils || "زيوت الطعام", href: "/products", icon: Droplets },
-                { label: t.nav.menuGhee || "السمن النباتي", href: "/products", icon: CakeSlice },
-                { label: t.nav.menuShortening || "الشورتنج", href: "/products", icon: Flame },
-            ]
+            subLinks: fetchedCategories.length > 0 
+                ? fetchedCategories.map((c: any) => ({
+                    label: isRTL ? c.name_ar : c.name_en,
+                    href: `/products?category=${c.slug}`,
+                    icon: Droplets, // Fallback icon for mobile
+                    imageUrl: c.imageUrl,
+                    slug: c.slug
+                })) 
+                : [
+                    { label: t.nav.menuOils || "زيوت الطعام", href: "/products", icon: Droplets, slug: "oils" },
+                    { label: t.nav.menuGhee || "السمن النباتي", href: "/products", icon: CakeSlice, slug: "ghee" },
+                    { label: t.nav.menuShortening || "الشورتنج", href: "/products", icon: Flame, slug: "shortening" },
+                ]
         },
         {
             id: "quality_production",
@@ -90,28 +112,28 @@ export const Navbar = () => {
 
     return (
         <header className={cn(
-            "fixed top-0 w-full transition-all duration-500 pt-3 px-3 sm:px-6 lg:px-8",
+            "fixed top-0 w-full transition-all duration-500 pt-3 px-3 sm:px-4 lg:px-6",
             isOpen ? "z-[100]" : "z-50"
         )}>
-            <Container className="max-w-7xl">
+            <Container className="max-w-[1480px]">
                 <div
                     className={cn(
-                        "flex items-center justify-between min-h-[3.5rem] sm:min-h-[4rem] md:h-20 px-4 sm:px-6 py-2 md:py-0 rounded-2xl transition-all duration-500 relative",
+                        "flex items-center justify-between min-h-[3.5rem] sm:min-h-[4rem] md:h-[4.5rem] lg:h-[4.5rem] px-3 sm:px-4 lg:px-6 py-2 md:py-0 rounded-[1.25rem] transition-all duration-500 relative",
                         isSolid
                             ? "bg-white shadow-lg border border-gray-200"
                             : "bg-black/20 backdrop-blur-md border border-white/20 shadow-md"
                     )}
                 >
                     {/* Logo Section */}
-                    <Link href="/" className="flex items-center gap-3 group shrink-0 relative z-50">
+                    <Link href="/" className="flex items-center gap-2 lg:gap-3 group shrink-0 relative z-50">
                         <div className={cn(
-                            "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm overflow-hidden",
+                            "w-11 h-11 md:w-[3.75rem] md:h-[3.75rem] min-w-[2.75rem] md:min-w-[3.75rem] rounded-xl lg:rounded-2xl flex items-center justify-center transition-all duration-300 shadow-sm overflow-hidden shrink-0",
                             isSolid ? "bg-primary-green/10 group-hover:bg-primary-green/20" : "bg-white/20 group-hover:bg-white/30"
                         )}>
                             {logoUrl ? (
-                                <img src={logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
+                                <img src={logoUrl} alt="Logo" className="w-full h-full object-contain object-center p-0.5 scale-110" />
                             ) : (
-                                <Leaf className={cn("w-6 h-6", isSolid ? "text-primary-green" : "text-white")} />
+                                <Leaf className={cn("w-7 h-7 md:w-10 md:h-10 scale-110", isSolid ? "text-primary-green" : "text-white")} />
                             )}
                         </div>
                         <div className="flex flex-col justify-center">
@@ -131,8 +153,8 @@ export const Navbar = () => {
                     </Link>
 
                     {/* Center Desktop Navigation */}
-                    <nav className="hidden xl:flex items-center justify-center flex-1 mx-1 xl:mx-4 h-full">
-                        <ul className="flex items-center gap-0.5 xl:gap-1">
+                    <nav className="hidden xl:flex items-center justify-center flex-1 mx-1 lg:mx-4 h-full">
+                        <ul className="flex items-center gap-1 xl:gap-1.5">
                             {navLinks.map((link) => (
                                 <li
                                     key={link.id}
@@ -143,7 +165,7 @@ export const Navbar = () => {
                                     <Link
                                         href={link.href}
                                         className={cn(
-                                            "px-3 py-2 rounded-lg text-[13px] font-bold transition-all duration-300 flex items-center gap-1 whitespace-nowrap peer",
+                                            "px-2.5 xl:px-3 py-2 rounded-lg text-[13px] font-bold transition-all duration-300 flex items-center gap-1 whitespace-nowrap peer",
                                             isActive(link.href)
                                                 ? (isSolid ? "text-green-700 bg-green-50" : "text-white bg-white/20")
                                                 : cn(navTextClass, navHoverClass)
@@ -165,37 +187,26 @@ export const Navbar = () => {
                                     {link.hasMegaDropdown && (
                                         <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-[540px] z-50 transition-all duration-300 opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-3 group-hover:translate-y-0">
                                             <div className="bg-white rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden">
-                                                {/* Product Category Cards */}
-                                                <div className="grid grid-cols-3 gap-0 p-2">
-                                                    <Link href="/products" className="group/card p-4 rounded-xl hover:bg-green-50 transition-all duration-300 text-center flex flex-col items-center gap-3">
-                                                        <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center group-hover/card:bg-green-200 group-hover/card:scale-110 transition-all duration-300">
-                                                            <Droplets className="w-6 h-6 text-green-700" />
-                                                        </div>
-                                                        <div>
-                                                            <p className="font-bold text-gray-900 text-sm mb-1">{t.nav.menuOils}</p>
-                                                            <p className="text-xs text-gray-500 leading-relaxed whitespace-pre-line">{t.nav.menuOilsDesc}</p>
-                                                        </div>
-                                                    </Link>
-
-                                                    <Link href="/products" className="group/card p-4 rounded-xl hover:bg-amber-50 transition-all duration-300 text-center flex flex-col items-center gap-3 border-x border-gray-100">
-                                                        <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center group-hover/card:bg-amber-200 group-hover/card:scale-110 transition-all duration-300">
-                                                            <CakeSlice className="w-6 h-6 text-amber-600" />
-                                                        </div>
-                                                        <div>
-                                                            <p className="font-bold text-gray-900 text-sm mb-1">{t.nav.menuGhee}</p>
-                                                            <p className="text-xs text-gray-500 leading-relaxed whitespace-pre-line">{t.nav.menuGheeDesc}</p>
-                                                        </div>
-                                                    </Link>
-
-                                                    <Link href="/products" className="group/card p-4 rounded-xl hover:bg-orange-50 transition-all duration-300 text-center flex flex-col items-center gap-3">
-                                                        <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center group-hover/card:bg-orange-200 group-hover/card:scale-110 transition-all duration-300">
-                                                            <Flame className="w-6 h-6 text-orange-600" />
-                                                        </div>
-                                                        <div>
-                                                            <p className="font-bold text-gray-900 text-sm mb-1">{t.nav.menuShortening}</p>
-                                                            <p className="text-xs text-gray-500 leading-relaxed whitespace-pre-line">{t.nav.menuShorteningDesc}</p>
-                                                        </div>
-                                                    </Link>
+                                                {/* Product Category Cards dynamically mapped */}
+                                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-0 p-2">
+                                                    {link.subLinks?.map((subLink: any, idx: number) => {
+                                                        const IconComponent = subLink.icon;
+                                                        return (
+                                                            <Link key={idx} href={subLink.href} className="group/card p-4 rounded-xl hover:bg-green-50/50 transition-all duration-300 text-center flex flex-col items-center gap-3 border border-transparent hover:border-green-100">
+                                                                <div className="w-14 h-14 rounded-xl bg-slate-50 flex items-center justify-center group-hover/card:bg-white group-hover/card:scale-110 group-hover/card:shadow-sm transition-all duration-300 overflow-hidden border border-slate-100 p-1.5">
+                                                                    {subLink.imageUrl ? (
+                                                                        <img src={subLink.imageUrl} alt={subLink.label} className="w-full h-full object-contain" />
+                                                                    ) : (
+                                                                        IconComponent && <IconComponent className="w-7 h-7 text-green-700" />
+                                                                    )}
+                                                                </div>
+                                                                <div>
+                                                                    <p className="font-bold text-gray-900 text-sm mb-1">{subLink.label}</p>
+                                                                    <p className="text-xs text-gray-500 leading-relaxed font-medium">استكشف المنتجات</p>
+                                                                </div>
+                                                            </Link>
+                                                        );
+                                                    })}
                                                 </div>
 
                                                 {/* CTA Footer Strip */}
@@ -231,9 +242,28 @@ export const Navbar = () => {
                     </nav>
 
                     {/* Right Call-to-Action & Utils */}
-                    <div className="hidden xl:flex items-center gap-2 xl:gap-4 shrink-0 relative z-50">
+                    <div className="hidden xl:flex items-center gap-2 xl:gap-3 shrink-0 relative z-50">
+                        {/* Cart Button */}
+                        <button
+                            onClick={() => setCartOpen(true)}
+                            className={cn(
+                                "relative p-3 rounded-[1rem] transition-all duration-300 hover:scale-105 active:scale-95 group/cart",
+                                isSolid ? "bg-gray-50 hover:bg-green-50 text-gray-700" : "bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm"
+                            )}
+                        >
+                            <ShoppingBag className={cn("w-6 h-6", isSolid ? "group-hover/cart:text-green-700" : "")} strokeWidth={2} />
+                            {(isMounted && getTotalItems() > 0) && (
+                                <span className={cn(
+                                    "absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold text-white shadow-md border-2",
+                                    isSolid ? "bg-red-500 border-white" : "bg-accent-gold text-primary-dark border-transparent"
+                                )}>
+                                    {getTotalItems()}
+                                </span>
+                            )}
+                        </button>
+
                         <div className={cn(
-                            "flex items-center pl-2 xl:pl-4 border-l transition-colors duration-300",
+                            "flex items-center pl-2 xl:pl-3 border-l transition-colors duration-300",
                             isSolid ? "border-surface-light text-text-dark" : "border-white/20 text-white"
                         )}>
                             <LanguageSwitcher currentLocale={locale} onChange={setLocale} />
@@ -241,29 +271,50 @@ export const Navbar = () => {
                         <Link
                             href="/contact"
                             className={cn(
-                                "flex items-center justify-center gap-2 h-10 px-4 sm:px-5 rounded-lg font-bold text-sm transition-all duration-300 relative overflow-hidden group/btn",
+                                "flex items-center justify-center gap-2 h-9 lg:h-10 px-4 xl:px-5 rounded-lg font-bold text-sm transition-all duration-300 relative overflow-hidden group/btn",
                                 isSolid
                                     ? "bg-green-700 text-white hover:bg-green-800 shadow-md hover:shadow-lg"
                                     : "bg-white text-green-800 hover:bg-gray-50 shadow-lg"
                             )}
                         >
-                            <span className="text-sm sm:text-base">{t.nav.getQuote}</span>
-                            <ArrowLeft className={cn("w-4 h-4 sm:w-5 sm:h-5 transition-transform", isRTL ? "group-hover/btn:-translate-x-1" : "group-hover/btn:translate-x-1 rotate-180")} strokeWidth={2.5} />
+                            <span className="text-sm whitespace-nowrap">{t.nav.getQuote}</span>
+                            <ArrowLeft className={cn("w-5 h-5 transition-transform shrink-0", isRTL ? "group-hover/btn:-translate-x-1" : "group-hover/btn:translate-x-1 rotate-180")} strokeWidth={2.5} />
                         </Link>
                     </div>
 
-                    {/* Mobile Toggle — visible on all mobile and tablet sizes up to xl */}
+                    {/* Mobile Toggle & Cart — visible on all mobile and tablet sizes up to xl */}
                     {!isOpen && (
-                        <button
-                            className={cn(
-                                "flex xl:hidden p-2 rounded-lg transition-colors relative z-50",
-                                isSolid ? "text-primary-dark hover:bg-surface-soft" : "text-white bg-white/10 backdrop-blur-sm hover:bg-white/20"
-                            )}
-                            onClick={() => setIsOpen(true)}
-                            aria-label="Toggle Menu"
-                        >
-                            <Menu className="w-6 h-6" />
-                        </button>
+                        <div className="flex xl:hidden items-center gap-2 relative z-50">
+                            {/* Mobile Cart Button */}
+                            <button
+                                onClick={() => setCartOpen(true)}
+                                className={cn(
+                                    "relative p-2.5 rounded-xl transition-colors",
+                                    isSolid ? "text-primary-dark hover:bg-surface-soft bg-gray-50/80" : "text-white bg-white/10 backdrop-blur-sm hover:bg-white/20"
+                                )}
+                            >
+                                <ShoppingBag className="w-6 h-6" strokeWidth={2} />
+                                {(isMounted && getTotalItems() > 0) && (
+                                    <span className={cn(
+                                        "absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold text-white shadow-md border-2",
+                                        isSolid ? "bg-red-500 border-white" : "bg-accent-gold text-primary-dark border-transparent"
+                                    )}>
+                                        {getTotalItems()}
+                                    </span>
+                                )}
+                            </button>
+                            
+                            <button
+                                className={cn(
+                                    "flex p-2 rounded-lg transition-colors",
+                                    isSolid ? "text-primary-dark hover:bg-surface-soft" : "text-white bg-white/10 backdrop-blur-sm hover:bg-white/20"
+                                )}
+                                onClick={() => setIsOpen(true)}
+                                aria-label="Toggle Menu"
+                            >
+                                <Menu className="w-6 h-6" />
+                            </button>
+                        </div>
                     )}
                 </div>
             </Container>
@@ -304,10 +355,12 @@ export const Navbar = () => {
                                     className="font-black text-xl text-primary-dark flex items-center gap-2 drop-shadow-sm"
                                 >
                                     {logoUrl ? (
-                                        <img src={logoUrl} alt="Logo" className="w-8 h-8 object-contain drop-shadow-sm" />
+                                        <div className="w-12 h-12 min-w-[3rem] bg-white shadow-md rounded-2xl p-0.5 flex shrink-0 items-center justify-center overflow-hidden">
+                                            <img src={logoUrl} alt="Logo" className="w-full h-full object-contain drop-shadow-sm scale-110" />
+                                        </div>
                                     ) : (
-                                        <div className="w-10 h-10 bg-white shadow-xl rounded-xl flex items-center justify-center border border-white/50">
-                                            <Leaf className="w-6 h-6 text-primary-green" />
+                                        <div className="w-12 h-12 min-w-[3rem] bg-white shadow-xl rounded-2xl flex items-center justify-center border border-white/50 shrink-0">
+                                            <Leaf className="w-8 h-8 text-primary-green scale-110" />
                                         </div>
                                     )}
                                     <div className="flex flex-col justify-center">
@@ -361,20 +414,24 @@ export const Navbar = () => {
                                                                         onClick={() => setIsOpen(false)}
                                                                         className="flex items-center gap-3 px-4 py-3 rounded-xl text-green-700 font-bold hover:bg-green-50 transition-colors"
                                                                     >
-                                                                        <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
-                                                                            <ArrowLeft className={cn("w-4 h-4 text-green-700", isRTL ? "" : "rotate-180")} />
+                                                                        <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
+                                                                            <ArrowLeft className={cn("w-5 h-5 text-green-700", isRTL ? "" : "rotate-180")} />
                                                                         </div>
                                                                         {t.nav.menuViewAll || "عرض كل " + link.label}
                                                                     </Link>
-                                                                    {link.subLinks.map((sub, i) => (
+                                                                    {link.subLinks.map((sub: any, i) => (
                                                                         <Link 
                                                                             key={i} 
                                                                             href={sub.href} 
                                                                             onClick={() => setIsOpen(false)}
                                                                             className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 font-bold hover:bg-green-50 hover:text-green-700 transition-colors"
                                                                         >
-                                                                            <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                                                                                <sub.icon className="w-4 h-4 text-green-700" />
+                                                                            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center shrink-0 overflow-hidden p-1 border border-green-200">
+                                                                                {sub.imageUrl ? (
+                                                                                    <img src={sub.imageUrl} alt={sub.label} className="w-full h-full object-contain" />
+                                                                                ) : (
+                                                                                    sub.icon && <sub.icon className="w-5 h-5 text-green-700" />
+                                                                                )}
                                                                             </div>
                                                                             {sub.label}
                                                                         </Link>
@@ -428,6 +485,9 @@ export const Navbar = () => {
                     </>
                 )}
             </AnimatePresence>
+
+            {/* Mount CartDrawer */}
+            <CartDrawer />
         </header>
     );
 };

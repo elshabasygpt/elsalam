@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Navbar } from "@/components/organisms/Navbar";
 import { Footer } from "@/components/organisms/Footer";
 import { CTAPartnership } from "@/components/organisms/CTAPartnership";
@@ -20,7 +21,7 @@ import {
     type ProductCategory,
     type PromotionItem,
 } from "@/lib/products-api";
-import { Loader2, ShoppingBag, Sparkles } from "lucide-react";
+import { Loader2, ShoppingBag, Sparkles, Home, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function ProductsPage() {
     const { t, locale, isRTL } = useLanguage();
@@ -60,24 +61,49 @@ export default function ProductsPage() {
         })),
     ];
 
+    const BreadcrumbSeparator = isRTL ? ChevronLeft : ChevronRight;
+
     return (
         <main className={`min-h-screen bg-surface-soft ${isRTL ? "font-arabic" : ""}`} dir={isRTL ? "rtl" : "ltr"}>
             <Navbar />
 
-            {/* Hero */}
-            <section className="pt-36 pb-16 bg-primary-dark text-white relative overflow-hidden">
-                <div className="absolute inset-0 opacity-5">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full translate-y-1/2 -translate-x-1/2" />
+            {/* Hero Section */}
+            <section className="relative pt-40 pb-20 overflow-hidden bg-gradient-to-br from-green-950 via-green-900 to-green-800 border-b border-green-800/50">
+                {/* Decorative Elements */}
+                <div className="absolute inset-0 overflow-hidden">
+                    <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[100%] rounded-full bg-green-500/10 blur-3xl saturate-200" />
+                    <div className="absolute -bottom-[20%] -left-[10%] w-[40%] h-[80%] rounded-full bg-yellow-500/10 blur-3xl saturate-200" />
+                    <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
+                    {/* Grid Pattern */}
+                    <div className="absolute inset-0 bg-[radial-gradient(#ffffff15_1px,transparent_1px)] [background-size:20px_20px] opacity-20" />
                 </div>
-                <Container className="text-center relative z-10">
+
+                <Container className="relative z-10">
                     <ScrollReveal>
-                        <Typography variant="h1" className="text-white mb-4">{t.products.heroTitle}</Typography>
-                        <Typography variant="body-lg" className="text-white/80 max-w-xl mx-auto">
-                            {t.products.heroSubtitle}
-                        </Typography>
+                        <div className="flex flex-col items-center text-center">
+                            {/* Breadcrumb */}
+                            <nav className="flex items-center gap-2.5 px-5 py-2.5 mb-8 text-sm md:text-base font-bold text-white/70 bg-white/5 backdrop-blur-md rounded-full border border-white/10 shadow-lg">
+                                <Link href="/" className="flex items-center gap-2 hover:text-white transition-colors">
+                                    <Home className="w-5 h-5" />
+                                    {t.nav.home || "الرئيسية"}
+                                </Link>
+                                <BreadcrumbSeparator className="w-5 h-5 text-white/40" />
+                                <span className="text-white drop-shadow-md">{t.nav.products || "منتجاتنا"}</span>
+                            </nav>
+
+                            {/* Titles */}
+                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 drop-shadow-lg tracking-tight">
+                                {t.products.heroTitle}
+                            </h1>
+                            <p className="text-lg md:text-xl text-white/80 max-w-2xl leading-relaxed font-medium">
+                                {t.products.heroSubtitle}
+                            </p>
+                        </div>
                     </ScrollReveal>
                 </Container>
+                
+                {/* Bottom Curve */}
+                <div className="absolute bottom-0 left-0 right-0 h-12 md:h-16 bg-surface-soft" style={{ clipPath: "ellipse(70% 100% at 50% 100%)" }} />
             </section>
 
             {/* Promotions Banner */}

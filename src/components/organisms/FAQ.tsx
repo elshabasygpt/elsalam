@@ -23,8 +23,25 @@ export const FAQ = () => {
         setOpenIndex(openIndex === index ? null : index);
     };
 
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": items.map((item: any) => ({
+            "@type": "Question",
+            "name": item.question,
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": item.answer
+            }
+        }))
+    };
+
     return (
         <section className="py-24 bg-surface-soft relative overflow-hidden">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             <div className="absolute top-0 left-0 w-96 h-96 bg-green-100/30 rounded-full blur-3xl pointer-events-none" />
 
             <Container className="relative z-10 max-w-3xl">

@@ -6,6 +6,8 @@ import { BackToTop } from '@/components/organisms/BackToTop'
 import { MobileBottomNav } from '@/components/organisms/MobileBottomNav'
 import { LanguageProvider } from '@/lib/i18n-context'
 import { Toaster } from 'react-hot-toast'
+import Script from 'next/script'
+import { prisma } from '@/lib/prisma'
 
 const cairo = Cairo({
     subsets: ['arabic', 'latin'],
@@ -73,14 +75,38 @@ const jsonLd = {
         "https://facebook.com/elsalamoils",
         "https://instagram.com/elsalamoils",
         "https://linkedin.com/company/elsalamoils"
-    ]
+    ],
+    "hasCredential": [
+        {
+            "@type": "EducationalOccupationalCredential",
+            "credentialCategory": "ISO 22000",
+            "name": "ISO 22000 Food Safety Management",
+            "recognizedBy": {
+                "@type": "Organization",
+                "name": "International Organization for Standardization"
+            }
+        },
+        {
+            "@type": "EducationalOccupationalCredential",
+            "credentialCategory": "HACCP",
+            "name": "Hazard Analysis and Critical Control Points",
+            "recognizedBy": {
+                "@type": "Organization",
+                "name": "HACCP Alliance"
+            }
+        }
+    ],
+    "knowsAbout": ["Vegetable Oils Production", "Margarine", "Shortening", "B2B Export", "Food Safety"]
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
+    const settings = await prisma.siteSettings.findFirst();
+    const gaId = settings?.googleAnalyticsId;
+
     return (
         <html lang="ar" dir="rtl" className={`${cairo.variable} ${inter.variable}`} suppressHydrationWarning>
             <head>
@@ -90,6 +116,24 @@ export default function RootLayout({
                 />
             </head>
             <body className="font-arabic antialiased text-text-dark bg-surface-soft min-h-screen flex flex-col pb-safe">
+                {gaId && (
+                    <>
+                        <Script
+                            src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+                            strategy="afterInteractive"
+                        />
+                        <Script id="google-analytics" strategy="afterInteractive">
+                            {`
+                                window.dataLayer = window.dataLayer || [];
+                                function gtag(){dataLayer.push(arguments);}
+                                gtag('js', new Date());
+                                gtag('config', '${gaId}', {
+                                    page_path: window.location.pathname,
+                                });
+                            `}
+                        </Script>
+                    </>
+                )}
                 <LanguageProvider>
                     <Toaster position="top-center" reverseOrder={false} />
                     {children}

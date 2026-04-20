@@ -9,7 +9,7 @@ export async function GET() {
 
     const categories = await prisma.category.findMany({
         include: { _count: { select: { products: true } } },
-        orderBy: { createdAt: "desc" },
+        orderBy: { sortOrder: "asc" },
     });
     return NextResponse.json(categories);
 }
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-        const { name_ar, name_en, slug } = body;
+        const { name_ar, name_en, slug, imageUrl, sortOrder } = body;
 
         if (!name_ar || !name_en || !slug) {
             return NextResponse.json({ error: "جميع الحقول مطلوبة" }, { status: 400 });
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
         }
 
         const category = await prisma.category.create({
-            data: { name_ar, name_en, slug },
+            data: { name_ar, name_en, slug, imageUrl, sortOrder: sortOrder ? parseInt(sortOrder) : 0 },
         });
         return NextResponse.json(category, { status: 201 });
     } catch (error) {

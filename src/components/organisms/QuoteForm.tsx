@@ -6,7 +6,7 @@ import { Typography } from "@/components/atoms/Typography";
 import { Button } from "@/components/atoms/Button";
 import { FormField } from "@/components/molecules/FormField";
 import { SectionHeader } from "@/components/molecules/SectionHeader";
-import { CheckCircle, ArrowRight, ArrowLeft, Package, Globe, User } from "lucide-react";
+import { CheckCircle, ArrowRight, ArrowLeft, Package, Globe, User, ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/lib/i18n-context";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
@@ -16,29 +16,59 @@ export const QuoteForm = () => {
     const [step, setStep] = useState(1);
     const [submitted, setSubmitted] = useState(false);
 
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        requirements: [] as string[],
+        volume: "", packaging: "",
+        country: "", notes: "",
+        companyName: "", contactName: "", email: "", phone: ""
+    });
+
     const nextStep = () => setStep((prev) => Math.min(prev + 1, 3));
     const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (step === 3) {
-            setSubmitted(true);
-            toast.success(isRTL ? "تم إرسال طلب عرض السعر بنجاح!" : "Quote request submitted successfully!", {
-                duration: 4000,
-                position: "bottom-center",
-                style: {
-                    background: '#16a34a',
-                    color: '#fff',
-                    fontWeight: 'bold',
-                    padding: '16px',
-                    borderRadius: '12px',
-                },
-                iconTheme: {
-                    primary: '#fff',
-                    secondary: '#16a34a',
-                },
+        if (step < 3) { nextStep(); return; }
+        
+        setLoading(true);
+        try {
+            const bodyContent = `
+Requirements: ${formData.requirements.join(", ")}
+Volume: ${formData.volume}
+Packaging: ${formData.packaging}
+Country: ${formData.country}
+Notes: ${formData.notes}
+            `.trim();
+
+            const res = await fetch("/api/public/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: formData.contactName,
+                    email: formData.email,
+                    phone: formData.phone,
+                    company: formData.companyName,
+                    subject: "B2B Quote Request",
+                    body: bodyContent,
+                    type: "quote"
+                })
             });
+
+            if (res.ok) {
+                setSubmitted(true);
+                toast.success(isRTL ? "تم إرسال طلب عرض السعر بنجاح!" : "Quote request submitted successfully!", {
+                    duration: 4000, position: "bottom-center",
+                    style: { background: '#16a34a', color: '#fff', fontWeight: 'bold', padding: '16px', borderRadius: '12px' },
+                    iconTheme: { primary: '#fff', secondary: '#16a34a' },
+                });
+            } else {
+                toast.error(isRTL ? "خطأ في الإرسال" : "Failed to send request.");
+            }
+        } catch {
+            toast.error(isRTL ? "فشل الاتصال بالخادم" : "Server connection failed.");
         }
+        setLoading(false);
     };
 
     if (submitted) {
@@ -128,7 +158,17 @@ export const QuoteForm = () => {
                                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                                 {t.quote.products.map((p: string, i: number) => (
                                                     <label key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-green-400 hover:bg-green-50/50 cursor-pointer transition-all">
-                                                        <input type="checkbox" className="w-5 h-5 text-green-600 rounded border-gray-300 focus:ring-green-500" />
+                                                        <input type="checkbox" className="w-5 h-5 text-green-600 rounded border-gray-300 focus:ring-green-500" 
+                                                            checked={formData.requirements.includes(p)}
+                                                            onChange={(e) => {
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    requirements: e.target.checked 
+                                                                        ? [...prev.requirements, p]
+                                                                        : prev.requirements.filter(req => req !== p)
+                                                                }))
+                                                            }}
+                                                        />
                                                         <span className="font-semibold text-gray-700">{p}</span>
                                                     </label>
                                                 ))}
@@ -136,10 +176,12 @@ export const QuoteForm = () => {
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <FormField label={t.quote.volume} type="number" placeholder={t.quote.volumePlaceholder} required />
+                                            <FormField label={t.quote.volume} type="number" placeholder={t.quote.volumePlaceholder} required 
+                                                value={formData.volume} onChange={(e) => setFormData(prev => ({...prev, volume: e.target.value}))} />
                                             <div>
                                                 <label className="block text-sm font-bold text-gray-700 mb-2">{t.quote.packagingLabel}</label>
-                                                <select className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all font-medium appearance-none">
+                                                <select className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all font-medium appearance-none"
+                                                    value={formData.packaging} onChange={(e) => setFormData(prev => ({...prev, packaging: e.target.value}))}>
                                                     <option value="">{isRTL ? "اختر التعبئة" : "Select Packaging"}</option>
                                                     {t.quote.packaging.map((p: string, i: number) => (
                                                         <option key={i} value={p}>{p}</option>
@@ -161,7 +203,8 @@ export const QuoteForm = () => {
                                     >
                                         <h3 className="text-2xl font-black text-gray-900 mb-6">{isRTL ? "تفاصيل الشحن" : "Shipping Details"}</h3>
 
-                                        <FormField label={t.quote.country} placeholder={t.quote.countryPlaceholder} required />
+                                        <FormField label={t.quote.country} placeholder={t.quote.countryPlaceholder} required 
+                                            value={formData.country} onChange={(e) => setFormData(prev => ({...prev, country: e.target.value}))} />
 
                                         <div>
                                             <label className="block text-sm font-bold text-gray-700 mb-2">{t.quote.notes}</label>
@@ -169,6 +212,7 @@ export const QuoteForm = () => {
                                                 rows={5}
                                                 className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 placeholder:text-gray-400 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all resize-none font-medium"
                                                 placeholder={t.quote.notesPlaceholder}
+                                                value={formData.notes} onChange={(e) => setFormData(prev => ({...prev, notes: e.target.value}))}
                                             />
                                         </div>
                                     </motion.div>
@@ -186,10 +230,14 @@ export const QuoteForm = () => {
                                         <h3 className="text-2xl font-black text-gray-900 mb-6">{isRTL ? "بيانات التواصل" : "Contact Information"}</h3>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
-                                            <FormField label={t.quote.companyName} placeholder={t.quote.companyPlaceholder} required />
-                                            <FormField label={t.quote.contactName} placeholder={t.quote.contactPlaceholder} required />
-                                            <FormField label={t.quote.email} type="email" placeholder="trade@company.com" dir="ltr" required />
-                                            <FormField label={t.quote.phone} type="tel" placeholder="+123456789" dir="ltr" required />
+                                            <FormField label={t.quote.companyName} placeholder={t.quote.companyPlaceholder} required 
+                                                value={formData.companyName} onChange={(e) => setFormData(prev => ({...prev, companyName: e.target.value}))} />
+                                            <FormField label={t.quote.contactName} placeholder={t.quote.contactPlaceholder} required 
+                                                value={formData.contactName} onChange={(e) => setFormData(prev => ({...prev, contactName: e.target.value}))} />
+                                            <FormField label={t.quote.email} type="email" placeholder="trade@company.com" dir="ltr" required 
+                                                value={formData.email} onChange={(e) => setFormData(prev => ({...prev, email: e.target.value}))} />
+                                            <FormField label={t.quote.phone} type="tel" placeholder="+123456789" dir="ltr" required 
+                                                value={formData.phone} onChange={(e) => setFormData(prev => ({...prev, phone: e.target.value}))} />
                                         </div>
 
                                         <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100 flex items-start gap-3">
@@ -227,13 +275,20 @@ export const QuoteForm = () => {
                                         <NextIcon className="w-5 h-5" />
                                     </button>
                                 ) : (
-                                    <button
-                                        type="submit"
-                                        className="flex items-center gap-2 px-10 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-black rounded-xl hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-                                    >
-                                        {t.quote.submit}
-                                        <CheckCircle className="w-5 h-5" />
-                                    </button>
+                                    <div className="flex flex-col items-end gap-3">
+                                        <button
+                                            type="submit"
+                                            disabled={loading}
+                                            data-analytics="submit_quote_form"
+                                            className="flex items-center gap-2 px-10 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-black rounded-xl hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-75 disabled:cursor-wait"
+                                        >
+                                            {loading ? (isRTL ? "جاري الإرسال..." : "Sending...") : t.quote.submit}
+                                            {!loading && <CheckCircle className="w-5 h-5" />}
+                                        </button>
+                                        <div className="flex items-center gap-4 text-gray-400 text-xs">
+                                            <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> ISO 22000 Certified</span>
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         </form>

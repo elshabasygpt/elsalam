@@ -610,6 +610,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
                 { key: "title", labelAr: "العنوان", labelEn: "Title", type: "text", bilingual: true, required: true, placeholder: "مثال: قصة مصنع السلام" },
                 { key: "subtitle", labelAr: "الوصف", labelEn: "Subtitle", type: "textarea", bilingual: true },
                 { key: "badge", labelAr: "الشارة", labelEn: "Badge", type: "text", bilingual: true, placeholder: "مثال: جودة عالمية منذ عام 2000" },
+                { key: "backgroundImage", labelAr: "صورة الخلفية", labelEn: "Background Image", type: "url", bilingual: false, placeholder: "/images/about-bg.jpg" },
             ],
         },
         {
@@ -651,6 +652,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             fields: [
                 { key: "name", labelAr: "الاسم", labelEn: "Name", type: "text", bilingual: true },
                 { key: "role", labelAr: "المنصب", labelEn: "Role", type: "text", bilingual: true },
+                { key: "image", labelAr: "الصورة الشخصية", labelEn: "Profile Image URL", type: "url", bilingual: false, placeholder: "/images/ceo.jpg" },
                 { key: "quote", labelAr: "اقتباس", labelEn: "Quote", type: "textarea", bilingual: true },
                 { key: "educationDesc", labelAr: "التعليم والنشأة", labelEn: "Education & Early Life", type: "textarea", bilingual: true },
                 {
@@ -663,6 +665,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
                         { key: "title", labelAr: "اسم المحطة (شركة + فترة)", labelEn: "Station (Company + Period)", type: "text", bilingual: true, placeholder: "شركة كوكاكولا – الإسكندرية (1990–1992)" },
                         { key: "role", labelAr: "المسمى الوظيفي", labelEn: "Job Title", type: "text", bilingual: true, placeholder: "مشرف مبيعات" },
                         { key: "desc", labelAr: "الوصف والإنجازات", labelEn: "Description & Achievements", type: "textarea", bilingual: true },
+                        { key: "image", labelAr: "شعار الشركة", labelEn: "Company Logo URL", type: "url", bilingual: false, placeholder: "/images/logos/company.png" },
                     ],
                 },
                 { key: "entrepreneurshipDesc", labelAr: "التحول لريادة الأعمال", labelEn: "Entrepreneurship Journey", type: "textarea", bilingual: true },
@@ -707,6 +710,29 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
                     listFields: [
                         { key: "title", labelAr: "وصف الصورة", labelEn: "Caption", type: "text", bilingual: true },
                         { key: "url", labelAr: "رابط الصورة", labelEn: "Image URL", type: "url", bilingual: false, placeholder: "/images/factory/gallery-1.jpg" },
+                    ],
+                },
+            ],
+        },
+        {
+            id: "team",
+            title: "فريق الإدارة العليا",
+            emoji: "👥",
+            description: "أعضاء فريق الإدارة العليا وشركاء النجاح",
+            fields: [
+                { key: "badge", labelAr: "شارة القسم", labelEn: "Badge", type: "text", bilingual: true, placeholder: "شركاء النجاح" },
+                { key: "title", labelAr: "عنوان القسم", labelEn: "Section Title", type: "text", bilingual: true, placeholder: "فريق الإدارة العليا" },
+                { key: "subtitle", labelAr: "وصف القسم", labelEn: "Section Subtitle", type: "textarea", bilingual: true },
+                {
+                    key: "members",
+                    labelAr: "عضو",
+                    labelEn: "Member",
+                    type: "list",
+                    bilingual: false,
+                    listFields: [
+                        { key: "name", labelAr: "اسم العضو", labelEn: "Name", type: "text", bilingual: true },
+                        { key: "role", labelAr: "المسمى الوظيفي", labelEn: "Role", type: "text", bilingual: true },
+                        { key: "image", labelAr: "الصورة الشخصية", labelEn: "Profile Image URL", type: "url", bilingual: false, placeholder: "/images/team/member.jpg" },
                     ],
                 },
             ],

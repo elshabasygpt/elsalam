@@ -44,6 +44,12 @@ export default async function AdminSettingsPage() {
                     smtpFromName: (settings as any).smtpFromName || "",
                     smtpSecure: (settings as any).smtpSecure || "tls",
                     logoUrl: (settings as any).logoUrl || "",
+                    googleAnalyticsId: (settings as any).googleAnalyticsId || "",
+                    imapHost: (settings as any).imapHost || "",
+                    imapPort: (settings as any).imapPort || 993,
+                    imapSecure: (settings as any).imapSecure || "tls",
+                    imapUser: (settings as any).imapUser || "",
+                    imapPass: (settings as any).imapPass || "",
                 }}
             />
         </div>

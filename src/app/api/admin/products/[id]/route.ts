@@ -21,6 +21,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
             technical_specs: true,
             packagings: true,
             certifications: true,
+            images: true,
         },
     });
 
@@ -57,6 +58,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
             await tx.technicalSpec.deleteMany({ where: { productId } });
             await tx.productPackaging.deleteMany({ where: { productId } });
             await tx.productCertification.deleteMany({ where: { productId } });
+            await tx.productImage.deleteMany({ where: { productId } });
 
             // Update product + create new related data
             return tx.product.update({
@@ -69,6 +71,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
                     short_description_en: body.short_description_en || null,
                     description_ar: body.description_ar || null,
                     description_en: body.description_en || null,
+                    price: body.price !== undefined ? body.price : null,
+                    price_unit_ar: body.price_unit_ar || null,
+                    price_unit_en: body.price_unit_en || null,
                     featured_image: body.featured_image || null,
                     categoryId: body.categoryId || null,
                     is_featured: body.is_featured || false,
@@ -101,12 +106,18 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
                             name: c.name,
                         })),
                     } : undefined,
+                    images: body.images?.length ? {
+                        create: body.images.map((i: any) => ({
+                            url: i.url,
+                        })),
+                    } : undefined,
                 },
                 include: {
                     features: true,
                     technical_specs: true,
                     packagings: true,
                     certifications: true,
+                    images: true,
                 },
             });
         });

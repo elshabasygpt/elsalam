@@ -17,7 +17,8 @@ interface SettingsData {
     facebookUrl: string; twitterUrl: string; instagramUrl: string; linkedinUrl: string;
     smtpHost: string; smtpPort: number; smtpUser: string; smtpPass: string;
     smtpFrom: string; smtpFromName: string; smtpSecure: string;
-    logoUrl: string;
+    imapHost: string; imapPort: number; imapSecure: string; imapUser: string; imapPass: string;
+    logoUrl: string; googleAnalyticsId: string;
 }
 
 interface UserItem {
@@ -47,8 +48,8 @@ function FormSection({ title, icon: Icon, children }: { title: string; icon?: an
     return (
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
             <div className="px-6 py-4 border-b border-gray-50 flex items-center gap-2.5">
-                {Icon && (<div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center"><Icon className="w-4.5 h-4.5 text-slate-500" /></div>)}
-                <h2 className="font-bold text-sm text-slate-800">{title}</h2>
+                {Icon && (<div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center"><Icon className="w-6 h-6 text-slate-500" /></div>)}
+                <h2 className="font-bold text-base text-slate-800">{title}</h2>
             </div>
             <div className="p-6 space-y-5">{children}</div>
         </div>
@@ -62,11 +63,11 @@ function InputField({ label, dir, value, onChange, type, placeholder, icon: Icon
         <div>
             <label className="block text-xs font-bold text-slate-500 mb-2">{label}</label>
             <div className="relative">
-                {Icon && <Icon className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />}
+                {Icon && <Icon className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-300" />}
                 <input
                     type={type || "text"} dir={dir || "rtl"} value={value}
                     onChange={(e) => onChange(e.target.value)}
-                    className={`w-full ${Icon ? "pr-10" : "px-4"} pl-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all text-sm font-medium placeholder:text-slate-300 ${dir === 'ltr' ? 'text-left' : ''}`}
+                    className={`w-full ${Icon ? "pr-12" : "px-4"} pl-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all text-sm font-medium placeholder:text-slate-300 ${dir === 'ltr' ? 'text-left' : ''}`}
                     placeholder={placeholder}
                 />
             </div>
@@ -158,7 +159,7 @@ function SiteSettingsTab({ initialData }: { initialData: SettingsData }) {
                                         className="absolute -top-2 -left-2 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
                                         title="إزالة اللوجو"
                                     >
-                                        <X className="w-4 h-4" />
+                                        <X className="w-5 h-5 shrink-0" />
                                     </button>
                                 </div>
                             ) : (
@@ -241,6 +242,12 @@ function SiteSettingsTab({ initialData }: { initialData: SettingsData }) {
                     <InputField label="Instagram" dir="ltr" value={form.instagramUrl} onChange={set("instagramUrl")} placeholder="https://instagram.com/..." />
                     <InputField label="Twitter / X" dir="ltr" value={form.twitterUrl} onChange={set("twitterUrl")} placeholder="https://x.com/..." />
                     <InputField label="LinkedIn" dir="ltr" value={form.linkedinUrl} onChange={set("linkedinUrl")} placeholder="https://linkedin.com/company/..." />
+                </div>
+            </FormSection>
+
+            <FormSection title="أدوات تحليل البيانات" icon={Globe}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <InputField label="معرف Google Analytics (G-XXXXXX / GTM-XXXXX)" dir="ltr" value={form.googleAnalyticsId} onChange={set("googleAnalyticsId")} placeholder="G-123456789" />
                 </div>
             </FormSection>
 
@@ -339,8 +346,8 @@ function UsersTab() {
                 <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
                     <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center"><UserPlus className="w-4.5 h-4.5 text-green-600" /></div>
-                            <h2 className="font-bold text-sm text-slate-800">{editingId ? "تعديل المستخدم" : "إضافة مستخدم جديد"}</h2>
+                            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center shrink-0"><UserPlus className="w-6 h-6 text-green-600" /></div>
+                            <h2 className="font-bold text-base text-slate-800">{editingId ? "تعديل المستخدم" : "إضافة مستخدم جديد"}</h2>
                         </div>
                         <button type="button" onClick={resetForm} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all"><X className="w-5 h-5" /></button>
                     </div>
@@ -410,8 +417,8 @@ function UsersTab() {
                 <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
                     <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center"><Users className="w-4.5 h-4.5 text-slate-500" /></div>
-                            <h2 className="font-bold text-sm text-slate-800">المستخدمون ({users.length})</h2>
+                            <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center shrink-0"><Users className="w-6 h-6 text-slate-500" /></div>
+                            <h2 className="font-bold text-base text-slate-800">المستخدمون ({users.length})</h2>
                         </div>
                         {!showForm && (
                             <button onClick={() => { resetForm(); setShowForm(true); }} className="inline-flex items-center gap-1.5 bg-green-600 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-green-700 transition-all">
@@ -447,7 +454,7 @@ function UsersTab() {
                                             </td>
                                             <td className="px-5 py-4 text-center">
                                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border ${roleInfo.color}`}>
-                                                    <roleInfo.icon className="w-4.5 h-4.5" /> {roleInfo.label}
+                                                    <roleInfo.icon className="w-5 h-5 shrink-0" /> {roleInfo.label}
                                                 </span>
                                             </td>
                                             <td className="px-5 py-4 text-center">
@@ -457,11 +464,11 @@ function UsersTab() {
                                             </td>
                                             <td className="px-5 py-4">
                                                 <div className="flex items-center justify-center gap-2">
-                                                    <button onClick={() => startEdit(user)} className="p-2 text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-all border border-green-100" title="تعديل">
-                                                        <Pencil className="w-5 h-5" />
+                                                    <button onClick={() => startEdit(user)} className="p-2.5 text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-all border border-green-100 shrink-0" title="تعديل">
+                                                        <Pencil className="w-5 h-5 shrink-0" />
                                                     </button>
-                                                    <button onClick={() => handleDelete(user.id, user.name)} className="p-2 text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-all border border-red-100" title="حذف">
-                                                        <Trash2 className="w-5 h-5" />
+                                                    <button onClick={() => handleDelete(user.id, user.name)} className="p-2.5 text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-all border border-red-100 shrink-0" title="حذف">
+                                                        <Trash2 className="w-5 h-5 shrink-0" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -478,8 +485,8 @@ function UsersTab() {
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
                 <button type="button" onClick={() => setShowPermissions(!showPermissions)} className="w-full px-6 py-4 border-b border-gray-50 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center"><Shield className="w-4.5 h-4.5 text-amber-600" /></div>
-                        <h2 className="font-bold text-sm text-slate-800">مصفوفة الصلاحيات</h2>
+                        <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center shrink-0"><Shield className="w-6 h-6 text-amber-600" /></div>
+                        <h2 className="font-bold text-base text-slate-800">مصفوفة الصلاحيات</h2>
                     </div>
                     <span className="text-xs text-slate-400">{showPermissions ? "إخفاء ▲" : "عرض ▼"}</span>
                 </button>
@@ -565,6 +572,11 @@ function SmtpSettingsTab({ initialData }: { initialData: SettingsData }) {
         smtpFrom: initialData.smtpFrom || "",
         smtpFromName: initialData.smtpFromName || "",
         smtpSecure: initialData.smtpSecure || "tls",
+        imapHost: initialData.imapHost || "",
+        imapPort: initialData.imapPort || 993,
+        imapSecure: initialData.imapSecure || "tls",
+        imapUser: initialData.imapUser || "",
+        imapPass: initialData.imapPass || "",
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -580,6 +592,28 @@ function SmtpSettingsTab({ initialData }: { initialData: SettingsData }) {
         setLoading(false);
     };
 
+    const [testing, setTesting] = useState(false);
+    const [testResult, setTestResult] = useState<{ success: boolean; msg: string } | null>(null);
+
+    const handleTestConnection = async () => {
+        setTesting(true); setTestResult(null); setError(""); setSuccess(false);
+        try {
+            const res = await fetch("/api/admin/settings/test-smtp", {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(form)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setTestResult({ success: true, msg: data.message });
+            } else {
+                setTestResult({ success: false, msg: data.error || data.details || "فشل الاتصال" });
+            }
+        } catch {
+            setTestResult({ success: false, msg: "خطأ في الشبكة أثناء الاتصال بالخادم." });
+        }
+        setTesting(false);
+    };
+
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {error && <div className="flex items-center gap-2 p-4 bg-red-50 text-red-600 rounded-xl font-bold text-sm border border-red-100">❌ {error}</div>}
@@ -590,11 +624,35 @@ function SmtpSettingsTab({ initialData }: { initialData: SettingsData }) {
                 <Mail className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
                 <div>
                     <p className="text-sm font-bold text-blue-800 mb-1">ربط البريد الإلكتروني الاحترافي</p>
-                    <p className="text-xs text-blue-600 leading-relaxed">قم بإدخال بيانات خادم البريد SMTP لإرسال الردود من بريد info@elsalamoil.com مباشرة من لوحة التحكم. يمكنك الحصول على هذه البيانات من مزود خدمة الاستضافة.</p>
+                    <p className="text-xs text-blue-600 leading-relaxed">قم بإدخال بيانات خادم البريد SMTP لإرسال الردود من بريد info@elsalamoil.com مباشرة من لوحة التحكم، وإعدادات خادم الاستقبال IMAP لقرأة الرسائل الواردة بداخل قسم البريد الوارد المدمج.</p>
                 </div>
             </div>
 
-            <FormSection title="خادم البريد SMTP" icon={Mail}>
+            <FormSection title="خادم استقبال البريد الوارد (IMAP Webmail)" icon={Mail}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <InputField label="عنوان خادم الاستقبال (IMAP Host)" dir="ltr" value={form.imapHost} onChange={(v) => setForm({ ...form, imapHost: v })} placeholder="imap.elsalamoil.com" />
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-2">منفذ الاستقبال (Port)</label>
+                        <input type="number" dir="ltr" value={form.imapPort} onChange={(e) => setForm({ ...form, imapPort: parseInt(e.target.value) || 993 })}
+                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all text-sm font-medium text-left" />
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <InputField label="مستخدم الاستقبال (عادة نفس البريد)" dir="ltr" value={form.imapUser} onChange={(v) => setForm({ ...form, imapUser: v })} placeholder="info@elsalamoil.com" />
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-2">كلمة المرور المشتركة (Password)</label>
+                        <div className="relative">
+                            <input type={showPass ? "text" : "password"} dir="ltr" value={form.imapPass} onChange={(e) => setForm({ ...form, imapPass: e.target.value })}
+                                className="w-full px-4 pl-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all text-sm font-medium text-left" placeholder="••••••••" />
+                            <button type="button" onClick={() => setShowPass(!showPass)} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500">
+                                {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </FormSection>
+
+            <FormSection title="خادم إرسال البريد (SMTP Send)" icon={Mail}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <InputField label="عنوان الخادم (SMTP Host)" dir="ltr" value={form.smtpHost} onChange={(v) => setForm({ ...form, smtpHost: v })} placeholder="mail.elsalamoil.com" />
                     <div>
@@ -636,10 +694,22 @@ function SmtpSettingsTab({ initialData }: { initialData: SettingsData }) {
                 </div>
             </FormSection>
 
-            <div className="flex justify-end pt-2">
-                <button type="submit" disabled={loading} className="inline-flex items-center gap-2 bg-gradient-to-l from-green-600 to-green-700 text-white px-8 py-3 rounded-xl font-bold text-sm hover:from-green-700 hover:to-green-800 transition-all shadow-lg shadow-green-600/15 disabled:opacity-50 active:scale-[0.97]">
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />} حفظ إعدادات البريد
-                </button>
+            <div className="flex justify-between items-center pt-2">
+                <div>
+                    {testResult && (
+                        <div className={`text-xs font-bold px-4 py-2 rounded-lg ${testResult.success ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                            {testResult.msg}
+                        </div>
+                    )}
+                </div>
+                <div className="flex gap-3">
+                    <button type="button" onClick={handleTestConnection} disabled={testing} className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 border border-blue-200 px-6 py-3 rounded-xl font-bold text-sm hover:bg-blue-100 transition-all disabled:opacity-50 active:scale-[0.97]">
+                        {testing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Globe className="w-5 h-5" />} اختبار الاتصال بالخادم
+                    </button>
+                    <button type="submit" disabled={loading} className="inline-flex items-center gap-2 bg-gradient-to-l from-green-600 to-green-700 text-white px-8 py-3 rounded-xl font-bold text-sm hover:from-green-700 hover:to-green-800 transition-all shadow-lg shadow-green-600/15 disabled:opacity-50 active:scale-[0.97]">
+                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />} حفظ الإعدادات
+                    </button>
+                </div>
             </div>
         </form>
     );

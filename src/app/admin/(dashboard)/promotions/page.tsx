@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Loader2, Percent, X, Save, Calendar, Package, Upload } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Percent, X, Save, Calendar, Package, Upload, Eye, EyeOff } from "lucide-react";
 
 interface Product {
     id: number;
@@ -26,6 +26,7 @@ interface Promotion {
     ends_at: string;
     productId?: number;
     product?: Product;
+    isActive: boolean;
 }
 
 const EMPTY_FORM = {
@@ -144,7 +145,24 @@ export default function AdminPromotionsPage() {
         }
     };
 
-    const isActive = (p: Promotion) => {
+    const handleToggleVisibility = async (p: Promotion) => {
+        try {
+            const res = await fetch(`/api/admin/promotions/${p.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ isActive: !p.isActive }),
+            });
+            if (res.ok) {
+                setPromotions(proms => proms.map(prom => prom.id === p.id ? { ...prom, isActive: !p.isActive } : prom));
+            } else {
+                alert("حدث خطأ أثناء تغيير ظهور العرض");
+            }
+        } catch {
+            alert("حدث خطأ في الاتصال");
+        }
+    };
+
+    const isDateActive = (p: Promotion) => {
         const now = new Date();
         const end = new Date(p.ends_at);
         const start = p.starts_at ? new Date(p.starts_at) : null;
@@ -369,16 +387,21 @@ export default function AdminPromotionsPage() {
                                             )}
                                         </td>
                                         <td className="px-5 py-3.5 text-center">
-                                            {isActive(p) ? (
-                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 text-[10px] font-bold rounded-lg">
-                                                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                                                    نشط
-                                                </span>
-                                            ) : (
-                                                <span className="inline-flex items-center px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-lg">
-                                                    منتهي
-                                                </span>
-                                            )}
+                                            <div className="flex flex-col gap-1 items-center justify-center">
+                                                {isDateActive(p) ? (
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 text-[10px] font-bold rounded-lg">
+                                                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                                                        تاريخياً نشط
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-lg">
+                                                        منتهي الصلاحية
+                                                    </span>
+                                                )}
+                                                {!p.isActive ? (
+                                                    <span className="inline-flex items-center px-2 py-0.5 bg-red-50 text-red-600 text-[10px] font-bold rounded-lg">مخفي</span>
+                                                ) : <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-lg">ظاهر بالموقع</span>}
+                                            </div>
                                         </td>
                                         <td className="px-5 py-3.5 text-center">
                                             <span className="text-[11px] text-slate-500">
@@ -387,6 +410,9 @@ export default function AdminPromotionsPage() {
                                         </td>
                                         <td className="px-5 py-3.5">
                                             <div className="flex items-center justify-center gap-1">
+                                                <button onClick={() => handleToggleVisibility(p)} className={`p-2 rounded-lg transition-all ${p.isActive ? "text-blue-500 hover:bg-blue-50" : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"}`} title={p.isActive ? "إخفاء العرض" : "إظهار العرض"}>
+                                                    {p.isActive ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                                                </button>
                                                 <button onClick={() => startEdit(p)} className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all" title="تعديل">
                                                     <Pencil className="w-5 h-5" />
                                                 </button>

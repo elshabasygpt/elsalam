@@ -27,11 +27,9 @@ export async function PUT(req: NextRequest) {
         let settings = await prisma.siteSettings.findFirst();
 
         if (settings) {
-            settings = await prisma.siteSettings.update({
-                where: { id: settings.id },
-                data: {
-                    siteNameAr: body.siteNameAr,
-                    siteNameEn: body.siteNameEn,
+            const updateData: any = {
+                siteNameAr: body.siteNameAr,
+                siteNameEn: body.siteNameEn,
                     siteDescriptionAr: body.siteDescriptionAr || null,
                     siteDescriptionEn: body.siteDescriptionEn || null,
                     contactEmail: body.contactEmail || null,
@@ -49,8 +47,17 @@ export async function PUT(req: NextRequest) {
                     smtpFrom: body.smtpFrom || null,
                     smtpFromName: body.smtpFromName || null,
                     smtpSecure: body.smtpSecure || null,
+                    imapHost: body.imapHost || null,
+                    imapPort: body.imapPort ? parseInt(body.imapPort) : null,
+                    imapSecure: body.imapSecure || null,
+                    imapUser: body.imapUser || null,
+                    imapPass: body.imapPass || null,
                     logoUrl: body.logoUrl || null,
-                },
+                    googleAnalyticsId: body.googleAnalyticsId || null,
+            };
+            settings = await prisma.siteSettings.update({
+                where: { id: settings.id },
+                data: updateData,
             });
         } else {
             settings = await prisma.siteSettings.create({

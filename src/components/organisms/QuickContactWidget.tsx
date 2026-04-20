@@ -53,6 +53,7 @@ export const QuickContactWidget = () => {
                                 href="https://wa.me/201017400030"
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                data-analytics="whatsapp_contact_click"
                                 className="flex items-center gap-3 p-3 bg-green-50 rounded-xl hover:bg-green-100 transition-colors group"
                             >
                                 <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center shrink-0">
@@ -67,6 +68,7 @@ export const QuickContactWidget = () => {
 
                             <a
                                 href="tel:+201017400030"
+                                data-analytics="phone_contact_click"
                                 className="flex items-center gap-3 p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors group"
                             >
                                 <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
@@ -81,6 +83,7 @@ export const QuickContactWidget = () => {
 
                             <a
                                 href="mailto:trade@elsalam-packaging.com"
+                                data-analytics="email_contact_click"
                                 className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors group"
                             >
                                 <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center shrink-0">
@@ -103,6 +106,7 @@ export const QuickContactWidget = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsOpen(!isOpen)}
+                data-analytics="contact_widget_toggle"
                 className="w-14 h-14 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow"
             >
                 {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
     const promotions = await prisma.promotion.findMany({
-        where: { ends_at: { gte: new Date() } },
+        where: { ends_at: { gte: new Date() }, isActive: true },
         include: {
             product: {
                 select: { slug: true, name_ar: true, name_en: true },

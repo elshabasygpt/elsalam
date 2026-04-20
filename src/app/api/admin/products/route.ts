@@ -43,6 +43,9 @@ export async function POST(req: NextRequest) {
                 short_description_en: body.short_description_en || null,
                 description_ar: body.description_ar || null,
                 description_en: body.description_en || null,
+                price: body.price !== undefined ? body.price : null,
+                price_unit_ar: body.price_unit_ar || null,
+                price_unit_en: body.price_unit_en || null,
                 featured_image: body.featured_image || null,
                 categoryId: body.categoryId || null,
                 is_featured: body.is_featured || false,
@@ -76,12 +79,18 @@ export async function POST(req: NextRequest) {
                         name: c.name,
                     })),
                 } : undefined,
+                images: body.images?.length ? {
+                    create: body.images.map((i: any) => ({
+                        url: i.url,
+                    })),
+                } : undefined,
             },
             include: {
                 features: true,
                 technical_specs: true,
                 packagings: true,
                 certifications: true,
+                images: true,
             },
         });
 

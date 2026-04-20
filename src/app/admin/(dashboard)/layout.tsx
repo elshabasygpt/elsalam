@@ -12,7 +12,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     }
 
     return (
-        <AdminShell userName={session.user?.name || "المدير"}>
+        <AdminShell userName={session.user?.name || "المدير"} userRole={session.user?.role || "USER"}>
             {children}
         </AdminShell>
     );

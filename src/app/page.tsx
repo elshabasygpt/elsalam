@@ -12,8 +12,8 @@ export const metadata = {
     },
 };
 
-// force-dynamic means: never cache this page — always fetch fresh from DB
-export const dynamic = "force-dynamic";
+// revalidate every 60 seconds to enable ISR and improve loading speed
+export const revalidate = 60;
 
 export default async function HomePage() {
     // Fetch CMS content from database (saved via admin panel)

@@ -30,16 +30,9 @@ export function HomePageClient({ cmsContent: initialContent }: HomePageClientPro
     const [cmsContent, setCmsContent] = useState<Record<string, any>>(initialContent);
 
     useEffect(() => {
-        // Always fetch the latest content from DB when the page loads in the browser
-        // This bypasses ANY server-side cache and ensures updated images/text appear immediately
-        fetch(`/api/public/pages/home`, { cache: "no-store" })
-            .then(r => r.json())
-            .then(json => {
-                if (json.data && Object.keys(json.data).length > 0) {
-                    setCmsContent(json.data);
-                }
-            })
-            .catch(() => {/* keep server-side content on error */});
+        // Keeping useEffect for any future client-side initialization,
+        // but removed the redundant fetch since Next.js ISR (revalidate) 
+        // ensures the server sends fresh enough content.
     }, []);
 
     return (

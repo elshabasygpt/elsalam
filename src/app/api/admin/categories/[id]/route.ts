@@ -9,7 +9,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     try {
         const body = await req.json();
-        const { name_ar, name_en, slug } = body;
+        const { name_ar, name_en, slug, imageUrl, sortOrder } = body;
         const p = await params;
         const id = parseInt(p.id);
 
@@ -19,7 +19,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
         const category = await prisma.category.update({
             where: { id },
-            data: { name_ar, name_en, slug },
+            data: { name_ar, name_en, slug, imageUrl, sortOrder: sortOrder ? parseInt(sortOrder) : 0 },
         });
         return NextResponse.json(category);
     } catch (error) {

@@ -40,6 +40,7 @@ export function getAboutPageDefaultContent(): Record<string, any> {
         ceo: {
             name_ar: "محمد إسماعيل إدريس",
             name_en: "Mohamed Ismail Idris",
+            image: "",
             role_ar: "رئيس مجلس إدارة مصنع السلام لعصر واستخلاص الزيوت النباتية",
             role_en: "Chairman of the Board, Elsalam Factory for Vegetable Oils and Refining",
             quote_ar: "نؤمن أن الجودة ليست خياراً بل هي التزام. رؤيتنا أن نكون الشريك الأول لكل مصنع ومطعم وموزع يبحث عن زيوت نباتية بمعايير عالمية مصنوعة في مصر.",
@@ -47,11 +48,11 @@ export function getAboutPageDefaultContent(): Record<string, any> {
             educationDesc_ar: "تخرج السيد محمد إسماعيل إدريس من جامعة الإسكندرية عام 1990، وبدأ مسيرته المهنية في مجال المبيعات، حيث أظهر منذ بداياته شغفًا واضحًا بمجال التسويق وبناء العلامات التجارية وتعزيز الحصة السوقية للشركات.",
             educationDesc_en: "Mr. Mohamed Ismail Idris graduated from Alexandria University in 1990 and began his professional career in sales, where he demonstrated a clear passion for marketing, brand building, and expanding market share from the very beginning.",
             careerStations: [
-                { title_ar: "شركة كوكاكولا – الإسكندرية (1990–1992)", title_en: "Coca-Cola Company – Alexandria (1990–1992)", role_ar: "مشرف مبيعات", role_en: "Sales Supervisor", desc_ar: "توسيع الحصة السوقية، زيادة المبيعات، تطبيق تقنيات تسويق مبتكرة", desc_en: "Expanded market share, increased sales, implemented innovative marketing techniques" },
-                { title_ar: "شركة العوجان – المملكة العربية السعودية (1993–1995)", title_en: "Aujan Industries – Saudi Arabia (1993–1995)", role_ar: "مشرف التموين", role_en: "Catering Supervisor", desc_ar: "أسّس قسم التموين بالشركة، وساهم في إدخال منتجات (راني، فيمتو، شوكولاتة كادبوري) إلى قطاعات الفنادق والمطاعم والمستشفيات والقطاع العسكري، والخطوط الجوية السعودية.", desc_en: "Founded the company's Catering Department, successfully introducing products (Rani, Vimto, Cadbury chocolate) to hotels, restaurants, hospitals, the military sector, and Saudi Arabian Airlines." },
-                { title_ar: "شركة باعشن – السعودية (1995–1997)", title_en: "Baeshen Company – Saudi Arabia (1995–1997)", role_ar: "مدير المنطقة الشمالية", role_en: "Northern Region Manager", desc_ar: "قاد جهود تسويق علامة شاي ربيع، وأسهم في إطلاق وتوسيع انتشار المنتج في السوق السعودي.", desc_en: "Led the marketing efforts for Rabea Tea brand, contributing to the launch and extensive expansion of the product in the Saudi market." },
-                { title_ar: "شركة نستله مصر (1998)", title_en: "Nestle Egypt (1998)", role_ar: "مدير المبيعات - الإسكندرية", role_en: "Sales Manager - Alexandria", desc_ar: "أشرف على توزيع المنتجات الجافة (نسكافيه، نيدو، سيريلاك، شوكولاتة نستله) وعزز انتشار العلامة محليًا.", desc_en: "Supervised the distribution of dry products (Nescafe, Nido, Cerelac, Nestle chocolate) and enhanced the brand's local presence." },
-                { title_ar: "شركة صافولا سايم داربي (1999–2001)", title_en: "Savola Sime Darby (1999–2001)", role_ar: "مدير مبيعات القطاع الصناعي", role_en: "Industrial Sector Sales Manager", desc_ar: "ركز على توزيع زيت النخيل للصناعات الغذائية وقدم حلولًا صناعية مبتكرة من خلال إعادة تدوير مشتقات الزيت.", desc_en: "Focused on distributing palm oil to the food industry and introduced innovative industrial solutions by recycling oil derivatives." },
+                { title_ar: "شركة كوكاكولا – الإسكندرية (1990–1992)", title_en: "Coca-Cola Company – Alexandria (1990–1992)", role_ar: "مشرف مبيعات", role_en: "Sales Supervisor", desc_ar: "توسيع الحصة السوقية، زيادة المبيعات، تطبيق تقنيات تسويق مبتكرة", desc_en: "Expanded market share, increased sales, implemented innovative marketing techniques", image: "" },
+                { title_ar: "شركة العوجان – المملكة العربية السعودية (1993–1995)", title_en: "Aujan Industries – Saudi Arabia (1993–1995)", role_ar: "مشرف التموين", role_en: "Catering Supervisor", desc_ar: "أسّس قسم التموين بالشركة، وساهم في إدخال منتجات (راني، فيمتو، شوكولاتة كادبوري) إلى قطاعات الفنادق والمطاعم والمستشفيات والقطاع العسكري، والخطوط الجوية السعودية.", desc_en: "Founded the company's Catering Department, successfully introducing products (Rani, Vimto, Cadbury chocolate) to hotels, restaurants, hospitals, the military sector, and Saudi Arabian Airlines.", image: "" },
+                { title_ar: "شركة باعشن – السعودية (1995–1997)", title_en: "Baeshen Company – Saudi Arabia (1995–1997)", role_ar: "مدير المنطقة الشمالية", role_en: "Northern Region Manager", desc_ar: "قاد جهود تسويق علامة شاي ربيع، وأسهم في إطلاق وتوسيع انتشار المنتج في السوق السعودي.", desc_en: "Led the marketing efforts for Rabea Tea brand, contributing to the launch and extensive expansion of the product in the Saudi market.", image: "" },
+                { title_ar: "شركة نستله مصر (1998)", title_en: "Nestle Egypt (1998)", role_ar: "مدير المبيعات - الإسكندرية", role_en: "Sales Manager - Alexandria", desc_ar: "أشرف على توزيع المنتجات الجافة (نسكافيه، نيدو، سيريلاك، شوكولاتة نستله) وعزز انتشار العلامة محليًا.", desc_en: "Supervised the distribution of dry products (Nescafe, Nido, Cerelac, Nestle chocolate) and enhanced the brand's local presence.", image: "" },
+                { title_ar: "شركة صافولا سايم داربي (1999–2001)", title_en: "Savola Sime Darby (1999–2001)", role_ar: "مدير مبيعات القطاع الصناعي", role_en: "Industrial Sector Sales Manager", desc_ar: "ركز على توزيع زيت النخيل للصناعات الغذائية وقدم حلولًا صناعية مبتكرة من خلال إعادة تدوير مشتقات الزيت.", desc_en: "Focused on distributing palm oil to the food industry and introduced innovative industrial solutions by recycling oil derivatives.", image: "" },
             ],
             entrepreneurshipDesc_ar: "في عام 2002، اتخذ السيد محمد إدريس خطوة جريئة بتأسيس شركة السلام كشركة متخصصة في تجارة وتكرير الزيوت النباتية وتوريد المواد الخام للمصانع الكبرى والمطاعم.",
             entrepreneurshipDesc_en: "In 2002, Mr. Mohamed Idris took a bold step by founding Elsalam Company as a specialized entity in trading and refining vegetable oils and supplying raw materials to major factories and restaurants.",
@@ -89,6 +90,22 @@ export function getAboutPageDefaultContent(): Record<string, any> {
                 { title_ar: "منطقة استقبال المواد الخام", title_en: "Raw Material Reception Area", url: "" },
                 { title_ar: "غرفة التحكم المركزية", title_en: "Central Control Room", url: "" },
                 { title_ar: "خط إنتاج السمن", title_en: "Ghee Production Line", url: "" },
+            ],
+        },
+
+        // ── Team ──
+        team: {
+            badge_ar: "شركاء النجاح",
+            badge_en: "Partners in Success",
+            title_ar: "فريق الإدارة العليا",
+            title_en: "Executive Leadership",
+            subtitle_ar: "نخبة من الكفاءات المتميزة التي تقود رؤيتنا نحو العالمية، وتضمن أعلى معايير الجودة والتميز في كافة قطاعات الشركة.",
+            subtitle_en: "Our distinguished leadership driving our global vision and ensuring the highest standards of quality.",
+            members: [
+                { name_ar: "أحمد سليمان", name_en: "Ahmed Soliman", role_ar: "المدير المالي", role_en: "Chief Financial Officer", image: "" },
+                { name_ar: "منى عبد الرحمن", name_en: "Mona Abdulrahman", role_ar: "رئيس قطاع العمليات", role_en: "Chief Operating Officer", image: "" },
+                { name_ar: "طارق حسن", name_en: "Tarek Hassan", role_ar: "مدير الجودة والتطوير", role_en: "R&D Director", image: "" },
+                { name_ar: "ريم خالد", name_en: "Reem Khaled", role_ar: "مدير إدارة المبيعات", role_en: "Sales Director", image: "" },
             ],
         },
     };

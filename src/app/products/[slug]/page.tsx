@@ -19,8 +19,10 @@ import { getProductDetail, type ProductDetail } from "@/lib/products-api";
 import {
     Check, Package, Globe, ShieldCheck,
     Droplets, CakeSlice, Flame, Loader2,
-    FileText, ArrowLeft, ArrowRight, Sparkles, Settings
+    FileText, ArrowLeft, ArrowRight, Sparkles, Settings, ShoppingBag
 } from "lucide-react";
+import { useCartStore } from "@/lib/store/useCartStore";
+import { cn } from "@/utils/classnames";
 
 function safeArray(value: unknown): string[] {
     if (Array.isArray(value)) return value;
@@ -45,8 +47,11 @@ export default function ProductDetailPage() {
     const { t, locale, isRTL } = useLanguage();
 
     const [product, setProduct] = useState<ProductDetail | null>(null);
+    const [activeImage, setActiveImage] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    
+    const addItem = useCartStore((state) => state.addItem);
 
     const BackArrow = isRTL ? ArrowRight : ArrowLeft;
     const CtaArrow = isRTL ? ArrowLeft : ArrowRight;
@@ -58,6 +63,7 @@ export default function ProductDetailPage() {
             try {
                 const data = await getProductDetail(slug);
                 setProduct(data);
+                setActiveImage(data.featured_image || "/images/placeholder.svg");
             } catch {
                 setError(true);
             } finally {
@@ -157,14 +163,14 @@ export default function ProductDetailPage() {
                                     )}
                                 </div>
 
-                                <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white mb-4 drop-shadow-xl leading-tight">{title}</h1>
-                                <p className="text-white/70 text-sm md:text-base font-bold tracking-[0.2em] uppercase font-english mb-6">{subtitle}</p>
+                                <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white mb-6 drop-shadow-xl leading-snug">{title}</h1>
+                                <p className="text-white/70 text-sm md:text-base font-bold tracking-[0.2em] uppercase font-english mb-8">{subtitle}</p>
                                 <p className="text-white/90 text-lg md:text-xl max-w-2xl leading-relaxed mb-10">{description}</p>
 
                                 {/* Price block with CTA */}
-                                <div className="flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start p-6 rounded-3xl bg-black/10 backdrop-blur-md border border-white/10 shadow-2xl">
+                                <div className="inline-flex flex-col sm:flex-row items-center gap-4 sm:gap-6 justify-center lg:justify-start p-4 sm:p-5 rounded-3xl bg-black/10 backdrop-blur-md border border-white/10 shadow-2xl">
                                     <PriceTag
-                                        price={product.price}
+                                        price={product.price || (product.packagings?.length > 0 ? product.packagings[0].price : null)}
                                         originalPrice={activePromo?.original_price}
                                         promoPrice={activePromo?.promo_price}
                                         unitAr={product.price_unit_ar || undefined}
@@ -173,11 +179,32 @@ export default function ProductDetailPage() {
                                         className="text-white drop-shadow-md [&_span]:text-white [&_span]:!text-white/70"
                                     />
                                     <div className="w-px h-12 bg-white/20 hidden sm:block"></div>
+                                    <button
+                                        onClick={() => {
+                                            const finalPrice = activePromo?.promo_price || product.price || (product.packagings?.length > 0 ? product.packagings[0].price : 0) || 0;
+                                            addItem({
+                                                id: product.id.toString(),
+                                                productId: product.id,
+                                                name_ar: product.name_ar,
+                                                name_en: product.name_en,
+                                                price: finalPrice,
+                                                quantity: 1,
+                                                image: product.featured_image || "/images/placeholder.svg",
+                                                slug: product.slug
+                                            });
+                                        }}
+                                        className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-green-500 text-white font-black rounded-2xl hover:scale-105 hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:bg-green-400 transition-all"
+                                    >
+                                        <ShoppingBag className="w-5 h-5" />
+                                        {locale === "ar" ? "أضف للسلة" : "Add to Cart"}
+                                    </button>
+
                                     <Link
                                         href="/contact"
-                                        className="inline-flex items-center gap-3 px-8 py-4 bg-white text-green-900 font-black rounded-2xl hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all"
+                                        data-analytics="product_quote_click"
+                                        className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-white text-green-900 font-black rounded-2xl hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all"
                                     >
-                                        {locale === "ar" ? "طلب تسعير جملة" : "Request Bulk Quote"}
+                                        {locale === "ar" ? "تسعير جملة" : "Bulk Quote"}
                                         <CtaArrow className="w-5 h-5" />
                                     </Link>
                                 </div>
@@ -193,13 +220,34 @@ export default function ProductDetailPage() {
                                 transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
                             >
                                 <img
-                                    src="/images/placeholder.svg"
+                                    src={activeImage || product.featured_image || "/images/placeholder.svg"}
                                     alt={title}
                                     className="w-full h-full object-contain filter drop-shadow-[0_30px_50px_rgba(0,0,0,0.5)] hover:scale-[1.03] transition-transform duration-500 cursor-crosshair"
                                 />
                                 {/* Bottom shadow reflection */}
                                 <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-3/4 h-10 bg-black/50 blur-2xl rounded-full" />
                             </motion.div>
+
+                            {/* Image Thumbnails */}
+                            {(product.images && product.images.length > 0) && (
+                                <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 flex justify-center flex-wrap items-center gap-2 lg:gap-3 z-40 w-full px-4">
+                                    <button
+                                        onClick={() => setActiveImage(product.featured_image || "/images/placeholder.svg")}
+                                        className={cn("w-14 h-14 lg:w-16 lg:h-16 rounded-xl bg-white/10 backdrop-blur-md border p-1.5 transition-all outline-none", (!activeImage || activeImage === product.featured_image) ? "border-green-400 shadow-[0_0_20px_rgba(74,222,128,0.4)] bg-white/20 scale-110" : "border-white/20 hover:bg-white/20")}
+                                    >
+                                        <img src={product.featured_image || "/images/placeholder.svg"} className="w-full h-full object-contain drop-shadow-md" alt="Main" />
+                                    </button>
+                                    {product.images.map((img, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => setActiveImage(img.url)}
+                                            className={cn("w-14 h-14 lg:w-16 lg:h-16 rounded-xl bg-white/10 backdrop-blur-md border p-1.5 transition-all outline-none", activeImage === img.url ? "border-green-400 shadow-[0_0_20px_rgba(74,222,128,0.4)] bg-white/20 scale-110" : "border-white/20 hover:bg-white/20")}
+                                        >
+                                            <img src={img.url} className="w-full h-full object-contain drop-shadow-md" alt={`Gallery ${i}`} />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
 
                             {/* Floating Badges */}
                             <motion.div
@@ -327,17 +375,17 @@ export default function ProductDetailPage() {
                                             {locale === "ar" ? "المواصفات الفنية التفصيلية" : "Detailed Technical Specs"}
                                         </h2>
                                         <div className="overflow-hidden rounded-xl border border-gray-100">
-                                            <table className="w-full text-left" dir={isRTL ? "rtl" : "ltr"}>
+                                            <table className="w-full text-start" dir={isRTL ? "rtl" : "ltr"}>
                                                 <thead className="bg-gray-50 text-xs uppercase text-gray-500 font-bold border-b border-gray-100">
                                                     <tr>
-                                                        <th className="px-5 py-3">{locale === "ar" ? "الخاصية" : "Property"}</th>
-                                                        <th className="px-5 py-3">{locale === "ar" ? "القيمة" : "Value"}</th>
+                                                        <th className="px-5 py-3 text-start">{locale === "ar" ? "الخاصية" : "Property"}</th>
+                                                        <th className="px-5 py-3 text-start">{locale === "ar" ? "القيمة" : "Value"}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {product.technical_specs.map((spec, i) => (
                                                         <tr key={i} className={`border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors ${i % 2 === 0 ? "bg-white" : "bg-gray-50/30"}`}>
-                                                            <td className="px-5 py-4 text-sm font-bold text-gray-900 w-1/2 border-r border-gray-50">
+                                                            <td className={`px-5 py-4 text-sm font-bold text-gray-900 w-1/2 ${isRTL ? "border-l" : "border-r"} border-gray-50`}>
                                                                 {locale === "ar" ? spec.property_ar : spec.property_en}
                                                             </td>
                                                             <td className="px-5 py-4 text-sm text-gray-600 font-medium">
@@ -413,6 +461,7 @@ export default function ProductDetailPage() {
                                     </p>
                                     <Link
                                         href="/contact"
+                                        data-analytics="sidebar_quote_click"
                                         className="inline-flex items-center gap-2 w-full justify-center px-6 py-3 bg-white text-green-800 font-bold rounded-xl hover:bg-gray-50 transition-all text-sm"
                                     >
                                         {locale === "ar" ? "اطلب تسعير" : "Request Quote"}
@@ -421,6 +470,7 @@ export default function ProductDetailPage() {
                                     {product.is_exportable && (
                                         <Link
                                             href="/b2b"
+                                            data-analytics="sidebar_export_click"
                                             className="inline-flex items-center gap-2 w-full justify-center mt-3 px-6 py-3 bg-white/10 border border-white/20 text-white font-bold rounded-xl hover:bg-white/20 transition-all text-sm"
                                         >
                                             <Globe className="w-5 h-5" />

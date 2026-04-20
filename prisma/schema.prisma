@@ -14,9 +14,12 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
-  role          String    @default("USER") // ADMIN or USER
+  role          String    @default("USER") // ADMIN, USER, SALES_REP, SALES_MANAGER
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  
+  repClients    Client[]      @relation("RepClients")
+  repOrders     ClientOrder[] @relation("RepOrders")
 }
 
 model SiteSettings {
@@ -40,7 +43,15 @@ model SiteSettings {
   smtpFrom          String?
   smtpFromName      String?
   smtpSecure        String?  @default("tls")
+
+  imapHost          String?
+  imapPort          Int?     @default(993)
+  imapSecure        String?  @default("tls") // none, ssl, tls
+  imapUser          String?
+  imapPass          String?
+
   logoUrl           String?
+  googleAnalyticsId String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
@@ -58,6 +69,8 @@ model Category {
   name_ar   String
   name_en   String
   slug      String    @unique
+  imageUrl  String?   @db.Text
+  sortOrder Int       @default(0)
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -97,6 +110,8 @@ model Product {
   images         ProductImage[]
   packagings     ProductPackaging[]
   promotions     Promotion[]
+  orderItems     OrderItem[]
+  webOrderItems  WebOrderItem[]
 
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -173,6 +188,7 @@ model Promotion {
   featured_image String?
   starts_at      DateTime?
   ends_at        DateTime
+    isActive       Boolean   @default(true)
 
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
@@ -219,4 +235,87 @@ model Message {
   isStarred   Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+model Client {
+  id             Int      @id @default(autoincrement())
+  name           String
+  company        String?
+  industry       String?
+  storeType      String?  // سوبرماركت، محل غذائي، عطارة
+  mainPhone      String?
+  secondaryPhone String?
+  storeImage     String?
+  lat            Float?
+  lng            Float?
+  locationUrl    String?
+  notes          String?
+  repId          String?
+  rep            User?    @relation("RepClients", fields: [repId], references: [id])
+  contacts       ClientContact[]
+  orders         ClientOrder[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model ClientContact {
+  id          Int      @id @default(autoincrement())
+  clientId    Int
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  personName  String?
+  department  String   // e.g., "المبيعات", "المالية"
+  email       String
+  phone       String?
+}
+
+model ClientOrder {
+  id              Int      @id @default(autoincrement())
+  clientId        Int
+  client          Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  repId           String
+  rep             User     @relation("RepOrders", fields: [repId], references: [id])
+  status          String   @default("NEW") // NEW, REVIEW, APPROVED, DELIVERING, DELIVERED
+  totalAmount     Float    @default(0)
+  notes           String?
+  rejectionReason String?
+  expectedDate    DateTime?
+  items           OrderItem[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model OrderItem {
+  id         Int         @id @default(autoincrement())
+  orderId    Int
+  order      ClientOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId  Int
+  product    Product     @relation(fields: [productId], references: [id])
+  quantity   Int
+  unitPrice  Float       @default(0)
+  subtotal   Float       @default(0)
+}
+
+model WebOrder {
+  id              Int            @id @default(autoincrement())
+  customerName    String
+  customerEmail   String?
+  customerPhone   String
+  governorate     String
+  shippingAddress String
+  totalAmount     Float          @default(0)
+  status          String         @default("PENDING") // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+  items           WebOrderItem[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model WebOrderItem {
+  id         Int      @id @default(autoincrement())
+  orderId    Int
+  order      WebOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  quantity   Int
+  unitPrice  Float    @default(0)
+  subtotal   Float    @default(0)
 }

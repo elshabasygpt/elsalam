@@ -6,32 +6,39 @@ import { usePathname } from "next/navigation";
 import {
     LayoutDashboard, Package, FileText, Settings, Newspaper,
     LogOut, Home, ExternalLink, Menu, X, ChevronLeft, ChevronDown,
-    Leaf, Tag, Percent, Mail
+    Leaf, Tag, Percent, Mail, Users, PackageOpen, BadgeCheck, ShoppingBag
 } from "lucide-react";
 
 type NavItem = {
     id: string; label: string; href: string; icon: any; exact?: boolean;
     children?: { id: string; label: string; href: string; icon: any }[];
+    roles?: string[]; // Array of roles allowed to see this item
 };
 
 const NAV_ITEMS: NavItem[] = [
-    { id: "home", label: "الرئيسية", href: "/admin", icon: Home, exact: true },
-    { id: "pages", label: "محتوى الصفحات", href: "/admin/pages", icon: FileText },
+    { id: "home", label: "الرئيسية", href: "/admin", icon: Home, exact: true, roles: ["ADMIN", "SALES_MANAGER"] },
+    { id: "web_orders", label: "طلبات المتجر العام", href: "/admin/web-orders", icon: ShoppingBag, roles: ["ADMIN", "SALES_MANAGER"] },
+    { id: "orders", label: "طلبات البيع الميدانية", href: "/admin/orders", icon: PackageOpen, roles: ["ADMIN", "SALES_MANAGER"] },
+    { id: "clients", label: "العملاء والمنافذ", href: "/admin/clients", icon: Users, roles: ["ADMIN", "SALES_MANAGER"] },
+    { id: "pages", label: "محتوى الصفحات", href: "/admin/pages", icon: FileText, roles: ["ADMIN"] },
     {
-        id: "products", label: "المنتجات", href: "/admin/products", icon: Package,
+        id: "products", label: "المنتجات", href: "/admin/products", icon: Package, roles: ["ADMIN"],
         children: [
             { id: "categories", label: "التصنيفات", href: "/admin/categories", icon: Tag },
             { id: "promotions", label: "العروض", href: "/admin/promotions", icon: Percent },
         ],
     },
-    { id: "news", label: "الأخبار", href: "/admin/news", icon: Newspaper },
-    { id: "inbox", label: "البريد الوارد", href: "/admin/inbox", icon: Mail },
-    { id: "settings", label: "إعدادات عامة", href: "/admin/settings", icon: Settings },
+    { id: "news", label: "الأخبار", href: "/admin/news", icon: Newspaper, roles: ["ADMIN"] },
+    { id: "users", label: "فريق الإدارة والمبيعات", href: "/admin/users", icon: BadgeCheck, roles: ["ADMIN"] },
+    { id: "inbox", label: "البريد الوارد", href: "/admin/inbox", icon: Mail, roles: ["ADMIN"] },
+    { id: "settings", label: "إعدادات عامة", href: "/admin/settings", icon: Settings, roles: ["ADMIN"] },
 ];
 
-export function AdminShell({ children, userName }: { children: ReactNode; userName: string }) {
+export function AdminShell({ children, userName, userRole = "USER" }: { children: ReactNode; userName: string; userRole?: string }) {
     const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
+
+    const filteredNavItems = NAV_ITEMS.filter(item => !item.roles || item.roles.includes(userRole));
 
     // Auto-expand Products dropdown if on sub-pages
     const isProductsSection = pathname.startsWith("/admin/products") || pathname.startsWith("/admin/categories") || pathname.startsWith("/admin/promotions");
@@ -218,7 +225,7 @@ export function AdminShell({ children, userName }: { children: ReactNode; userNa
 
                 {/* Navigation */}
                 <nav className="flex-1 overflow-y-auto px-3 py-5 space-y-1">
-                    {NAV_ITEMS.map((item) => <DesktopNavItem key={item.id} item={item} />)}
+                    {filteredNavItems.map((item) => <DesktopNavItem key={item.id} item={item} />)}
                 </nav>
 
                 {/* Bottom */}
@@ -280,13 +287,13 @@ export function AdminShell({ children, userName }: { children: ReactNode; userNa
                         <a href="/" target="_blank" className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-green-600 transition-colors px-3 py-2 rounded-lg hover:bg-green-50">
                             <ExternalLink className="w-5 h-5" /> عرض الموقع
                         </a>
-                        <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-100">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-sm">
-                                <span className="text-white text-xs font-black">{userName.charAt(0).toUpperCase()}</span>
+                        <div className="flex items-center gap-3 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-100">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-sm">
+                                <span className="text-white text-base font-black">{userName.charAt(0).toUpperCase()}</span>
                             </div>
                             <div className="hidden sm:block">
-                                <div className="text-xs font-bold text-slate-700 leading-tight">{userName}</div>
-                                <div className="text-[10px] text-slate-400 leading-tight">مدير النظام</div>
+                                <div className="text-[14px] font-bold text-slate-800 leading-none mb-1">{userName}</div>
+                                <div className="text-[11px] text-slate-400 font-bold leading-none">مدير النظام</div>
                             </div>
                         </div>
                     </div>

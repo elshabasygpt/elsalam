@@ -19,6 +19,7 @@ interface FeatureItem { feature_ar: string; feature_en: string }
 interface SpecItem { property_ar: string; property_en: string; value_ar: string; value_en: string }
 interface PackagingItem { size_ar: string; size_en: string; price: string }
 interface CertItem { name: string }
+interface ImageItem { url: string }
 
 interface ProductFormProps {
     categories: Category[];
@@ -35,10 +36,14 @@ interface ProductFormProps {
         is_featured: boolean;
         is_exportable: boolean;
         featured_image: string;
+        price: number | null;
+        price_unit_ar: string | null;
+        price_unit_en: string | null;
         features?: FeatureItem[];
         technical_specs?: SpecItem[];
         packagings?: PackagingItem[];
         certifications?: CertItem[];
+        images?: ImageItem[];
     };
 }
 
@@ -78,6 +83,9 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
         is_featured: initialData?.is_featured || false,
         is_exportable: initialData?.is_exportable || false,
         featured_image: initialData?.featured_image || "",
+        price: initialData?.price?.toString() || "",
+        price_unit_ar: initialData?.price_unit_ar || "",
+        price_unit_en: initialData?.price_unit_en || "",
     });
 
     // Related data arrays
@@ -85,6 +93,7 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
     const [specs, setSpecs] = useState<SpecItem[]>(initialData?.technical_specs || []);
     const [packagings, setPackagings] = useState<PackagingItem[]>(initialData?.packagings || []);
     const [certifications, setCertifications] = useState<CertItem[]>(initialData?.certifications || []);
+    const [images, setImages] = useState<ImageItem[]>(initialData?.images || []);
 
     const isEditing = !!initialData?.id;
 
@@ -141,11 +150,15 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
 
             const payload = {
                 ...form,
+                price: form.price ? parseFloat(form.price) : null,
+                price_unit_ar: form.price_unit_ar || null,
+                price_unit_en: form.price_unit_en || null,
                 categoryId: form.categoryId ? parseInt(form.categoryId) : null,
                 features: features.filter(f => f.feature_ar || f.feature_en),
                 technical_specs: specs.filter(s => s.property_ar || s.value_ar),
                 packagings: packagings.filter(p => p.size_ar || p.size_en),
                 certifications: certifications.filter(c => c.name),
+                images: images.filter(i => i.url),
             };
 
             const res = await fetch(url, {
@@ -216,6 +229,21 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
                     <div>
                         <label className="block text-xs font-bold text-slate-500 mb-2">Description (English)</label>
                         <textarea dir="ltr" value={form.description_en} onChange={(e) => setForm({ ...form, description_en: e.target.value })} rows={5} className={`${inputCls} resize-none text-left`} placeholder="Detailed product description..." />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 border-t border-slate-100 pt-5 mt-2">
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-2">السعر الأساسي (ج.م)</label>
+                        <input type="number" step="0.01" dir="ltr" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className={`${inputCls} text-left`} placeholder="0.00" />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-2">وحدة السعر (عربي)</label>
+                        <input type="text" value={form.price_unit_ar} onChange={(e) => setForm({ ...form, price_unit_ar: e.target.value })} className={inputCls} placeholder="مثال: للجركن" />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-2">Price Unit (English)</label>
+                        <input type="text" dir="ltr" value={form.price_unit_en} onChange={(e) => setForm({ ...form, price_unit_en: e.target.value })} className={`${inputCls} text-left`} placeholder="e.g. per jerry can" />
                     </div>
                 </div>
             </FormSection>
@@ -293,6 +321,36 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
                 <div>
                     <label className="block text-xs font-bold text-slate-400 mb-2">أو أدخل الرابط مباشرة</label>
                     <input type="text" dir="ltr" value={form.featured_image} onChange={(e) => setForm({ ...form, featured_image: e.target.value })} className={`${inputCls} text-left text-xs`} placeholder="/images/products/product.jpg" />
+                </div>
+            </FormSection>
+
+            {/* ── Image Gallery (معرض الصور) ── */}
+            <FormSection title="معرض الصور" icon={ImageIcon}>
+                <p className="text-xs text-slate-400 -mt-2">أضف صور إضافية للمنتج (تظهر بجوار الصورة الرئيسية)</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {images.map((img, i) => (
+                        <div key={i} className="relative group p-2 bg-slate-50 border border-slate-100 rounded-xl aspect-square flex flex-col justify-center">
+                            {img.url ? (
+                                <img src={img.url} className="w-full h-full object-contain mix-blend-multiply" alt="Gallery item" />
+                            ) : (
+                                <input
+                                    type="text" dir="ltr"
+                                    value={img.url}
+                                    onChange={(e) => { const arr = [...images]; arr[i].url = e.target.value; setImages(arr); }}
+                                    className={`${miniInputCls} text-left mt-auto`}
+                                    placeholder="/images/example.jpg"
+                                />
+                            )}
+                            <button type="button" onClick={() => setImages(images.filter((_, j) => j !== i))} className="absolute top-1 right-1 p-1 bg-white text-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow hover:bg-red-50">
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+                    ))}
+                    
+                    <button type="button" onClick={() => setImages([...images, { url: "" }])} className="aspect-square rounded-xl border-2 border-dashed border-slate-200 hover:border-green-300 hover:bg-green-50/50 flex flex-col items-center justify-center gap-2 text-slate-400 hover:text-green-600 transition-all">
+                        <Plus className="w-6 h-6" />
+                        <span className="text-xs font-bold font-arabic">إضافة صورة</span>
+                    </button>
                 </div>
             </FormSection>
 
