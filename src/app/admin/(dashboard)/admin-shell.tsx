@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
     LayoutDashboard, Package, FileText, Settings, Newspaper,
     LogOut, Home, ExternalLink, Menu, X, ChevronLeft, ChevronDown,
-    Leaf, Tag, Percent, Mail, Users, PackageOpen, BadgeCheck, ShoppingBag
+    Leaf, Tag, Percent, Mail, Users, PackageOpen, BadgeCheck, ShoppingBag, MapPin, TicketPercent
 } from "lucide-react";
 
 type NavItem = {
@@ -19,7 +19,13 @@ const NAV_ITEMS: NavItem[] = [
     { id: "home", label: "الرئيسية", href: "/admin", icon: Home, exact: true, roles: ["ADMIN", "SALES_MANAGER"] },
     { id: "web_orders", label: "طلبات المتجر العام", href: "/admin/web-orders", icon: ShoppingBag, roles: ["ADMIN", "SALES_MANAGER"] },
     { id: "orders", label: "طلبات البيع الميدانية", href: "/admin/orders", icon: PackageOpen, roles: ["ADMIN", "SALES_MANAGER"] },
-    { id: "clients", label: "العملاء والمنافذ", href: "/admin/clients", icon: Users, roles: ["ADMIN", "SALES_MANAGER"] },
+    {
+        id: "clients", label: "العملاء والمنافذ", href: "/admin/clients", icon: Users, roles: ["ADMIN", "SALES_MANAGER"],
+        children: [
+            { id: "clients_list", label: "قائمة العملاء", href: "/admin/clients", icon: Users },
+            { id: "pipeline", label: "مسار المبيعات", href: "/admin/clients/pipeline", icon: Tag },
+        ]
+    },
     { id: "pages", label: "محتوى الصفحات", href: "/admin/pages", icon: FileText, roles: ["ADMIN"] },
     {
         id: "products", label: "المنتجات", href: "/admin/products", icon: Package, roles: ["ADMIN"],
@@ -31,6 +37,8 @@ const NAV_ITEMS: NavItem[] = [
     { id: "news", label: "الأخبار", href: "/admin/news", icon: Newspaper, roles: ["ADMIN"] },
     { id: "users", label: "فريق الإدارة والمبيعات", href: "/admin/users", icon: BadgeCheck, roles: ["ADMIN"] },
     { id: "inbox", label: "البريد الوارد", href: "/admin/inbox", icon: Mail, roles: ["ADMIN"] },
+    { id: "shipping", label: "مناطق الشحن", href: "/admin/shipping", icon: MapPin, roles: ["ADMIN"] },
+    { id: "promos", label: "كوبونات الخصم", href: "/admin/promocodes", icon: TicketPercent, roles: ["ADMIN"] },
     { id: "settings", label: "إعدادات عامة", href: "/admin/settings", icon: Settings, roles: ["ADMIN"] },
 ];
 

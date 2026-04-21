@@ -46,7 +46,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
                     is_featured: product.is_featured,
                     is_exportable: product.is_exportable,
                     featured_image: product.featured_image || "",
-                    price: product.price?.toString() || "",
+                    price: product.price ? Number(product.price) : null,
                     price_unit_ar: product.price_unit_ar || "",
                     price_unit_en: product.price_unit_en || "",
                     features: product.features.map(f => ({

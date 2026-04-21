@@ -34,6 +34,7 @@ export interface ProductItem {
     price_unit_en: string | null;
     is_exportable: boolean;
     is_featured: boolean;
+    stock: number;
     icon: string | null;
     gradient_from: string | null;
     gradient_to: string | null;

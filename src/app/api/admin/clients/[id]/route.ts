@@ -13,7 +13,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     try {
         const body = await req.json();
-        const { name, company, industry, notes, contacts } = body;
+        const { name, company, industry, notes, contacts, status, creditLimit, outstandingBalance } = body;
 
         // In a real scenario, we might want to deeply update contacts.
         // The simplest approach is to delete old and create new ones.
@@ -24,6 +24,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
                 company,
                 industry,
                 notes,
+                ...(status && { status }),
+                ...(creditLimit !== undefined && { creditLimit: Number(creditLimit) }),
+                ...(outstandingBalance !== undefined && { outstandingBalance: Number(outstandingBalance) }),
                 contacts: {
                     deleteMany: {}, // clean old
                     create: contacts?.map((c: any) => ({

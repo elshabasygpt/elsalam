@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Plus, Search, MapPin, Camera, Building2, Store, Phone, PhoneCall, Loader2, Link2, X, Trash2, Edit, Eye, Mail, Send } from "lucide-react";
+import { Plus, Search, MapPin, Camera, Building2, Store, Phone, PhoneCall, Loader2, Link2, X, Trash2, Edit, Eye, Mail, Send, CreditCard } from "lucide-react";
 
 export default function CRMClientsPage() {
     const [clients, setClients] = useState<any[]>([]);
@@ -28,6 +28,9 @@ export default function CRMClientsPage() {
         lng: null as number | null,
         locationUrl: "",
         notes: "",
+        status: "LEAD",
+        creditLimit: 0,
+        outstandingBalance: 0,
         contacts: [] as { personName: string, department: string, email: string, phone: string }[]
     });
 
@@ -118,8 +121,7 @@ export default function CRMClientsPage() {
                 setForm({
                     name: "", company: "", storeType: "سوبرماركت",
                     mainPhone: "", secondaryPhone: "", storeImage: null,
-                    mainPhone: "", secondaryPhone: "", storeImage: null,
-                    lat: null, lng: null, locationUrl: "", notes: "", contacts: []
+                    lat: null, lng: null, locationUrl: "", notes: "", status: "LEAD", creditLimit: 0, outstandingBalance: 0, contacts: []
                 });
             } else {
                 alert("حدث خطأ أثناء الحفظ");
@@ -153,6 +155,9 @@ export default function CRMClientsPage() {
             lng: client.lng || null,
             locationUrl: client.locationUrl || "",
             notes: client.notes || "",
+            status: client.status || "LEAD",
+            creditLimit: client.creditLimit || 0,
+            outstandingBalance: client.outstandingBalance || 0,
             contacts: client.contacts || []
         });
         setShowModal(true);
@@ -161,7 +166,7 @@ export default function CRMClientsPage() {
     const openAddModal = () => {
         setEditId(null);
         setForm({
-            name: "", company: "", storeType: "سوبرماركت", mainPhone: "", secondaryPhone: "", storeImage: null, lat: null, lng: null, locationUrl: "", notes: "", contacts: []
+            name: "", company: "", storeType: "سوبرماركت", mainPhone: "", secondaryPhone: "", storeImage: null, lat: null, lng: null, locationUrl: "", notes: "", status: "LEAD", creditLimit: 0, outstandingBalance: 0, contacts: []
         });
         setShowModal(true);
     };
@@ -228,9 +233,14 @@ export default function CRMClientsPage() {
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/30 to-transparent z-10 transition-opacity duration-300 group-hover:from-slate-900/90" />
                                 <img src={client.storeImage || "https://images.unsplash.com/photo-1604719312566-8fa2065b2167?w=600&q=80"} onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1604719312566-8fa2065b2167?w=600&q=80" }} alt={client.name} className="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-110 group-hover:opacity-100" />
                                 <div className="absolute top-4 right-4 z-20">
-                                    <span className="bg-white/95 backdrop-blur-md text-slate-800 text-[10px] font-black px-3 py-1.5 rounded-full shadow-sm">
-                                        {client.storeType}
-                                    </span>
+                                    <div className="flex gap-1.5">
+                                        <span className="bg-white/95 backdrop-blur-md text-slate-800 text-[10px] font-black px-3 py-1.5 rounded-full shadow-sm">
+                                            {client.storeType}
+                                        </span>
+                                        <span className={`text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-sm ${client.status === "ACTIVE" ? "bg-green-500" : client.status === "NEGOTIATION" ? "bg-blue-500" : client.status === "INACTIVE" ? "bg-red-500" : "bg-amber-500"}`}>
+                                            {client.status === "LEAD" ? "محتمل" : client.status === "NEGOTIATION" ? "مفاوضة" : client.status === "ACTIVE" ? "دائم" : "غير نشط"}
+                                        </span>
+                                    </div>
                                 </div>
                                 <div className="absolute bottom-5 right-5 left-5 z-20 text-white transform transition-all duration-300">
                                     <h3 className="text-xl font-black drop-shadow-md truncate">{client.name}</h3>
@@ -355,6 +365,27 @@ export default function CRMClientsPage() {
                                 </div>
 
                                 <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5">حالة العميل (مرحلة البيع) *</label>
+                                    <select className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:border-green-500" value={form.status} onChange={e => setForm({...form, status: e.target.value})}>
+                                        <option value="LEAD">عميل محتمل (Lead)</option>
+                                        <option value="NEGOTIATION">قيد التفاوض (Negotiation)</option>
+                                        <option value="ACTIVE">عميل نشط ودائم (Active)</option>
+                                        <option value="INACTIVE">عميل غير نشط (Inactive)</option>
+                                    </select>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 mb-1.5">الحد الائتماني المسموح به</label>
+                                        <input type="number" step="0.01" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:bg-white focus:border-green-500 transition-all" value={form.creditLimit} onChange={e => setForm({...form, creditLimit: Number(e.target.value)})} placeholder="0" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 mb-1.5">المديونية (الرصيد المستحق)</label>
+                                        <input type="number" step="0.01" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:bg-white focus:border-green-500 transition-all" value={form.outstandingBalance} onChange={e => setForm({...form, outstandingBalance: Number(e.target.value)})} placeholder="0" />
+                                    </div>
+                                </div>
+
+                                <div>
                                     <label className="block text-xs font-bold text-slate-700 mb-1.5">رقم الهاتف (الأساسي) *</label>
                                     <input required type="tel" dir="ltr" className="w-full text-right px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all" value={form.mainPhone} onChange={e => setForm({...form, mainPhone: e.target.value})} placeholder="01xxxxxxxxx" />
                                 </div>
@@ -447,6 +478,24 @@ export default function CRMClientsPage() {
                             
                             {/* Call Cards */}
                             <div className="grid grid-cols-2 gap-4 mb-6">
+                                {/* Financial & Credit Limits */}
+                                <div className="col-span-2 bg-gradient-to-r from-slate-900 to-slate-800 p-5 rounded-[28px] shadow-sm flex flex-col justify-between items-center sm:flex-row gap-4 border border-slate-700">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-inner ${viewClient.outstandingBalance >= viewClient.creditLimit && viewClient.creditLimit > 0 ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"}`}>
+                                            <CreditCard className="w-7 h-7" />
+                                        </div>
+                                        <div>
+                                            <div className="text-[12px] text-slate-400 font-bold mb-0.5">الحالة الائتمانية والمديونية</div>
+                                            <div className="flex items-baseline gap-2">
+                                                <span className={`text-[20px] font-black tracking-wide ${viewClient.outstandingBalance >= viewClient.creditLimit && viewClient.creditLimit > 0 ? "text-red-400" : "text-white"}`} dir="ltr">{viewClient.outstandingBalance?.toLocaleString()} EGP</span>
+                                                <span className="text-slate-500 text-[11px] font-bold">/ {viewClient.creditLimit?.toLocaleString()} EGP (الحد)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className={`px-4 py-2 rounded-xl text-xs font-black shadow-sm flex-shrink-0 ${viewClient.outstandingBalance >= viewClient.creditLimit && viewClient.creditLimit > 0 ? "bg-red-500 text-white" : "bg-white/10 text-slate-300"}`}>
+                                        {viewClient.outstandingBalance >= viewClient.creditLimit && viewClient.creditLimit > 0 ? "متجاوز للحد ⚠️" : "ضمن الحد المسموح"}
+                                    </div>
+                                </div>
                                 <div className="bg-white p-5 rounded-[28px] border border-slate-100/80 shadow-sm flex flex-col items-center justify-center text-center transition-all hover:border-green-200">
                                     <div className="w-14 h-14 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-3 shadow-inner">
                                         <Phone className="w-7 h-7" />

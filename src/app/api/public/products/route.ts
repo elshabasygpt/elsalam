@@ -43,6 +43,7 @@ export async function GET(req: NextRequest) {
         price_unit_en: p.price_unit_en,
         is_exportable: p.is_exportable,
         is_featured: p.is_featured,
+        stock: p.stock,
         icon: p.icon,
         gradient_from: p.gradient_from,
         gradient_to: p.gradient_to,

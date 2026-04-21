@@ -69,6 +69,8 @@ export function ProductsClient() {
         if (e) { e.preventDefault(); e.stopPropagation(); }
         addItem({
             id: product.id.toString(),
+            productId: product.id,
+            slug: product.slug,
             name_ar: product.name_ar,
             name_en: product.name_en,
             price: product.active_promotion?.promo_price || product.price || 0,
@@ -82,6 +84,8 @@ export function ProductsClient() {
         if (e) { e.preventDefault(); e.stopPropagation(); }
         addItem({
             id: product.id.toString(),
+            productId: product.id,
+            slug: product.slug,
             name_ar: product.name_ar,
             name_en: product.name_en,
             price: product.active_promotion?.promo_price || product.price || 0,
@@ -207,9 +211,15 @@ export function ProductsClient() {
 
                                                 {/* Quick Action Overlay */}
                                                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col justify-center gap-2 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 z-30">
-                                                    <button onClick={(e) => handleAddToCart(product, e)} className="w-10 h-10 rounded-full bg-white shadow-lg text-green-700 flex items-center justify-center hover:bg-green-700 hover:text-white hover:scale-110 tooltip-trigger transition-all">
-                                                        <ShoppingBag className="w-4.5 h-4.5" />
-                                                    </button>
+                                                    {product.stock > 0 ? (
+                                                        <button onClick={(e) => handleAddToCart(product, e)} className="w-10 h-10 rounded-full bg-white shadow-lg text-green-700 flex items-center justify-center hover:bg-green-700 hover:text-white hover:scale-110 tooltip-trigger transition-all">
+                                                            <ShoppingBag className="w-4.5 h-4.5" />
+                                                        </button>
+                                                    ) : (
+                                                        <div className="w-10 h-10 rounded-full bg-slate-100 shadow-md text-slate-400 flex items-center justify-center cursor-not-allowed" title={locale === "ar" ? "نفذت الكمية" : "Out of stock"}>
+                                                            <ShoppingBag className="w-4.5 h-4.5 opacity-50" />
+                                                        </div>
+                                                    )}
                                                     <a href={`/products/${product.slug}`} className="w-10 h-10 rounded-full bg-white shadow-lg text-green-700 flex items-center justify-center hover:bg-green-700 hover:text-white hover:scale-110 transition-all">
                                                         <Eye className="w-4.5 h-4.5" />
                                                     </a>
@@ -241,7 +251,8 @@ export function ProductsClient() {
                                             {/* Content Container */}
                                             <div className="p-6 flex flex-col flex-grow bg-white relative z-20">
                                                 <div className="mb-4">
-                                                    <h3 className="font-black text-slate-800 text-lg md:text-[20px] leading-tight mb-2 group-hover:text-green-700 transition-colors line-clamp-2">{title}</h3>
+                                                    <h3 className="font-black text-slate-800 text-lg md:text-[20px] leading-tight mb-1 group-hover:text-green-700 transition-colors line-clamp-2">{title}</h3>
+                                                    {product.stock === 0 && <span className="text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded inline-block mb-2">{locale === "ar" ? "نفذت الكمية" : "Out of Stock"}</span>}
                                                     {desc && <p className="text-slate-500 text-[13px] leading-relaxed line-clamp-2">{desc}</p>}
                                                 </div>
 

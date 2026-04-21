@@ -50,7 +50,7 @@ export function MobileBottomNav() {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 100, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                    className="fixed bottom-0 inset-x-0 z-50 md:hidden"
+                    className="fixed bottom-0 inset-x-0 z-50 md:hidden print:hidden"
                     style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
                 >
                     {/* Glass card with strong border */}

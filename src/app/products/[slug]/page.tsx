@@ -172,13 +172,13 @@ export default function ProductDetailPage() {
                                 />
                                 
                                 {/* Inner Floating Box Badges */}
-                                <div className={`absolute top-0 ${isRTL ? '-right-4' : '-left-4'} bg-white shadow-lg p-2.5 rounded-2xl flex flex-col items-center gap-1 border border-gray-100 scale-90 sm:scale-100 z-30`}>
-                                    <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7 text-green-600" />
-                                    <span className="text-[10px] font-black uppercase text-gray-800 leading-tight text-center">ISO<br/>22000</span>
+                                <div className={`absolute top-0 ${isRTL ? '-right-4' : '-left-4'} bg-white shadow-lg p-3 sm:p-4 rounded-2xl flex flex-col items-center gap-1 border border-gray-100 scale-90 sm:scale-100 z-30`}>
+                                    <ShieldCheck className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" />
+                                    <span className="text-xs sm:text-sm font-black uppercase text-gray-800 leading-tight text-center">ISO<br/>22000</span>
                                 </div>
-                                <div className={`absolute bottom-4 ${isRTL ? '-left-6' : '-right-6'} bg-white shadow-lg px-3 py-2 rounded-xl flex items-center justify-center gap-2 border border-gray-100 scale-90 sm:scale-100 z-30`}>
-                                    <Sparkles className="w-5 h-5 text-yellow-500 shrink-0" />
-                                    <span className="text-xs font-black text-gray-800 leading-none">100%<br/><span className="text-[9px] text-gray-500 font-medium">{locale === "ar" ? "طبيعي ونقي" : "Pure & Natural"}</span></span>
+                                <div className={`absolute bottom-4 ${isRTL ? '-left-6' : '-right-6'} bg-white shadow-lg px-4 py-3 rounded-xl flex items-center justify-center gap-2 border border-gray-100 scale-90 sm:scale-100 z-30`}>
+                                    <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 text-yellow-500 shrink-0" />
+                                    <span className="text-sm font-black text-gray-800 leading-none">100%<br/><span className="text-[10px] sm:text-xs text-gray-500 font-medium">{locale === "ar" ? "طبيعي ونقي" : "Pure & Natural"}</span></span>
                                 </div>
                             </motion.div>
 
@@ -209,10 +209,10 @@ export default function ProductDetailPage() {
                         {/* —— RIGHT COLUMN: Product Information —— */}
                         <div className="w-full lg:w-[55%] xl:w-[60%] p-6 sm:p-10 xl:p-12 text-start flex flex-col">
                             <div className="flex flex-wrap items-center gap-2 mb-4">
-                                <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg">{categoryName}</span>
+                                <span className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs sm:text-sm font-bold rounded-lg">{categoryName}</span>
                                 {product.is_exportable && (
-                                    <span className="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-lg flex items-center gap-1.5 border border-green-200">
-                                        <Globe className="w-4 h-4" />
+                                    <span className="px-3 py-1.5 bg-green-50 text-green-700 text-xs sm:text-sm font-bold rounded-lg flex items-center gap-1.5 border border-green-200">
+                                        <Globe className="w-5 h-5 shrink-0" />
                                         {locale === "ar" ? "متاح للتصدير" : "Export Available"}
                                     </span>
                                 )}
@@ -240,8 +240,8 @@ export default function ProductDetailPage() {
                                 <ul className="flex flex-col gap-3 mb-8">
                                     {features.map((feature, i) => (
                                         <li key={i} className="flex items-start gap-3">
-                                            <div className="w-6 h-6 rounded-full bg-green-100 border border-green-200 flex items-center justify-center shrink-0 mt-0.5">
-                                                <Check className="w-4 h-4 text-green-700" />
+                                            <div className="w-7 h-7 rounded-full bg-green-100 border border-green-200 flex items-center justify-center shrink-0 mt-0.5">
+                                                <Check className="w-5 h-5 text-green-700 shrink-0" />
                                             </div>
                                             <span className="text-gray-800 font-medium text-sm sm:text-base leading-snug">{feature}</span>
                                         </li>
@@ -263,7 +263,7 @@ export default function ProductDetailPage() {
                                             }}
                                             className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-green-700 text-white font-black rounded-xl hover:scale-[1.02] hover:bg-green-800 transition-all shadow-[0_4px_15px_rgba(22,163,74,0.3)] text-sm sm:text-base"
                                         >
-                                            <ShoppingCart className="w-5 h-5 shrink-0" />
+                                            <ShoppingCart className="w-6 h-6 shrink-0" />
                                             {locale === "ar" ? "أضف للسلة" : "Add to Cart"}
                                         </button>
                                         
@@ -278,16 +278,16 @@ export default function ProductDetailPage() {
                                             }}
                                             className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-yellow-400 text-slate-900 font-black rounded-xl hover:scale-[1.02] hover:bg-yellow-500 transition-all shadow-[0_4px_15px_rgba(250,204,21,0.2)] text-sm sm:text-base"
                                         >
-                                            <CreditCard className="w-5 h-5 shrink-0" />
+                                            <CreditCard className="w-6 h-6 shrink-0" />
                                             {locale === "ar" ? "شراء مباشر سريع" : "Fast Buy Now"}
                                         </button>
                                 </div>
                                 <div className="mt-4 pt-4 border-t border-slate-200">
                                     <Link
                                         href="/contact"
-                                        className="inline-flex items-center justify-center gap-2 w-full px-6 py-3.5 bg-white border border-slate-300 text-slate-700 font-bold rounded-xl hover:bg-slate-100 hover:text-green-800 transition-all text-sm"
+                                        className="inline-flex items-center justify-center gap-2.5 w-full px-6 py-3.5 bg-white border border-slate-300 text-slate-700 font-bold rounded-xl hover:bg-slate-100 hover:text-green-800 transition-all text-sm sm:text-base"
                                     >
-                                        <Handshake className="w-4.5 h-4.5" />
+                                        <Handshake className="w-5 h-5 shrink-0" />
                                         {locale === "ar" ? "طلب تسعير جملة B2B" : "Request Bulk B2B Quote"}
                                     </Link>
                                 </div>
@@ -295,9 +295,9 @@ export default function ProductDetailPage() {
 
                             {/* Trust Elements Footer */}
                             <div className="mt-5 flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 text-xs sm:text-sm text-gray-500 font-bold">
-                                <span className="flex items-center gap-1.5"><Lock className="w-4 h-4 text-green-600" /> {locale === "ar" ? "دفع آمن 100%" : "Secure Checkout"}</span>
-                                <span className="flex items-center gap-1.5"><Truck className="w-4 h-4 text-green-600" /> {locale === "ar" ? "توصيل سريع متاح" : "Fast Delivery"}</span>
-                                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-600" /> {locale === "ar" ? "جودة مضمونة" : "Quality Guaranteed"}</span>
+                                <span className="flex items-center gap-1.5"><Lock className="w-5 h-5 text-green-600 shrink-0" /> {locale === "ar" ? "دفع آمن 100%" : "Secure Checkout"}</span>
+                                <span className="flex items-center gap-1.5"><Truck className="w-5 h-5 text-green-600 shrink-0" /> {locale === "ar" ? "توصيل سريع متاح" : "Fast Delivery"}</span>
+                                <span className="flex items-center gap-1.5"><Check className="w-5 h-5 text-green-600 shrink-0" /> {locale === "ar" ? "جودة مضمونة" : "Quality Guaranteed"}</span>
                             </div>
                         </div>
                     </div>
@@ -321,11 +321,11 @@ export default function ProductDetailPage() {
                                         aria-selected={isActive}
                                         onClick={() => setActiveTab(tab.id)}
                                         className={cn(
-                                            "flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all focus:outline-none shrink-0",
+                                            "flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-bold text-sm sm:text-base transition-all focus:outline-none shrink-0",
                                             isActive ? "bg-green-700 text-white shadow-md shadow-green-700/20" : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
                                         )}
                                     >
-                                        <Icon className="w-4.5 h-4.5 shrink-0" />
+                                        <Icon className="w-5 h-5 shrink-0" />
                                         <span>{tab.label}</span>
                                     </button>
                                 );
@@ -338,7 +338,7 @@ export default function ProductDetailPage() {
                             {activeTab === "description" && (
                                 <div className="max-w-4xl animate-in fade-in slide-in-from-bottom-2 duration-300">
                                     <h3 className="text-xl sm:text-2xl font-black text-gray-900 mb-6 flex items-center gap-3">
-                                        <FileText className="w-6 h-6 text-green-600" />
+                                        <FileText className="w-7 h-7 sm:w-8 sm:h-8 text-green-600 shrink-0" />
                                         {locale === "ar" ? "الوصف الشامل للمنتج" : "Comprehensive Description"}
                                     </h3>
                                     {longDesc ? (
@@ -411,14 +411,14 @@ export default function ProductDetailPage() {
                             {activeTab === "packaging" && (
                                 <div className="max-w-4xl animate-in fade-in slide-in-from-bottom-2 duration-300">
                                     <h3 className="text-lg sm:text-xl font-black text-gray-900 mb-6 pb-4 flex items-center gap-2">
-                                        <Package className="w-6 h-6 text-green-600" />
+                                        <Package className="w-7 h-7 sm:w-8 sm:h-8 text-green-600 shrink-0" />
                                         {locale === "ar" ? "خيارات التعبئة والأوزان" : "Packaging Options"}
                                     </h3>
                                     <PackagingPriceTable packagings={product.packagings} />
                                     
                                     {product.is_exportable && (
-                                        <div className="mt-8 bg-blue-50 border border-blue-100 rounded-xl p-5 flex items-start gap-4">
-                                            <Globe className="w-6 h-6 text-blue-600 shrink-0 mt-0.5" />
+                                        <div className="mt-8 bg-blue-50 border border-blue-100 rounded-xl p-5 sm:p-6 flex items-start gap-4">
+                                            <Globe className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600 shrink-0 mt-0.5" />
                                             <div>
                                                 <h4 className="font-bold text-blue-900 mb-1">{locale === "ar" ? "مخارج الشحن والتصدير" : "Shipping & Export Logistics"}</h4>
                                                 <p className="text-sm text-blue-800/80 leading-relaxed max-w-2xl">{locale === "ar" ? "يتم ترتيب باليتات التحميل وفق المعايير الدولية للشحن البحري (20ft / 40ft containers). نرجو التواصل مع قسم المبيعات لتنسيق حمولة الحاويات." : "Loading pallets are arranged according to international sea freight standards. Please contact sales to coordinate container loads."}</p>
@@ -436,8 +436,8 @@ export default function ProductDetailPage() {
                                             <h3 className="text-lg sm:text-xl font-black text-gray-900 mb-6 border-b border-gray-100 pb-4">{locale === "ar" ? "شهادات واعتمادات الجودة" : "Quality Credentials"}</h3>
                                             <div className="flex flex-wrap gap-3">
                                                 {certifications.map((cert, i) => (
-                                                    <span key={i} className="px-5 py-3 bg-white text-gray-800 text-sm font-bold rounded-xl border-2 border-gray-200 shadow-sm flex items-center gap-2 hover:border-green-500 hover:text-green-700 transition-colors">
-                                                        <ShieldCheck className="w-5 h-5 text-green-500" />
+                                                    <span key={i} className="px-5 py-4 bg-white text-gray-800 text-sm sm:text-base font-bold rounded-xl border-2 border-gray-200 shadow-sm flex items-center gap-2.5 hover:border-green-500 hover:text-green-700 transition-colors">
+                                                        <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7 text-green-500 shrink-0" />
                                                         {cert}
                                                     </span>
                                                 ))}
@@ -452,10 +452,10 @@ export default function ProductDetailPage() {
                                                 href={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"}/products/${product.slug}/pdf`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-4 bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:border-green-400 hover:shadow-md transition-all group max-w-md w-full"
+                                                className="inline-flex items-center gap-5 bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 hover:border-green-400 hover:shadow-md transition-all group max-w-md w-full"
                                             >
-                                                <div className="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center shrink-0 group-hover:bg-red-500 group-hover:text-white transition-colors">
-                                                    <FileText className="w-6 h-6" />
+                                                <div className="w-14 h-14 rounded-full bg-red-50 text-red-500 flex items-center justify-center shrink-0 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                                                    <FileText className="w-7 h-7 sm:w-8 sm:h-8" />
                                                 </div>
                                                 <div>
                                                     <h4 className="font-black text-gray-900 group-hover:text-green-700 transition-colors">

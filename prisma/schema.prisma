@@ -20,6 +20,7 @@ model User {
   
   repClients    Client[]      @relation("RepClients")
   repOrders     ClientOrder[] @relation("RepOrders")
+  webOrders     WebOrder[]
 }
 
 model SiteSettings {
@@ -97,6 +98,7 @@ model Product {
   gradient_from        String?
   gradient_to          String?
   categoryId           Int?
+  stock                Int       @default(100)
   activePromotionId    Int?      @unique
 
   category       Category?       @relation(fields: [categoryId], references: [id])
@@ -250,6 +252,9 @@ model Client {
   lng            Float?
   locationUrl    String?
   notes          String?
+  status         String   @default("LEAD")
+  creditLimit    Float    @default(0)
+  outstandingBalance Float @default(0)
   repId          String?
   rep            User?    @relation("RepClients", fields: [repId], references: [id])
   contacts       ClientContact[]
@@ -297,16 +302,22 @@ model OrderItem {
 
 model WebOrder {
   id              Int            @id @default(autoincrement())
+  userId          String?
+  user            User?          @relation(fields: [userId], references: [id])
   customerName    String
   customerEmail   String?
   customerPhone   String
   governorate     String
   shippingAddress String
+  shippingFee     Float          @default(0)
+  paymentMethod   String         @default("COD")
   totalAmount     Float          @default(0)
   status          String         @default("PENDING") // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
   items           WebOrderItem[]
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
+  promoCode      String?
+  discountAmount Float   @default(0)
 }
 
 model WebOrderItem {
@@ -318,4 +329,28 @@ model WebOrderItem {
   quantity   Int
   unitPrice  Float    @default(0)
   subtotal   Float    @default(0)
+}
+
+model ShippingZone {
+  id        Int      @id @default(autoincrement())
+  name_ar   String   @unique
+  name_en   String   @unique
+  fee       Float    @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PromoCode {
+  id             Int       @id @default(autoincrement())
+  code           String    @unique
+  type           String    // PERCENTAGE or FIXED
+  value          Float
+  minOrderValue  Float?
+  maxUses        Int?
+  usedCount      Int       @default(0)
+  isActive       Boolean   @default(true)
+  expiresAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }

@@ -106,24 +106,22 @@ export const Navbar = () => {
     };
 
     // Solid Background classes vs Transparent background classes
-    const isSolid = scrolled || !isHome || isOpen;
-    const navTextClass = isSolid ? "text-gray-900" : "text-white";
-    const navHoverClass = isSolid ? "hover:text-green-700" : "hover:text-gray-200";
+    const forceSolidBar = scrolled || !isHome || isOpen;
+    const navTextClass = forceSolidBar ? "text-gray-900" : "text-white";
+    const navHoverClass = forceSolidBar ? "hover:text-green-700" : "hover:text-gray-200";
 
     return (
         <header className={cn(
             "fixed top-0 w-full transition-all duration-500",
-            scrolled ? "bg-white/95 backdrop-blur-xl shadow-sm border-b border-gray-200" : "pt-2 sm:pt-3 px-2 sm:px-4 lg:px-6",
+            forceSolidBar ? "bg-white/95 backdrop-blur-xl shadow-sm border-b border-gray-200 py-1" : "pt-2 sm:pt-3 px-2 sm:px-4 lg:px-6",
             isOpen ? "z-[100]" : "z-50"
         )}>
             <Container className="max-w-[1480px]">
                 <div
                     className={cn(
                         "flex items-center justify-between min-h-[3.5rem] sm:min-h-[4rem] md:h-[4.5rem] lg:h-[4.5rem] py-2 md:py-0 transition-all duration-500 relative",
-                        !scrolled 
-                            ? (isSolid 
-                                ? "bg-white shadow-lg border border-gray-200 rounded-[1.25rem] px-3 sm:px-4 lg:px-6" 
-                                : "bg-black/20 backdrop-blur-md border border-white/20 shadow-md rounded-[1.25rem] px-3 sm:px-4 lg:px-6")
+                        !forceSolidBar 
+                            ? "bg-black/20 backdrop-blur-md border border-white/20 shadow-md rounded-[1.25rem] px-3 sm:px-4 lg:px-6"
                             : "px-2 lg:px-0"
                     )}
                 >
@@ -131,24 +129,24 @@ export const Navbar = () => {
                     <Link href="/" className="flex items-center gap-2 lg:gap-3 group shrink-0 relative z-50">
                         <div className={cn(
                             "w-11 h-11 md:w-[3.75rem] md:h-[3.75rem] min-w-[2.75rem] md:min-w-[3.75rem] rounded-xl lg:rounded-2xl flex items-center justify-center transition-all duration-300 shadow-sm overflow-hidden shrink-0",
-                            isSolid ? "bg-primary-green/10 group-hover:bg-primary-green/20" : "bg-white/20 group-hover:bg-white/30"
+                            forceSolidBar ? "bg-primary-green/10 group-hover:bg-primary-green/20" : "bg-white/20 group-hover:bg-white/30"
                         )}>
                             {logoUrl ? (
                                 <img src={logoUrl} alt="Logo" className="w-full h-full object-contain object-center p-0.5 scale-110" />
                             ) : (
-                                <Leaf className={cn("w-7 h-7 md:w-10 md:h-10 scale-110", isSolid ? "text-primary-green" : "text-white")} />
+                                <Leaf className={cn("w-7 h-7 md:w-10 md:h-10 scale-110", forceSolidBar ? "text-primary-green" : "text-white")} />
                             )}
                         </div>
                         <div className="flex flex-col justify-center">
                             <Typography variant="h4" as="span" weight="bold" className={cn(
                                 "transition-colors duration-300 font-black tracking-tight leading-none",
-                                isSolid ? "text-primary-dark" : "text-white drop-shadow-md"
+                                forceSolidBar ? "text-primary-dark" : "text-white drop-shadow-md"
                             )}>
                                 {t.nav.brand}
                             </Typography>
                             <span className={cn(
                                 "text-[10px] leading-tight font-bold mt-1 tracking-wide opacity-90 block",
-                                isSolid ? "text-primary-green" : "text-white/90"
+                                forceSolidBar ? "text-primary-green" : "text-white/90"
                             )}>
                                 {isRTL ? "لعصر وإستخلاص الزيوت النباتية" : "For Extracting Vegetable Oils"}
                             </span>
@@ -170,7 +168,7 @@ export const Navbar = () => {
                                         className={cn(
                                             "px-2.5 xl:px-3 py-2 rounded-lg text-[13px] font-bold transition-all duration-300 flex items-center gap-1 whitespace-nowrap peer",
                                             isActive(link.href)
-                                                ? (isSolid ? "text-green-700 bg-green-50" : "text-white bg-white/20")
+                                                ? (forceSolidBar ? "text-green-700 bg-green-50" : "text-white bg-white/20")
                                                 : cn(navTextClass, navHoverClass)
                                         )}
                                     >
@@ -251,14 +249,14 @@ export const Navbar = () => {
                             onClick={() => setCartOpen(true)}
                             className={cn(
                                 "relative p-3 rounded-[1rem] transition-all duration-300 hover:scale-105 active:scale-95 group/cart",
-                                isSolid ? "bg-gray-50 hover:bg-green-50 text-gray-700" : "bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm"
+                                forceSolidBar ? "bg-gray-50 hover:bg-green-50 text-gray-700" : "bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm"
                             )}
                         >
-                            <ShoppingBag className={cn("w-6 h-6", isSolid ? "group-hover/cart:text-green-700" : "")} strokeWidth={2} />
+                            <ShoppingBag className={cn("w-6 h-6", forceSolidBar ? "group-hover/cart:text-green-700" : "")} strokeWidth={2} />
                             {(isMounted && getTotalItems() > 0) && (
                                 <span className={cn(
                                     "absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold text-white shadow-md border-2",
-                                    isSolid ? "bg-red-500 border-white" : "bg-accent-gold text-primary-dark border-transparent"
+                                    forceSolidBar ? "bg-red-500 border-white" : "bg-accent-gold text-primary-dark border-transparent"
                                 )}>
                                     {getTotalItems()}
                                 </span>
@@ -267,7 +265,7 @@ export const Navbar = () => {
 
                         <div className={cn(
                             "flex items-center pl-2 xl:pl-3 border-l transition-colors duration-300",
-                            isSolid ? "border-surface-light text-text-dark" : "border-white/20 text-white"
+                            forceSolidBar ? "border-surface-light text-text-dark" : "border-white/20 text-white"
                         )}>
                             <LanguageSwitcher currentLocale={locale} onChange={setLocale} />
                         </div>
@@ -275,7 +273,7 @@ export const Navbar = () => {
                             href="/contact"
                             className={cn(
                                 "flex items-center justify-center gap-2 h-9 lg:h-10 px-4 xl:px-5 rounded-lg font-bold text-sm transition-all duration-300 relative overflow-hidden group/btn",
-                                isSolid
+                                forceSolidBar
                                     ? "bg-green-700 text-white hover:bg-green-800 shadow-md hover:shadow-lg"
                                     : "bg-white text-green-800 hover:bg-gray-50 shadow-lg"
                             )}
@@ -293,14 +291,14 @@ export const Navbar = () => {
                                 onClick={() => setCartOpen(true)}
                                 className={cn(
                                     "relative p-2.5 rounded-xl transition-colors",
-                                    isSolid ? "text-primary-dark hover:bg-surface-soft bg-gray-50/80" : "text-white bg-white/10 backdrop-blur-sm hover:bg-white/20"
+                                    forceSolidBar ? "text-primary-dark hover:bg-surface-soft bg-gray-50/80" : "text-white bg-white/10 backdrop-blur-sm hover:bg-white/20"
                                 )}
                             >
                                 <ShoppingBag className="w-6 h-6" strokeWidth={2} />
                                 {(isMounted && getTotalItems() > 0) && (
                                     <span className={cn(
                                         "absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold text-white shadow-md border-2",
-                                        isSolid ? "bg-red-500 border-white" : "bg-accent-gold text-primary-dark border-transparent"
+                                        forceSolidBar ? "bg-red-500 border-white" : "bg-accent-gold text-primary-dark border-transparent"
                                     )}>
                                         {getTotalItems()}
                                     </span>
@@ -310,7 +308,7 @@ export const Navbar = () => {
                             <button
                                 className={cn(
                                     "flex p-2 rounded-lg transition-colors",
-                                    isSolid ? "text-primary-dark hover:bg-surface-soft" : "text-white bg-white/10 backdrop-blur-sm hover:bg-white/20"
+                                    forceSolidBar ? "text-primary-dark hover:bg-surface-soft" : "text-white bg-white/10 backdrop-blur-sm hover:bg-white/20"
                                 )}
                                 onClick={() => setIsOpen(true)}
                                 aria-label="Toggle Menu"

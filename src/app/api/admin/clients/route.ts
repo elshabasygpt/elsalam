@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     try {
         const body = await req.json();
-        const { name, company, industry, notes, contacts } = body;
+        const { name, company, industry, notes, contacts, status, creditLimit, outstandingBalance } = body;
 
         if (!name) {
             return NextResponse.json({ error: "Client name is required" }, { status: 400 });
@@ -40,6 +40,9 @@ export async function POST(req: NextRequest) {
                 company,
                 industry,
                 notes,
+                status: status || "LEAD",
+                creditLimit: Number(creditLimit) || 0,
+                outstandingBalance: Number(outstandingBalance) || 0,
                 contacts: {
                     create: contacts?.map((c: any) => ({
                         personName: c.personName,
