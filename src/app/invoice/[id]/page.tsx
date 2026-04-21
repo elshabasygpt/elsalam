@@ -10,7 +10,11 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
         where: { id: parseInt(id) },
         include: {
             items: {
-                include: { product: true }
+                include: { 
+                    product: {
+                        include: { images: true }
+                    } 
+                }
             }
         }
     });
@@ -66,8 +70,18 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                         {order.items.map((item: any) => (
                             <tr key={item.id} className="border-b border-slate-100 last:border-b-0">
                                 <td className="py-5 pr-4">
-                                    <p className="font-bold text-slate-800">{item.product.name_en}</p>
-                                    <p className="text-slate-500 text-[13px] font-medium" dir="rtl">{item.product.name_ar}</p>
+                                    <div className="flex items-center gap-4">
+                                        {item.product.images && item.product.images.length > 0 && (
+                                            <div className="w-12 h-12 relative rounded-md overflow-hidden bg-slate-50 border border-slate-100 flex-shrink-0 print:border-slate-300">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img src={item.product.images[0].url} alt={item.product.name_en} className="w-full h-full object-cover" />
+                                            </div>
+                                        )}
+                                        <div>
+                                            <p className="font-bold text-slate-800">{item.product.name_en}</p>
+                                            <p className="text-slate-500 text-[13px] font-medium" dir="rtl">{item.product.name_ar}</p>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td className="py-5 text-center font-bold text-slate-700">{item.quantity}</td>
                                 <td className="py-5 text-right font-semibold text-slate-600">{item.unitPrice.toLocaleString()} EGP</td>
@@ -102,7 +116,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
 
                 <div className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center justify-center text-center">
                     <p className="text-slate-500 font-medium italic mb-1">Thank you for your business. We appreciate your trust.</p>
-                    <p className="font-bold text-slate-700 tracking-wide text-sm">www.elsalamoils.com</p>
+                    <p className="font-bold text-slate-700 tracking-wide text-sm">www.elsalamoil.com</p>
                 </div>
             </div>
         </div>

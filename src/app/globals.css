@@ -12,6 +12,14 @@
     html {
         scroll-behavior: smooth;
     }
+
+    /* 🎨 RADICAL SOLUTION FOR ICONS: 
+       Makes all lucide icons scale with text and never shrink unexpectedly */
+    svg.lucide {
+        flex-shrink: 0;
+        width: 1.25em !important;
+        height: 1.25em !important;
+    }
 }
 
 @layer utilities {
