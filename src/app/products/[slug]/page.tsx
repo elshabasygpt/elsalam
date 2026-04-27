@@ -337,12 +337,16 @@ export default function ProductDetailPage() {
                             {/* Panel: Description */}
                             {activeTab === "description" && (
                                 <div className="max-w-4xl animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                    <h3 className="text-xl sm:text-2xl font-black text-gray-900 mb-6 flex items-center gap-3">
-                                        <FileText className="w-7 h-7 sm:w-8 sm:h-8 text-green-600 shrink-0" />
+                                    <h3 className="text-2xl sm:text-3xl font-black text-gray-900 mb-8 flex items-center gap-4">
+                                        <div className="p-2.5 bg-green-50 rounded-xl">
+                                            <FileText className="w-8 h-8 sm:w-10 sm:h-10 text-green-700 shrink-0" />
+                                        </div>
                                         {locale === "ar" ? "الوصف الشامل للمنتج" : "Comprehensive Description"}
                                     </h3>
                                     {longDesc ? (
-                                        <p className="whitespace-pre-line leading-relaxed text-gray-600 text-base sm:text-lg">{longDesc}</p>
+                                        <div className="text-gray-700 text-lg leading-loose text-justify font-medium">
+                                            <p className="whitespace-pre-wrap">{longDesc}</p>
+                                        </div>
                                     ) : (
                                         <p className="text-gray-400 italic font-medium">{locale === "ar" ? "لا يوجد وصف مطول متاح." : "No long description available."}</p>
                                     )}
