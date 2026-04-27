@@ -84,7 +84,7 @@ export function ProductImportModal({ isOpen, onClose, onSuccess }: ProductImport
         for (const row of parsedData) {
             try {
                 // Parse delimited relations
-                let features = [];
+                let features: { feature_ar: string; feature_en: string }[] = [];
                 if (row.features) {
                     features = String(row.features).split('|').map(f => {
                         const parts = f.split(':');
@@ -92,7 +92,7 @@ export function ProductImportModal({ isOpen, onClose, onSuccess }: ProductImport
                     });
                 }
 
-                let packagings = [];
+                let packagings: { size_ar: string; size_en: string; price: number }[] = [];
                 if (row.packagings) {
                     packagings = String(row.packagings).split('|').map(p => {
                         const parts = p.split(':');
