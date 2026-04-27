@@ -114,7 +114,7 @@ export default function ProductDetailPage() {
     const title = locale === "ar" ? product.name_ar : product.name_en;
     const subtitle = locale === "ar" ? product.name_en : product.name_ar;
     const description = locale === "ar" ? product.short_description_ar : product.short_description_en;
-    const longDesc = locale === "ar" ? product.long_description_ar : product.long_description_en;
+    const longDesc = locale === "ar" ? (product.description_ar || product.long_description_ar) : (product.description_en || product.long_description_en);
     const features = safeArray(locale === "ar" ? product.features_ar : product.features_en);
     const certifications = safeArray(product.certifications);
     const categoryName = product.category ? (locale === "ar" ? product.category.name_ar : product.category.name_en) : "";
