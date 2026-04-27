@@ -161,24 +161,24 @@ export default function ProductDetailPage() {
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white rounded-full blur-[60px] pointer-events-none" />
                             
                             <motion.div
-                                className="relative z-20 w-full max-w-[320px] aspect-square flex items-center justify-center mt-4 sm:mt-8"
+                                className="relative z-20 w-full max-w-[320px] sm:max-w-[400px] xl:max-w-[480px] aspect-square flex items-center justify-center mt-4 sm:mt-8"
                                 animate={{ y: [-8, 8, -8] }}
                                 transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
                             >
                                 <img
                                     src={activeImage || product.featured_image || "/images/placeholder.svg"}
                                     alt={title}
-                                    className="w-full h-full object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.15)] mix-blend-multiply cursor-crosshair"
+                                    className="w-full h-full object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.15)] mix-blend-multiply cursor-crosshair hover:scale-105 transition-transform duration-500"
                                 />
                                 
                                 {/* Inner Floating Box Badges */}
-                                <div className={`absolute top-0 ${isRTL ? '-right-4' : '-left-4'} bg-white shadow-lg p-3 sm:p-4 rounded-2xl flex flex-col items-center gap-1 border border-gray-100 scale-90 sm:scale-100 z-30`}>
-                                    <ShieldCheck className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" />
+                                <div className={`absolute top-0 sm:top-4 ${isRTL ? '-right-2 sm:-right-4' : '-left-2 sm:-left-4'} bg-white shadow-lg p-3 sm:p-5 rounded-2xl flex flex-col items-center gap-1 border border-gray-100 scale-90 sm:scale-100 z-30`}>
+                                    <ShieldCheck className="w-8 h-8 sm:w-12 sm:h-12 text-green-600" />
                                     <span className="text-xs sm:text-sm font-black uppercase text-gray-800 leading-tight text-center">ISO<br/>22000</span>
                                 </div>
-                                <div className={`absolute bottom-4 ${isRTL ? '-left-6' : '-right-6'} bg-white shadow-lg px-4 py-3 rounded-xl flex items-center justify-center gap-2 border border-gray-100 scale-90 sm:scale-100 z-30`}>
-                                    <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 text-yellow-500 shrink-0" />
-                                    <span className="text-sm font-black text-gray-800 leading-none">100%<br/><span className="text-[10px] sm:text-xs text-gray-500 font-medium">{locale === "ar" ? "طبيعي ونقي" : "Pure & Natural"}</span></span>
+                                <div className={`absolute bottom-4 sm:bottom-8 ${isRTL ? '-left-2 sm:-left-6' : '-right-2 sm:-right-6'} bg-white shadow-lg px-4 py-3 sm:px-5 sm:py-4 rounded-xl flex items-center justify-center gap-2 border border-gray-100 scale-90 sm:scale-100 z-30`}>
+                                    <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500 shrink-0" />
+                                    <span className="text-sm sm:text-base font-black text-gray-800 leading-none">100%<br/><span className="text-[10px] sm:text-xs text-gray-500 font-medium">{locale === "ar" ? "طبيعي ونقي" : "Pure & Natural"}</span></span>
                                 </div>
                             </motion.div>
 
