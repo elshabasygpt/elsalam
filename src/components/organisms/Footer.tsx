@@ -1,221 +1,332 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Container } from "@/components/atoms/Container";
 import { ScrollReveal } from "@/components/atoms/ScrollReveal";
-import { MapPin, Phone, Mail, Leaf, Facebook, Linkedin, Instagram, ArrowLeft, Send } from "lucide-react";
+import {
+    MapPin, Phone, Mail, Facebook, Linkedin, Instagram,
+    ArrowLeft, Send, ChevronRight, ExternalLink, Leaf
+} from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useLanguage } from "@/lib/i18n-context";
 import { usePageContent, getBilingualValue } from "@/lib/page-content-context";
-import { useEffect, useState } from "react";
 
 const QUICK_LINK_HREFS = ["/", "/about", "/quality", "/production", "/media", "/contact"];
 const PRODUCT_LINK_HREFS = ["/products", "/products", "/products", "/b2b", "/export"];
-
-const SOCIAL_LINKS = [
-    { icon: <Facebook className="w-5 h-5" strokeWidth={1.5} />, href: "https://facebook.com/elsalamoils", label: "Facebook", hoverBg: "hover:bg-blue-600" },
-    { icon: <Instagram className="w-5 h-5" strokeWidth={1.5} />, href: "https://instagram.com/elsalamoils", label: "Instagram", hoverBg: "hover:bg-pink-600" },
-    { icon: <Linkedin className="w-5 h-5" strokeWidth={1.5} />, href: "https://linkedin.com/company/elsalamoils", label: "LinkedIn", hoverBg: "hover:bg-sky-600" },
-];
 
 export const Footer = () => {
     const { t, isRTL, locale } = useLanguage();
     const cmsFooter = usePageContent("footer");
     const [settings, setSettings] = useState<any>(null);
+    const [email, setEmail] = useState("");
+    const [subscribed, setSubscribed] = useState(false);
 
     useEffect(() => {
         fetch("/api/public/settings", { cache: "no-store" })
             .then(res => res.json())
-            .then(data => {
-                if (data && !data.error) {
-                    setSettings(data);
-                }
-            })
+            .then(data => { if (data && !data.error) setSettings(data); })
             .catch(err => console.error("Failed to fetch settings config:", err));
     }, []);
 
-    // Merge settings into display variables
-    // Priority: 1. CMS Footer Section -> 2. Global Site Settings -> 3. Fallback Translation
-    const displayPhone = cmsFooter?.phone || settings?.contactPhone || t.footer.phone;
-    const displayEmail = cmsFooter?.email || settings?.contactEmail || t.footer.email;
-    
-    // Address is bilingual
-    const cmsAddress = getBilingualValue(cmsFooter, "address", locale);
-    const settingsAddress = locale === 'ar' ? settings?.addressAr : settings?.addressEn;
-    const displayAddress = cmsAddress || settingsAddress || t.footer.address;
-
-    // Description is bilingual
-    const displayDescription = getBilingualValue(cmsFooter, "description", locale) || t.footer.description;
-
-    // Copyright is bilingual
-    const displayCopyright = getBilingualValue(cmsFooter, "copyright", locale) || t.footer.copyright;
-
-    // Social Links (Priority: 1. CMS Footer Section -> 2. Global Site Settings)
-    const displayFacebook = cmsFooter?.facebook || settings?.facebookUrl || "https://facebook.com/elsalamoils";
-    const displayInstagram = cmsFooter?.instagram || settings?.instagramUrl || "https://instagram.com/elsalamoils";
-    const displayLinkedin = cmsFooter?.linkedin || settings?.linkedinUrl || "https://linkedin.com/company/elsalamoils";
-
-    // Brand and Logo
-    const displayBrandName = locale === 'ar' ? (cmsFooter?.brandName || t.nav.brand) : (cmsFooter?.brandEn || t.nav.brand);
-    const displayBrandSub = locale === 'ar' ? "Elsalam Oils" : "Elsalam Oils"; // Keep static sub, or make it dynamic if needed
+    // ── Merge data priority: CMS → Settings → Fallback ──
+    const displayPhone   = cmsFooter?.phone   || settings?.contactPhone || t.footer.phone;
+    const displayEmail   = cmsFooter?.email   || settings?.contactEmail || t.footer.email;
+    const cmsAddress     = getBilingualValue(cmsFooter, "address", locale);
+    const settingsAddr   = locale === "ar" ? settings?.addressAr : settings?.addressEn;
+    const displayAddress = cmsAddress || settingsAddr || t.footer.address;
+    const displayDesc    = getBilingualValue(cmsFooter, "description", locale) || t.footer.description;
+    const displayCopy    = getBilingualValue(cmsFooter, "copyright", locale)   || t.footer.copyright;
+    const displayFB      = cmsFooter?.facebook  || settings?.facebookUrl  || "https://facebook.com/elsalamoils";
+    const displayIG      = cmsFooter?.instagram || settings?.instagramUrl || "https://instagram.com/elsalamoils";
+    const displayLI      = cmsFooter?.linkedin  || settings?.linkedinUrl  || "https://linkedin.com/company/elsalamoils";
+    const displayBrand   = locale === "ar" ? (cmsFooter?.brandName || t.nav.brand) : (cmsFooter?.brandEn || t.nav.brand);
     const displayLogoStr = cmsFooter?.logo;
 
-    const DYNAMIC_SOCIAL_LINKS = [
-        { icon: <Facebook className="w-5 h-5" strokeWidth={1.5} />, href: displayFacebook, label: "Facebook", hoverBg: "hover:bg-blue-600" },
-        { icon: <Instagram className="w-5 h-5" strokeWidth={1.5} />, href: displayInstagram, label: "Instagram", hoverBg: "hover:bg-pink-600" },
-        { icon: <Linkedin className="w-5 h-5" strokeWidth={1.5} />, href: displayLinkedin, label: "LinkedIn", hoverBg: "hover:bg-sky-600" },
+    const SOCIAL = [
+        { icon: <Facebook  className="w-5 h-5" strokeWidth={1.8} />, href: displayFB, label: "Facebook",  color: "hover:bg-blue-600/80  hover:border-blue-500" },
+        { icon: <Instagram className="w-5 h-5" strokeWidth={1.8} />, href: displayIG, label: "Instagram", color: "hover:bg-pink-600/80   hover:border-pink-500" },
+        { icon: <Linkedin  className="w-5 h-5" strokeWidth={1.8} />, href: displayLI, label: "LinkedIn",  color: "hover:bg-sky-600/80    hover:border-sky-500" },
     ];
 
+    const handleSubscribe = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (email) { setSubscribed(true); setEmail(""); }
+    };
+
     return (
-        <footer className="relative bg-gradient-to-b from-gray-950 via-green-950 to-gray-950 text-white mt-0">
-            {/* ── CTA Strip ── */}
-            <div className="bg-green-700">
-                <Container className="py-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div className="text-center md:text-start">
-                        <p className="text-white font-bold text-lg">{t.footer.ctaTitle}</p>
-                        <p className="text-green-200 text-sm">{t.footer.ctaSubtitle}</p>
+        <footer className="relative overflow-hidden" style={{ background: "linear-gradient(180deg, #0a1a0f 0%, #061209 60%, #040d07 100%)" }}>
+
+            {/* ── Decorative top glow ── */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[1px] bg-gradient-to-r from-transparent via-green-500/40 to-transparent" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-24 bg-green-500/5 blur-3xl rounded-full pointer-events-none" />
+
+            {/* ── Subtle radial pattern ── */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #22c55e 1px, transparent 0)", backgroundSize: "48px 48px" }} />
+
+            {/* ════════════════════════════════════════════
+                CTA STRIP
+            ════════════════════════════════════════════ */}
+            <div className="relative border-b border-green-500/10"
+                style={{ background: "linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%)" }}>
+                {/* glow blob */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute -top-10 left-1/4 w-64 h-32 bg-green-300/10 blur-3xl rounded-full" />
+                    <div className="absolute -bottom-10 right-1/4 w-64 h-32 bg-emerald-300/10 blur-3xl rounded-full" />
+                </div>
+                <Container className="relative py-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className={`text-center ${isRTL ? "md:text-right" : "md:text-left"}`}>
+                        <p className="text-white font-black text-xl md:text-2xl tracking-tight leading-snug">
+                            {t.footer.ctaTitle}
+                        </p>
+                        <p className="text-green-200/80 text-sm mt-1">{t.footer.ctaSubtitle}</p>
                     </div>
                     <Link
                         href="/contact"
-                        className="inline-flex items-center gap-2 px-8 py-3 bg-white text-green-800 font-bold rounded-xl hover:bg-gray-50 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-300 shadow-md text-base"
+                        className="group inline-flex items-center gap-2.5 px-8 py-3.5 bg-white text-green-900 font-bold rounded-2xl
+                                   hover:bg-green-50 hover:shadow-[0_0_30px_rgba(34,197,94,0.3)]
+                                   hover:-translate-y-0.5 active:scale-[0.97]
+                                   transition-all duration-300 shadow-xl text-sm whitespace-nowrap"
                     >
-                        <Send className="w-5 h-5" />
+                        <Send className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" />
                         {t.footer.ctaButton}
                     </Link>
                 </Container>
             </div>
 
-            {/* ── Main Footer Content ── */}
-            <Container className="pt-16 pb-8 mobile-bottom-offset">
+            {/* ════════════════════════════════════════════
+                MAIN CONTENT
+            ════════════════════════════════════════════ */}
+            <Container className="pt-16 pb-4 mobile-bottom-offset">
                 <ScrollReveal>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12 pb-12 border-b border-white/10">
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-10 mb-14 pb-14 border-b border-white/[0.06]">
 
-                        {/* Column 1: About + Social */}
-                        <div className="lg:col-span-1 space-y-5">
-                            <div className="flex items-center gap-3 mb-2">
-                                {displayLogoStr ? (
-                                    <img src={displayLogoStr} alt={displayBrandName} className="w-11 h-11 object-contain" />
-                                ) : (
-                                    <span className="w-11 h-11 rounded-xl bg-green-500/20 flex items-center justify-center">
-                                        <Leaf className="w-6 h-6 text-green-400" strokeWidth={1.5} />
-                                    </span>
-                                )}
+                        {/* ── Col 1: Brand + About ─────────────────── */}
+                        <div className="md:col-span-4 space-y-6">
+                            {/* Logo + Name */}
+                            <div className="flex items-center gap-4">
+                                <div className="relative w-20 h-20 rounded-2xl overflow-hidden border border-green-500/20 shadow-lg shadow-green-900/30 flex-shrink-0 bg-white/5">
+                                    {displayLogoStr ? (
+                                        <img src={displayLogoStr} alt={displayBrand} className="w-full h-full object-contain p-1" />
+                                    ) : (
+                                        <Image
+                                            src="/icon.png"
+                                            alt={displayBrand}
+                                            fill
+                                            className="object-contain p-2"
+                                            sizes="80px"
+                                        />
+                                    )}
+                                </div>
                                 <div>
-                                    <p className="text-white font-black text-lg leading-tight">{displayBrandName}</p>
-                                    <p className="text-green-400/70 text-xs font-semibold tracking-wider uppercase font-english">{displayBrandSub}</p>
+                                    <p className="text-white font-black text-xl leading-tight">{displayBrand}</p>
+                                    <p className="text-green-400/70 text-[11px] font-semibold tracking-widest uppercase font-english mt-0.5">
+                                        Elsalam Oils
+                                    </p>
+                                    <div className="flex items-center gap-1.5 mt-1.5">
+                                        <span className="w-5 h-0.5 bg-gradient-to-r from-green-500 to-transparent rounded-full" />
+                                        <span className="text-green-500/50 text-[9px] font-bold uppercase tracking-widest font-english">Est. 2000</span>
+                                    </div>
                                 </div>
                             </div>
-                            <p className="text-white/50 text-sm leading-relaxed whitespace-pre-line">
-                                {displayDescription}
+
+                            {/* Description */}
+                            <p className="text-white/40 text-sm leading-relaxed">
+                                {displayDesc}
                             </p>
 
-                            <div className="flex items-center gap-2 pt-1">
-                                {DYNAMIC_SOCIAL_LINKS.filter(s => s.href).map((social, i) => (
-                                    <a
-                                        key={i}
-                                        href={social.href}
-                                        className={`w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center transition-all duration-300 text-white/70 hover:text-white hover:scale-110 ${social.hoverBg}`}
-                                        aria-label={social.label}
-                                    >
-                                        {social.icon}
+                            {/* Stats pills */}
+                            <div className="flex flex-wrap gap-2">
+                                {[
+                                    { val: "25+", label: locale === "ar" ? "عاماً" : "Years" },
+                                    { val: "500T", label: locale === "ar" ? "يومياً" : "Daily" },
+                                    { val: "15+", label: locale === "ar" ? "دولة" : "Countries" },
+                                ].map((s, i) => (
+                                    <div key={i}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/8 bg-white/4 backdrop-blur-sm">
+                                        <span className="text-green-400 font-black text-sm font-english">{s.val}</span>
+                                        <span className="text-white/30 text-xs">{s.label}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Social icons */}
+                            <div className="flex items-center gap-3 pt-1">
+                                {SOCIAL.map((s, i) => (
+                                    <a key={i} href={s.href} target="_blank" rel="noopener noreferrer"
+                                        aria-label={s.label}
+                                        className={`w-14 h-14 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center
+                                                    text-white/50 hover:text-white transition-all duration-300
+                                                    hover:scale-110 hover:shadow-lg ${s.color}`}>
+                                        {s.icon}
                                     </a>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Column 2: Quick Links */}
-                        <div>
-                            <h4 className="text-white font-bold text-base mb-5 flex items-center gap-2">
-                                <span className="w-1.5 h-5 bg-green-500 rounded-full" />
+                        {/* ── Col 2: Quick Links ───────────────────── */}
+                        <div className="md:col-span-2">
+                            <h4 className="text-white font-bold text-sm mb-5 flex items-center gap-2">
+                                <span className="w-1 h-4 bg-green-500 rounded-full" />
                                 {t.footer.quickLinksTitle}
                             </h4>
-                            <ul className="space-y-2.5">
+                            <ul className="space-y-3">
                                 {t.footer.quickLinks.map((label, i) => (
                                     <li key={i}>
-                                        <Link
-                                            href={QUICK_LINK_HREFS[i]}
-                                            className="group text-white/50 hover:text-white text-sm transition-all duration-300 flex items-center gap-2"
-                                        >
-                                            <ArrowLeft className={`w-5 h-5 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-green-400 ${!isRTL ? "rotate-180" : ""}`} />
-                                            <span className="group-hover:translate-x-[-4px] transition-transform duration-300">{label}</span>
+                                        <Link href={QUICK_LINK_HREFS[i]}
+                                            className="group flex items-center gap-2 text-white/40 hover:text-white text-sm transition-all duration-300">
+                                            <ChevronRight className={`w-5 h-5 text-green-500/0 group-hover:text-green-400 transition-all duration-300 flex-shrink-0 ${!isRTL ? "rotate-180" : ""}`} />
+                                            <span className="group-hover:translate-x-0.5 transition-transform duration-300">{label}</span>
                                         </Link>
                                     </li>
                                 ))}
                             </ul>
                         </div>
 
-                        {/* Column 3: Products */}
-                        <div>
-                            <h4 className="text-white font-bold text-base mb-5 flex items-center gap-2">
-                                <span className="w-1.5 h-5 bg-amber-500 rounded-full" />
+                        {/* ── Col 3: Products ──────────────────────── */}
+                        <div className="md:col-span-2">
+                            <h4 className="text-white font-bold text-sm mb-5 flex items-center gap-2">
+                                <span className="w-1 h-4 bg-amber-500 rounded-full" />
                                 {t.footer.productsTitle}
                             </h4>
-                            <ul className="space-y-2.5">
+                            <ul className="space-y-3">
                                 {t.footer.productLinks.map((label, i) => (
                                     <li key={i}>
-                                        <Link
-                                            href={PRODUCT_LINK_HREFS[i]}
-                                            className="group text-white/50 hover:text-white text-sm transition-all duration-300 flex items-center gap-2"
-                                        >
-                                            <ArrowLeft className={`w-5 h-5 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-amber-400 ${!isRTL ? "rotate-180" : ""}`} />
-                                            <span className="group-hover:translate-x-[-4px] transition-transform duration-300">{label}</span>
+                                        <Link href={PRODUCT_LINK_HREFS[i]}
+                                            className="group flex items-center gap-2 text-white/40 hover:text-white text-sm transition-all duration-300">
+                                            <ChevronRight className={`w-5 h-5 text-amber-500/0 group-hover:text-amber-400 transition-all duration-300 flex-shrink-0 ${!isRTL ? "rotate-180" : ""}`} />
+                                            <span className="group-hover:translate-x-0.5 transition-transform duration-300">{label}</span>
                                         </Link>
                                     </li>
                                 ))}
                             </ul>
                         </div>
 
-                        {/* Column 4: Contact Info */}
-                        <div>
-                            <h4 className="text-white font-bold text-base mb-5 flex items-center gap-2">
-                                <span className="w-1.5 h-5 bg-sky-500 rounded-full" />
-                                {t.footer.addressTitle}
-                            </h4>
-                            <ul className="space-y-4">
-                                <li className="flex items-start gap-3">
-                                    <span className="w-10 h-10 rounded-xl bg-green-500/15 flex items-center justify-center shrink-0 mt-0.5">
-                                        <MapPin className="w-5 h-5 text-green-400" strokeWidth={1.5} />
-                                    </span>
-                                    <div>
-                                        <p className="text-white/80 text-sm font-medium">{t.footer.addressTitle}</p>
-                                        <p className="text-white/50 text-xs">{displayAddress}</p>
+                        {/* ── Col 4: Contact + Newsletter ──────────── */}
+                        <div className="md:col-span-4 space-y-6">
+                            {/* Contact */}
+                            <div>
+                                <h4 className="text-white font-bold text-sm mb-5 flex items-center gap-2">
+                                    <span className="w-1 h-4 bg-sky-500 rounded-full" />
+                                    {t.footer.addressTitle}
+                                </h4>
+                                <ul className="space-y-3.5">
+                                    {[
+                                        {
+                                            icon: <MapPin className="w-6 h-6" strokeWidth={1.5} />,
+                                            label: t.footer.addressTitle,
+                                            value: displayAddress,
+                                            color: "text-green-400",
+                                            bg: "bg-green-500/10"
+                                        },
+                                        {
+                                            icon: <Phone className="w-6 h-6" strokeWidth={1.5} />,
+                                            label: t.contact.phone,
+                                            value: displayPhone,
+                                            color: "text-green-400",
+                                            bg: "bg-green-500/10",
+                                            ltr: true,
+                                        },
+                                        {
+                                            icon: <Mail className="w-6 h-6" strokeWidth={1.5} />,
+                                            label: t.contact.emailLabel,
+                                            value: displayEmail,
+                                            color: "text-green-400",
+                                            bg: "bg-green-500/10",
+                                            ltr: true,
+                                        },
+                                    ].map((item, i) => (
+                                        <li key={i} className="flex items-start gap-4">
+                                            <span className={`w-12 h-12 rounded-2xl ${item.bg} flex items-center justify-center flex-shrink-0 mt-0.5 ${item.color}`}>
+                                                {item.icon}
+                                            </span>
+                                            <div>
+                                                <p className="text-white/50 text-xs font-medium mb-0.5">{item.label}</p>
+                                                <p className={`text-white/70 text-xs ${item.ltr ? "font-english" : ""}`} dir={item.ltr ? "ltr" : undefined}>
+                                                    {item.value}
+                                                </p>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Newsletter */}
+                            <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-4">
+                                <p className="text-white font-semibold text-sm mb-1">{t.footer.newsletterTitle}</p>
+                                <p className="text-white/35 text-xs mb-3">{t.footer.newsletterSubtitle}</p>
+                                {subscribed ? (
+                                    <div className="flex items-center gap-2 text-green-400 text-sm py-2">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span>{locale === "ar" ? "تم الاشتراك بنجاح!" : "Subscribed!"}</span>
                                     </div>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <span className="w-10 h-10 rounded-xl bg-green-500/15 flex items-center justify-center shrink-0 mt-0.5">
-                                        <Phone className="w-5 h-5 text-green-400" strokeWidth={1.5} />
-                                    </span>
-                                    <div>
-                                        <p className="text-white/80 text-sm font-medium">{t.contact.phone}</p>
-                                        <p className="text-white/50 text-xs font-english" dir="ltr">{displayPhone}</p>
-                                    </div>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <span className="w-10 h-10 rounded-xl bg-green-500/15 flex items-center justify-center shrink-0 mt-0.5">
-                                        <Mail className="w-5 h-5 text-green-400" strokeWidth={1.5} />
-                                    </span>
-                                    <div>
-                                        <p className="text-white/80 text-sm font-medium">{t.contact.emailLabel}</p>
-                                        <p className="text-white/50 text-xs font-english">{displayEmail}</p>
-                                    </div>
-                                </li>
-                            </ul>
+                                ) : (
+                                    <form onSubmit={handleSubscribe} className="flex gap-2">
+                                        <input
+                                            type="email"
+                                            value={email}
+                                            onChange={e => setEmail(e.target.value)}
+                                            placeholder={t.footer.newsletterPlaceholder}
+                                            required
+                                            className="flex-1 min-w-0 px-3 py-2.5 rounded-xl bg-white/8 border border-white/10 text-white text-xs placeholder-white/25
+                                                       focus:outline-none focus:border-green-500/50 focus:bg-white/12 transition-all duration-200"
+                                        />
+                                        <button type="submit"
+                                            className="px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-xl text-xs font-bold
+                                                       transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20 flex-shrink-0">
+                                            <Send className="w-3.5 h-3.5" />
+                                        </button>
+                                    </form>
+                                )}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {/* ════════════════════════════════════════════
+                        BOTTOM BAR
+                    ════════════════════════════════════════════ */}
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+
+                        {/* Left: Copyright */}
+                        <div className="flex items-center gap-2.5 text-white/25 text-xs">
+                            <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                                <Leaf className="w-5 h-5 text-green-500/60" />
+                            </div>
+                            <span>© {new Date().getFullYear()} {displayCopy}</span>
+                        </div>
+
+                        {/* Center: Certified badges */}
+                        <div className="hidden md:flex items-center gap-2">
+                            {[
+                                { label: "ISO 9001",   color: "text-sky-400",   bg: "bg-sky-500/10",   border: "border-sky-500/20" },
+                                { label: "ISO 22000",  color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
+                                { label: "HACCP",      color: "text-amber-400",  bg: "bg-amber-500/10",  border: "border-amber-500/20" },
+                                { label: "Halal ✓",    color: "text-green-400",  bg: "bg-green-500/10",  border: "border-green-500/20" },
+                            ].map((cert, i) => (
+                                <span key={i}
+                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${cert.border} ${cert.bg} ${cert.color} text-[11px] font-bold font-english tracking-wider transition-all duration-300 hover:scale-105`}>
+                                    {cert.label}
+                                </span>
+                            ))}
+                        </div>
+
+                        {/* Right: Policy links */}
+                        <div className="flex items-center gap-5 text-white/25 text-xs">
+                            <Link href="/privacy" className="hover:text-white/60 transition-colors duration-200">{t.footer.privacy}</Link>
+                            <span className="w-px h-3 bg-white/10" />
+                            <Link href="/terms" className="hover:text-white/60 transition-colors duration-200">{t.footer.terms}</Link>
                         </div>
                     </div>
 
-                    {/* ── Bottom Bar ── */}
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-white/30 text-xs">
-                        <div className="flex items-center gap-2">
-                            <Leaf className="w-5 h-5 text-green-600" />
-                            <p>© {new Date().getFullYear()} {displayCopyright}</p>
-                        </div>
-                        <div className="flex gap-6">
-                            <Link href="/privacy" className="hover:text-white/60 transition-colors">{t.footer.privacy}</Link>
-                            <Link href="/terms" className="hover:text-white/60 transition-colors">{t.footer.terms}</Link>
-                        </div>
-                    </div>
                 </ScrollReveal>
             </Container>
+
+            {/* ── Bottom accent line ── */}
+            <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-green-600/30 to-transparent" />
         </footer>
     );
 };

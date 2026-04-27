@@ -52,6 +52,16 @@ model SiteSettings {
   imapPass          String?
 
   logoUrl           String?
+  invoiceNotesAr    String?
+  invoiceNotesEn    String?
+  invoiceShowLogo   Boolean  @default(true)
+  invoiceLogoUrl    String?
+  invoiceLogoSize   Int?     @default(64)
+  invoiceColor      String?  @default("#15803d")
+  invoiceSubtitle   String?  @default("Industrial High-Quality Oils & Fats")
+  invoiceWebsiteUrl String?  @default("www.elsalamoils.com")
+  invoiceCompanyDetails String?
+
   googleAnalyticsId String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -63,6 +73,16 @@ model PageContent {
   content   String   // JSON string containing sections data
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PageContentHistory {
+  id        String   @id @default(cuid())
+  pageSlug  String
+  content   String
+  savedAt   DateTime @default(now())
+  label     String   @default("")
+
+  @@index([pageSlug, savedAt])
 }
 
 model Category {
@@ -318,6 +338,7 @@ model WebOrder {
   updatedAt       DateTime       @updatedAt
   promoCode      String?
   discountAmount Float   @default(0)
+  notes          String?
 }
 
 model WebOrderItem {

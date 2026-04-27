@@ -5,7 +5,8 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
     try {
-        const settings = await prisma.siteSettings.findFirst();
+        const settingsList = await prisma.$queryRawUnsafe<any[]>('SELECT * FROM "SiteSettings" LIMIT 1');
+        const settings = settingsList?.[0] || null;
         
         if (settings) {
             // Remove sensitive SMTP credentials before sending to client

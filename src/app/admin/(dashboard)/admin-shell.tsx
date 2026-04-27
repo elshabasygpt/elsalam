@@ -39,7 +39,13 @@ const NAV_ITEMS: NavItem[] = [
     { id: "inbox", label: "البريد الوارد", href: "/admin/inbox", icon: Mail, roles: ["ADMIN"] },
     { id: "shipping", label: "مناطق الشحن", href: "/admin/shipping", icon: MapPin, roles: ["ADMIN"] },
     { id: "promos", label: "كوبونات الخصم", href: "/admin/promocodes", icon: TicketPercent, roles: ["ADMIN"] },
-    { id: "settings", label: "إعدادات عامة", href: "/admin/settings", icon: Settings, roles: ["ADMIN"] },
+    {
+        id: "settings", label: "إعدادات النظام", href: "/admin/settings", icon: Settings, roles: ["ADMIN"],
+        children: [
+            { id: "general_settings", label: "إعدادات الموقع", href: "/admin/settings", icon: Settings },
+            { id: "invoice_settings", label: "إعدادات الفاتورة", href: "/admin/settings/invoice", icon: FileText },
+        ]
+    },
 ];
 
 export function AdminShell({ children, userName, userRole = "USER", pendingOrdersCount = 0, newMessagesCount = 0 }: { children: ReactNode; userName: string; userRole?: string; pendingOrdersCount?: number; newMessagesCount?: number; }) {

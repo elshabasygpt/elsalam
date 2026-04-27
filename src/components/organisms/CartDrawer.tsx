@@ -140,7 +140,7 @@ export function CartDrawer() {
 
                 {/* Footer / Summary */}
                 {items.length > 0 && (
-                    <div className="border-t border-gray-100 bg-white p-5">
+                    <div className="border-t border-gray-100 bg-white p-5 pb-28 sm:pb-5">
                         <div className="flex items-center justify-between mb-4">
                             <span className="text-gray-500 font-bold">{locale === "ar" ? "الإجمالي" : "Subtotal"}</span>
                             <span className="text-2xl font-black text-gray-900">

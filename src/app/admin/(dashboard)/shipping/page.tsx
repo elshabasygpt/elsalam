@@ -134,8 +134,8 @@ export default function AdminShippingPage() {
                                         <td className="px-6 py-4 font-semibold text-slate-500" dir="ltr">{zone.name_en}</td>
                                         <td className="px-6 py-4 text-center text-green-600 font-black text-lg">{zone.fee.toLocaleString()} EGP</td>
                                         <td className="px-6 py-4 text-center">
-                                            <button onClick={() => toggleStatus(zone)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${zone.isActive ? "bg-green-100 text-green-700 hover:bg-green-200" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
-                                                {zone.isActive ? <CheckCircle2 className="w-4 h-4"/> : <XCircle className="w-4 h-4"/>}
+                                            <button onClick={() => toggleStatus(zone)} className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-colors shadow-sm ${zone.isActive ? "bg-green-100 text-green-700 hover:bg-green-200" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
+                                                {zone.isActive ? <CheckCircle2 className="w-5 h-5"/> : <XCircle className="w-5 h-5"/>}
                                                 {zone.isActive ? "متاح" : "معطل"}
                                             </button>
                                         </td>

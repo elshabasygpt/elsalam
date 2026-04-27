@@ -1,8 +1,14 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-async function main() {
-    const page = await prisma.pageContent.findUnique({ where: { pageSlug: 'about' } });
-    console.log(JSON.stringify(JSON.parse(page.content).ceo.careerStations, null, 2));
-    await prisma.$disconnect();
+
+async function run() {
+  try {
+    const data = await prisma.$queryRawUnsafe('SELECT * FROM "SiteSettings" LIMIT 1');
+    console.log(data);
+  } catch (e) {
+    console.error(e);
+  }
+  await prisma.$disconnect();
 }
-main();
+
+run();

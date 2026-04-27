@@ -532,6 +532,38 @@ export const en: TranslationKeys = {
     // ── Back to Top ──
     backToTop: "Back to top",
 
+    // ── Privacy Page ──
+    privacyPage: {
+        heroTitle: "Privacy Policy",
+        heroSubtitle: "At Elsalam Oils, we are committed to protecting your privacy and ensuring the security of your data.",
+        lastUpdated: "Last Updated: April 2026",
+        intro: "This Privacy Policy explains how we collect, use, and protect your information when you use our website or interact with us. We take your privacy seriously and adhere to the highest data security standards.",
+        sections: [
+            {
+                title: "1. Information Collection",
+                content: "We collect information you voluntarily provide when filling out contact forms, requesting quotes, or communicating via email. This may include your name, company name, contact details, and business requirements."
+            },
+            {
+                title: "2. Use of Data",
+                content: "We use the collected information to improve customer service, respond to inquiries, process quote requests, and send updates about our products if you have subscribed to our newsletter."
+            },
+            {
+                title: "3. Data Protection",
+                content: "We implement advanced security measures to maintain the safety of your personal information. Your data is contained behind secured networks accessible only by authorized personnel bound by confidentiality."
+            },
+            {
+                title: "4. Third-Party Disclosure",
+                content: "We do not sell, trade, or transfer your personally identifiable information to outside parties. We may share generic aggregated demographic information with trusted partners, but never sensitive data."
+            },
+            {
+                title: "5. Your Consent",
+                content: "By using our site, you consent to our privacy policy. We reserve the right to update this policy at any time, and any changes will be posted on this page."
+            }
+        ],
+        contactTitle: "Privacy Concerns?",
+        contactDesc: "If you have any questions regarding our privacy policy, please feel free to contact us.",
+    },
+
     // ── WhatsApp ──
     whatsapp: {
         tooltip: "Chat with us on WhatsApp",

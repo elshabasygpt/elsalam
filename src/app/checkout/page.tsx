@@ -7,7 +7,7 @@ import { useLanguage } from "@/lib/i18n-context";
 import { Navbar } from "@/components/organisms/Navbar";
 import { Footer } from "@/components/organisms/Footer";
 import { Container } from "@/components/atoms/Container";
-import { CheckCircle2, ChevronRight, ChevronLeft, ChevronDown, Loader2, MapPin, Phone, User, ShoppingBag, ShieldCheck, Lock, CreditCard, Printer, FileText, ArrowLeft, ArrowRight } from "lucide-react";
+import { CheckCircle2, ChevronRight, ChevronLeft, ChevronDown, Loader2, MapPin, Phone, User, ShoppingBag, ShieldCheck, Lock, CreditCard, Printer, FileText, ArrowLeft, ArrowRight, Leaf } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/utils/classnames";
 import { motion } from "framer-motion";
@@ -15,6 +15,7 @@ import { egyptLocations } from "@/lib/egypt";
 import { SearchableSelect } from "@/components/atoms/SearchableSelect";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 import { AuthProvider } from "@/components/providers/AuthProvider";
 
@@ -49,9 +50,11 @@ function CheckoutContent() {
     const [appliedPromo, setAppliedPromo] = useState<any>(null);
     const [promoLoading, setPromoLoading] = useState(false);
     const [promoMessage, setPromoMessage] = useState({ text: "", type: "" });
+    const [siteSettings, setSiteSettings] = useState<any>(null);
 
     useEffect(() => {
         fetch("/api/public/shipping").then(r => r.json()).then(setShippingZones).catch(console.error);
+        fetch("/api/public/settings").then(r => r.json()).then(setSiteSettings).catch(console.error);
     }, []);
 
     useEffect(() => {
@@ -99,6 +102,47 @@ function CheckoutContent() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const errorToastOptions = {
+            position: "bottom-center" as const,
+            duration: 4000,
+            style: {
+                background: '#ef4444',
+                color: '#fff',
+                fontWeight: 'bold',
+                padding: '16px 24px',
+                borderRadius: '16px',
+                fontSize: '16px',
+                boxShadow: '0 10px 25px -5px rgba(239, 68, 68, 0.4)',
+            },
+            iconTheme: {
+                primary: '#fff',
+                secondary: '#ef4444',
+            },
+        };
+
+        // Custom Validation with Toasts
+        if (!formData.customerName.trim()) {
+            toast.error(locale === "ar" ? "برجاء كتابة الاسم كامل" : "Please enter your full name", errorToastOptions);
+            return;
+        }
+        if (!formData.customerPhone.trim()) {
+            toast.error(locale === "ar" ? "برجاء كتابة رقم الهاتف الخاص بك" : "Please enter your phone number", errorToastOptions);
+            return;
+        }
+        if (!formData.governorate) {
+            toast.error(locale === "ar" ? "برجاء اختيار المحافظة" : "Please select your governorate", errorToastOptions);
+            return;
+        }
+        if (!formData.city) {
+            toast.error(locale === "ar" ? "برجاء اختيار المدينة" : "Please select your city", errorToastOptions);
+            return;
+        }
+        if (!formData.shippingAddress.trim()) {
+            toast.error(locale === "ar" ? "برجاء كتابة العنوان التفصيلي بدقة" : "Please enter your detailed address", errorToastOptions);
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -120,7 +164,7 @@ function CheckoutContent() {
             if (res.ok) {
                 const orderData = await res.json();
                 // Snapshot order details for the invoice UI using real ID
-                const orderId = orderData.id;
+                const orderId = orderData.orderId || orderData.id;
                 const currentTotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
                 
                 setOrderDetails({
@@ -206,11 +250,33 @@ function CheckoutContent() {
 
                 {/* Printable Invoice Block */}
                 {orderDetails && (
-                    <div className="hidden print:block bg-white p-10 font-sans text-slate-900" dir={isRTL ? "rtl" : "ltr"}>
+                    <>
+                        <style dangerouslySetInnerHTML={{ __html: `
+                            @media print {
+                                @page { size: A4; margin: 0; }
+                                body { -webkit-print-color-adjust: exact; margin: 0; padding: 0; }
+                            }
+                        `}} />
+                        <div className="hidden print:flex print:flex-col bg-white p-10 font-sans text-slate-900 w-[210mm] min-h-[297mm] mx-auto overflow-hidden relative" dir={isRTL ? "rtl" : "ltr"}>
                         <div className="flex justify-between items-start border-b-2 border-slate-200 pb-8 mb-8">
                             <div>
-                                <h1 className="text-4xl font-black text-slate-900 mb-2">ELSALAM</h1>
-                                <p className="text-slate-500 text-sm">Industrial High-Quality Oils & Fats</p>
+                                {siteSettings?.invoiceShowLogo ? (
+                                    (siteSettings?.invoiceLogoUrl || siteSettings?.logoUrl) ? (
+                                        <img src={siteSettings.invoiceLogoUrl || siteSettings.logoUrl} alt="Logo" className="object-contain mb-2" crossOrigin="anonymous" style={{ height: `${siteSettings?.invoiceLogoSize || 64}px` }} />
+                                    ) : (
+                                        <div className="rounded-xl flex items-center justify-center mb-3 shadow-md print:shadow-none print:border print:border-green-800" style={{ backgroundImage: siteSettings?.invoiceColor ? 'none' : 'linear-gradient(to bottom right, #16a34a, #047857)', backgroundColor: siteSettings?.invoiceColor || '#16a34a', width: `${siteSettings?.invoiceLogoSize || 64}px`, height: `${siteSettings?.invoiceLogoSize || 64}px` }}>
+                                            <Leaf className="text-white" style={{ width: `${(siteSettings?.invoiceLogoSize || 64) * 0.6}px`, height: `${(siteSettings?.invoiceLogoSize || 64) * 0.6}px` }} />
+                                        </div>
+                                    )
+                                ) : (
+                                    <h1 className="text-4xl font-black mb-2" style={{ color: siteSettings?.invoiceColor || '#0f172a' }}>{siteSettings?.siteNameEn || "ELSALAM"}</h1>
+                                )}
+                                {siteSettings?.invoiceSubtitle && (
+                                    <p className="text-slate-500 text-sm font-medium">{siteSettings.invoiceSubtitle}</p>
+                                )}
+                                {siteSettings?.invoiceCompanyDetails && (
+                                    <p className="text-slate-500 text-xs mt-2 whitespace-pre-wrap leading-relaxed">{siteSettings.invoiceCompanyDetails}</p>
+                                )}
                             </div>
                             <div className="text-right">
                                 <h2 className="text-2xl font-bold text-slate-800 mb-1">{locale === "ar" ? "فاتورة طلب" : "INVOICE"}</h2>
@@ -278,11 +344,18 @@ function CheckoutContent() {
                             </div>
                         </div>
 
-                        <div className="mt-16 text-center text-slate-500 text-sm">
-                            <p>{locale === "ar" ? "نشكركم على اختياركم السلام للزيوت والدهون" : "Thank you for choosing Elsalam Oils & Fats"}</p>
-                            <p className="mt-1">www.elsalamoils.com</p>
+                        <div className="mt-auto pt-8 border-t-2 border-slate-100 text-center text-slate-500 text-sm font-medium print:break-inside-avoid">
+                            <p className="whitespace-pre-wrap">
+                                {locale === "ar" 
+                                    ? (siteSettings?.invoiceNotesAr || "نشكركم على اختياركم السلام للزيوت والدهون")
+                                    : (siteSettings?.invoiceNotesEn || "Thank you for choosing Elsalam Oils & Fats")}
+                            </p>
+                            {siteSettings?.invoiceWebsiteUrl && (
+                                <p className="mt-2 text-xs font-mono">{siteSettings.invoiceWebsiteUrl}</p>
+                            )}
                         </div>
-                    </div>
+                        </div>
+                    </>
                 )}
             </main>
         );
@@ -336,7 +409,7 @@ function CheckoutContent() {
                             className="xl:col-span-8 space-y-6"
                         >
                             {/* Contact Section */}
-                            <form id="checkout-form" onSubmit={handleSubmit} className="bg-white rounded-[24px] shadow-sm border border-slate-200">
+                            <form id="checkout-form" onSubmit={handleSubmit} noValidate className="bg-white rounded-[24px] shadow-sm border border-slate-200">
                                 <div className="border-b border-slate-100 p-6 md:p-8 flex items-center gap-4 bg-slate-50/50 relative rounded-t-[24px]">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 rounded-bl-[100px] rounded-tr-[24px] pointer-events-none"></div>
                                     <div className="w-[56px] h-[56px] sm:w-[64px] sm:h-[64px] min-w-[56px] sm:min-w-[64px] bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-inner relative z-10 shrink-0">

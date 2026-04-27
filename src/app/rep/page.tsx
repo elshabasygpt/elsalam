@@ -21,33 +21,34 @@ export default function RepDashboard() {
     const [stats,   setStats]   = useState<Stats>({ clients: 0, orders: 0, pending: 0, delivered: 0 });
     const [recent,  setRecent]  = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError]     = useState<string | null>(null);
     const [name,    setName]    = useState("المندوب");
 
     useEffect(() => { load(); }, []);
 
     const load = async () => {
         try {
-            const [sRes, cRes, oRes] = await Promise.all([
+            const [sRes, dRes] = await Promise.all([
                 fetch("/api/auth/session"),
-                fetch("/api/admin/crm/clients"),
-                fetch("/api/admin/crm/orders"),
+                fetch("/api/rep/dashboard"),
             ]);
+            
             const session = await sRes.json();
-            const clients = await cRes.json();
-            const orders  = await oRes.json();
+            const data = await dRes.json();
 
             setName(session?.user?.name?.split(" ")[0] ?? "المندوب");
 
-            const arr = Array.isArray(orders) ? orders : [];
-            setStats({
-                clients:   Array.isArray(clients) ? clients.length : 0,
-                orders:    arr.length,
-                pending:   arr.filter((o: any) => ["NEW","REVIEW","APPROVED"].includes(o.status)).length,
-                delivered: arr.filter((o: any) => o.status === "DELIVERED").length,
-            });
-            setRecent(arr.slice(0, 4));
-        } catch (e) {
+            if (data && data.stats) {
+                setStats(data.stats);
+                setRecent(data.recent || []);
+            } else if (data && data.error) {
+                setError(data.error);
+            } else {
+                setError("حدث خطأ غير معروف أثناء تحميل البيانات");
+            }
+        } catch (e: any) {
             console.error(e);
+            setError(e.message || "حدث خطأ في الاتصال بالخادم");
         } finally {
             setLoading(false);
         }
@@ -59,6 +60,14 @@ export default function RepDashboard() {
     if (loading) return (
         <div className="flex items-center justify-center py-32">
             <Loader2 className="w-10 h-10 animate-spin text-emerald-400" />
+        </div>
+    );
+
+    if (error) return (
+        <div className="flex items-center justify-center py-32">
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-6 py-4 rounded-2xl max-w-md text-center font-bold">
+                {error}
+            </div>
         </div>
     );
 
@@ -139,21 +148,21 @@ export default function RepDashboard() {
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/10 
                                             flex items-center justify-center border border-violet-500/20">
-                                <Clock className="w-5 h-5 text-violet-400" />
+                                <Clock className="w-6 h-6 text-violet-400 shrink-0" />
                             </div>
                             <h2 className="text-white/90 font-black text-base tracking-wide">أحدث الطلبيات</h2>
                         </div>
                         <Link href="/rep/orders"
                             className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/50
                                        hover:bg-white/10 hover:text-white transition-all">
-                            <ChevronLeft className="w-4 h-4" />
+                            <ChevronLeft className="w-6 h-6 shrink-0" />
                         </Link>
                     </div>
 
                     {recent.length === 0 ? (
                         <div className="flex-1 flex flex-col items-center justify-center text-center py-10">
                             <div className="w-20 h-20 mb-4 rounded-full bg-white/5 flex items-center justify-center border border-white/10 shadow-inner">
-                                <PackageCheck className="w-8 h-8 text-white/20" />
+                                <PackageCheck className="w-12 h-12 text-white/20 shrink-0" />
                             </div>
                             <h3 className="text-white/80 text-base font-bold mb-1">لا توجد طلبيات</h3>
                             <p className="text-white/40 text-xs mb-6 max-w-[200px]">لم تقم بإنشاء أي طلبيات جديدة حتى الآن.</p>
@@ -161,7 +170,7 @@ export default function RepDashboard() {
                                 className="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-6 py-3
                                            rounded-2xl text-sm font-bold border border-emerald-500/20
                                            hover:bg-emerald-500/20 transition-all">
-                                <Plus className="w-4 h-4" strokeWidth={2.5} />
+                                <Plus className="w-5 h-5 shrink-0" strokeWidth={2.5} />
                                 إنشاء أول طلبية
                             </Link>
                         </div>
@@ -194,7 +203,7 @@ export default function RepDashboard() {
                                         
                                         {/* Right Arrow */}
                                         <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/30 group-hover:bg-white/10 group-hover:text-white transition-all">
-                                            <ChevronLeft className="w-4 h-4" />
+                                            <ChevronLeft className="w-5 h-5 shrink-0" />
                                         </div>
                                     </div>
                                 );

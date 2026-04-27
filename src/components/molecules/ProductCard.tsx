@@ -105,7 +105,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
                 <div className="mt-auto pt-4 md:pt-5 border-t border-slate-100 outline-none">
                     <Link
-                        href={`/products/${id}`}
+                        href={id.startsWith("/") || id.startsWith("http") ? id : id.startsWith("?") ? `/products${id}` : `/products/${id}`}
                         className="group/btn w-full flex items-center justify-between px-4 md:px-6 py-3 md:py-4 bg-slate-50 text-green-700 hover:text-white font-[900] text-sm md:text-[15px] rounded-[14px] md:rounded-2xl hover:bg-green-700 active:scale-[0.98] transition-all duration-300 shadow-sm border border-slate-100"
                     >
                         <span className="relative z-10">{t.featuredProducts.productDetails}</span>

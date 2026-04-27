@@ -111,12 +111,13 @@ export const Navbar = () => {
     const navHoverClass = forceSolidBar ? "hover:text-green-700" : "hover:text-gray-200";
 
     return (
-        <header className={cn(
-            "fixed top-0 w-full transition-all duration-500",
-            forceSolidBar ? "bg-white/95 backdrop-blur-xl shadow-sm border-b border-gray-200 py-1" : "pt-2 sm:pt-3 px-2 sm:px-4 lg:px-6",
-            isOpen ? "z-[100]" : "z-50"
-        )}>
-            <Container className="max-w-[1480px]">
+        <>
+            <header className={cn(
+                "fixed top-0 w-full transition-all duration-500",
+                forceSolidBar ? "bg-white/95 backdrop-blur-xl shadow-sm border-b border-gray-200 py-1" : "pt-2 sm:pt-3 px-2 sm:px-4 lg:px-6",
+                isOpen ? "z-[100]" : "z-50"
+            )}>
+                <Container className="max-w-[1480px]">
                 <div
                     className={cn(
                         "flex items-center justify-between min-h-[3.5rem] sm:min-h-[4rem] md:h-[4.5rem] lg:h-[4.5rem] py-2 md:py-0 transition-all duration-500 relative",
@@ -486,9 +487,10 @@ export const Navbar = () => {
                     </>
                 )}
             </AnimatePresence>
+            </header>
 
-            {/* Mount CartDrawer */}
+            {/* Mount CartDrawer outside of the header to prevent backdrop-filter containing block issues */}
             <CartDrawer />
-        </header>
+        </>
     );
 };

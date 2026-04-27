@@ -38,6 +38,8 @@ next-env.d.ts
 
 # Local Debug/Scratch
 scratch/
+scratch_*.js
+public/uploads/
 *.txt
 *.log
 dev_output.txt

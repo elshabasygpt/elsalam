@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
     Save, Loader2, ArrowRight, ChevronDown, ChevronUp,
     Plus, Trash2, Code2, Eye, CheckCircle2,
     Languages, Upload, ImageIcon, X, FileText,
     Type, Palette, Maximize2, Square, LayoutTemplate,
-    Link2, AlignLeft, Image as ImageIcon2, GripVertical
+    Link2, AlignLeft, Image as ImageIcon2, GripVertical,
+    Monitor, Smartphone, History, RotateCcw, AlertCircle,
+    PanelRight, ChevronRight, Zap
 } from "lucide-react";
 import Link from "next/link";
 
@@ -864,14 +866,17 @@ function SingleField({
                 {required && <span className="text-red-400">*</span>}
             </label>
             {type === "textarea" ? (
-                <textarea
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    rows={3}
-                    className={`${inputCls} resize-none ${dir === "ltr" ? "text-left" : ""}`}
-                    placeholder={placeholder}
-                    dir={dir}
-                />
+                <div>
+                    <textarea
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        rows={3}
+                        className={`${inputCls} resize-none ${dir === "ltr" ? "text-left" : ""}`}
+                        placeholder={placeholder}
+                        dir={dir}
+                    />
+                    <p className="text-[10px] text-slate-300 text-left mt-1">{value.length} حرف · {value.trim() ? value.trim().split(/\s+/).length : 0} كلمة</p>
+                </div>
             ) : (
                 <input
                     type="text"
@@ -1455,6 +1460,8 @@ function FieldRenderer({
 
 // ─── Main Editor ───
 
+const MAX_HISTORY = 10;
+
 export function VisualPageEditor({
     slug,
     pageNameAr,
@@ -1468,241 +1475,311 @@ export function VisualPageEditor({
     const [error, setError] = useState("");
     const [advancedMode, setAdvancedMode] = useState(false);
     const [rawJson, setRawJson] = useState(initialContent);
-
-    // Parse initial data from JSON
-    const parseInitialData = useCallback(() => {
+    const [isDirty, setIsDirty] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
+    const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
+    const [localHistory, setLocalHistory] = useState<{ ts: number; label: string; data: string }[]>([]);
+    
+    // Load local history only on the client side to avoid hydration mismatch
+    useEffect(() => {
         try {
-            return JSON.parse(initialContent);
-        } catch {
-            return {};
-        }
+            const stored = localStorage.getItem(`page_history_${slug}`);
+            if (stored) {
+                setLocalHistory(JSON.parse(stored));
+            }
+        } catch {}
+    }, [slug]);
+
+    const [showHistory, setShowHistory] = useState(false);
+    const [activeSection, setActiveSection] = useState<string | null>(null);
+    const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+    const autosaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const parseInitialData = useCallback(() => {
+        try { return JSON.parse(initialContent); } catch { return {}; }
     }, [initialContent]);
 
     const [formData, setFormData] = useState<Record<string, any>>(parseInitialData);
 
+    // ── beforeunload warning ──
+    useEffect(() => {
+        const handler = (e: BeforeUnloadEvent) => {
+            if (isDirty) { e.preventDefault(); e.returnValue = ""; }
+        };
+        window.addEventListener("beforeunload", handler);
+        return () => window.removeEventListener("beforeunload", handler);
+    }, [isDirty]);
+
+    // ── Ctrl+S shortcut ──
+    useEffect(() => {
+        const handler = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+                e.preventDefault();
+                if (!loading) doSave();
+            }
+        };
+        window.addEventListener("keydown", handler);
+        return () => window.removeEventListener("keydown", handler);
+    }, [loading, formData, advancedMode, rawJson]);
+
+    // ── Autosave draft to localStorage every 60s ──
+    useEffect(() => {
+        if (!isDirty) return;
+        if (autosaveRef.current) clearTimeout(autosaveRef.current);
+        autosaveRef.current = setTimeout(() => {
+            try {
+                const draft = advancedMode ? rawJson : JSON.stringify(formData, null, 2);
+                localStorage.setItem(`page_draft_${slug}`, draft);
+            } catch {}
+        }, 60_000);
+        return () => { if (autosaveRef.current) clearTimeout(autosaveRef.current); };
+    }, [isDirty, formData, rawJson, advancedMode, slug]);
+
     const handleFieldChange = (sectionId: string, key: string, value: any) => {
-        setFormData((prev) => ({
-            ...prev,
-            [sectionId]: {
-                ...(prev[sectionId] || {}),
-                [key]: value,
-            },
-        }));
+        setFormData((prev) => ({ ...prev, [sectionId]: { ...(prev[sectionId] || {}), [key]: value } }));
+        setIsDirty(true);
     };
 
-    const getFormDataAsJson = () => {
-        return JSON.stringify(formData, null, 2);
+    const getFormDataAsJson = () => JSON.stringify(formData, null, 2);
+
+    const pushHistory = (label: string, data: string) => {
+        setLocalHistory(prev => {
+            const next = [{ ts: Date.now(), label, data }, ...prev].slice(0, MAX_HISTORY);
+            try { localStorage.setItem(`page_history_${slug}`, JSON.stringify(next)); } catch {}
+            return next;
+        });
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setError("");
-        setSuccess(false);
-
+    const doSave = async () => {
+        setLoading(true); setError(""); setSuccess(false);
         try {
             const contentToSave = advancedMode ? rawJson : getFormDataAsJson();
-
-            // Validate JSON
-            try {
-                JSON.parse(contentToSave);
-            } catch {
-                setError("صيغة JSON غير صحيحة");
-                setLoading(false);
-                return;
+            try { JSON.parse(contentToSave); } catch {
+                setError("صيغة JSON غير صحيحة"); setLoading(false); return;
             }
-
             const res = await fetch(`/api/admin/pages/${slug}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ content: contentToSave }),
             });
-
             if (res.ok) {
-                setSuccess(true);
+                const label = new Date().toLocaleString("ar-EG");
+                pushHistory(label, contentToSave);
+                // Also persist to server-side history
+                fetch("/api/admin/pages/history", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ slug, content: contentToSave, label }),
+                }).catch(() => {});
+                setSuccess(true); setIsDirty(false);
                 router.refresh();
                 setTimeout(() => setSuccess(false), 4000);
             } else {
-                const data = await res.json();
-                setError(data.error || "حدث خطأ أثناء حفظ المحتوى");
+                const d = await res.json();
+                setError(d.error || "حدث خطأ أثناء الحفظ");
             }
-        } catch {
-            setError("حدث خطأ في الاتصال");
-        } finally {
-            setLoading(false);
-        }
+        } catch { setError("حدث خطأ في الاتصال"); }
+        finally { setLoading(false); }
     };
 
-    const switchToAdvanced = () => {
-        setRawJson(getFormDataAsJson());
-        setAdvancedMode(true);
-    };
+    const handleSubmit = async (e: React.FormEvent) => { e.preventDefault(); await doSave(); };
 
-    const switchToVisual = () => {
+    const restoreHistory = (data: string) => {
         try {
-            setFormData(JSON.parse(rawJson));
-            setAdvancedMode(false);
-        } catch {
-            setError("لا يمكن التبديل — JSON غير صالح. أصلح الأخطاء أولاً.");
-        }
+            setFormData(JSON.parse(data)); setRawJson(data);
+            setIsDirty(true); setShowHistory(false);
+        } catch { setError("فشل استعادة النسخة"); }
     };
+
+    const switchToAdvanced = () => { setRawJson(getFormDataAsJson()); setAdvancedMode(true); };
+    const switchToVisual = () => {
+        try { setFormData(JSON.parse(rawJson)); setAdvancedMode(false); }
+        catch { setError("لا يمكن التبديل — JSON غير صالح."); }
+    };
+
+    const scrollToSection = (id: string) => {
+        sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "start" });
+        setActiveSection(id);
+    };
+
+    const pageHref = slug === "home" ? "/" : `/${slug}`;
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Toast Messages */}
-            {error && (
-                <div className="flex items-center gap-2 p-4 bg-red-50 text-red-600 rounded-xl font-bold text-sm border border-red-100">
-                    <span>❌</span> {error}
-                </div>
-            )}
-            {success && (
-                <div className="flex items-center gap-2 p-4 bg-green-50 text-green-600 rounded-xl font-bold text-sm border border-green-100">
-                    <CheckCircle2 className="w-5 h-5" /> تم حفظ المحتوى بنجاح
-                </div>
-            )}
+        <form onSubmit={handleSubmit} className="relative">
+            {/* ── Two-pane layout ── */}
+            <div className={`flex gap-4 ${showPreview ? "flex-row" : "flex-col"}`}>
 
-            {/* Mode Toggle */}
-            <div className="flex items-center justify-between bg-white px-5 py-3 rounded-xl border border-gray-100">
-                <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <Languages className="w-5 h-5" />
-                    <span>تعديل محتوى: <span className="font-bold text-slate-700">{pageNameAr}</span></span>
-                </div>
-                <button
-                    type="button"
-                    onClick={advancedMode ? switchToVisual : switchToAdvanced}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                        advancedMode
-                            ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
-                            : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-                    }`}
-                >
-                    {advancedMode ? (
-                        <>
-                            <Eye className="w-5 h-5" />
-                            العودة للوضع المرئي
-                        </>
-                    ) : (
-                        <>
-                            <Code2 className="w-5 h-5" />
-                            وضع متقدم (JSON)
-                        </>
+                {/* ── LEFT: Editor pane ── */}
+                <div className={`space-y-4 ${showPreview ? "w-1/2 overflow-y-auto max-h-screen" : "w-full"}`}>
+
+                    {/* ── Top bar ── */}
+                    <div className="flex flex-wrap items-center gap-2 bg-white px-4 py-3 rounded-xl border border-gray-100 shadow-sm">
+                        <Link href="/admin/pages" className="flex items-center gap-1 text-slate-400 hover:text-slate-600 text-sm font-bold transition-colors">
+                            <ArrowRight className="w-4 h-4" /> الصفحات
+                        </Link>
+                        <ChevronRight className="w-3 h-3 text-slate-300" />
+                        <span className="text-sm font-bold text-slate-700">{pageNameAr}</span>
+
+                        <div className="mr-auto flex items-center gap-2">
+                            {/* History */}
+                            <div className="relative">
+                                <button type="button" onClick={() => setShowHistory(v => !v)}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 text-xs font-bold transition-colors">
+                                    <History className="w-4 h-4" />
+                                    السجل ({localHistory.length})
+                                </button>
+                                {showHistory && localHistory.length > 0 && (
+                                    <div className="absolute left-0 top-full mt-1 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                                        <p className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase border-b border-gray-100">آخر {localHistory.length} نسخ محفوظة</p>
+                                        {localHistory.map((h, i) => (
+                                            <button key={i} type="button" onClick={() => restoreHistory(h.data)}
+                                                className="w-full flex items-center gap-2 px-3 py-2 hover:bg-green-50 text-right transition-colors">
+                                                <RotateCcw className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                                                <span className="text-xs text-slate-600 truncate">{h.label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Preview toggle */}
+                            <button type="button" onClick={() => setShowPreview(v => !v)}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${showPreview ? "bg-green-600 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+                                <PanelRight className="w-4 h-4" />
+                                {showPreview ? "إخفاء المعاينة" : "معاينة مباشرة"}
+                            </button>
+
+                            {/* Advanced mode */}
+                            <button type="button" onClick={advancedMode ? switchToVisual : switchToAdvanced}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${advancedMode ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+                                {advancedMode ? <><Eye className="w-4 h-4" /> مرئي</> : <><Code2 className="w-4 h-4" /> JSON</>}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* ── Toast messages ── */}
+                    {error && (
+                        <div className="flex items-center gap-2 p-3 bg-red-50 text-red-600 rounded-xl font-bold text-sm border border-red-100">
+                            <AlertCircle className="w-5 h-5 flex-shrink-0" /> {error}
+                            <button type="button" onClick={() => setError("")} className="mr-auto"><X className="w-4 h-4" /></button>
+                        </div>
                     )}
-                </button>
+                    {success && (
+                        <div className="flex items-center gap-2 p-3 bg-green-50 text-green-700 rounded-xl font-bold text-sm border border-green-100">
+                            <CheckCircle2 className="w-5 h-5" /> تم حفظ المحتوى بنجاح ✅
+                        </div>
+                    )}
+
+                    {/* ── Quick section jump ── */}
+                    {!advancedMode && sections.length > 3 && (
+                        <div className="flex flex-wrap gap-2 bg-white px-4 py-3 rounded-xl border border-gray-100">
+                            <span className="text-xs font-bold text-slate-400 self-center">انتقل إلى:</span>
+                            {sections.map(s => (
+                                <button key={s.id} type="button" onClick={() => scrollToSection(s.id)}
+                                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all ${activeSection === s.id ? "bg-green-600 text-white border-green-600" : "bg-slate-50 text-slate-500 border-slate-200 hover:border-green-400 hover:text-green-700"}`}>
+                                    <span>{s.emoji}</span> {s.title.split("(")[0].trim()}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* ── Content area ── */}
+                    {advancedMode ? (
+                        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+                            <div className="px-6 py-4 border-b border-gray-50 bg-amber-50/30 flex items-center gap-2">
+                                <Code2 className="w-5 h-5 text-amber-600" />
+                                <span className="text-sm font-bold text-amber-800">الوضع المتقدم — تعديل JSON مباشر</span>
+                            </div>
+                            <div className="p-4">
+                                <textarea value={rawJson} onChange={(e) => { setRawJson(e.target.value); setIsDirty(true); }}
+                                    rows={28} dir="ltr"
+                                    className="w-full px-4 py-3 bg-slate-900 text-green-400 border border-slate-700 rounded-xl focus:ring-2 focus:ring-green-500/20 outline-none font-mono text-xs resize-y leading-relaxed" />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {sections.map((section, sIdx) => {
+                                const sectionData = formData[section.id] || {};
+                                return (
+                                    <div key={section.id} ref={el => { sectionRefs.current[section.id] = el; }}>
+                                        {section.id === "heroSlides" ? (
+                                            <CollapsibleSection title={section.title} emoji={section.emoji} description={section.description} defaultOpen={true}>
+                                                <HeroSlidesPanel data={sectionData} onChange={(key, value) => handleFieldChange(section.id, key, value)} />
+                                            </CollapsibleSection>
+                                        ) : section.id === "heroDesign" ? (
+                                            <CollapsibleSection title={section.title} emoji={section.emoji} description={section.description} defaultOpen={true}>
+                                                <HeroDesignPanel data={sectionData} onChange={(key, value) => handleFieldChange(section.id, key, value)} />
+                                            </CollapsibleSection>
+                                        ) : (
+                                            <CollapsibleSection title={section.title} emoji={section.emoji} description={section.description} defaultOpen={sIdx < 2}>
+                                                {section.fields.map((field) => (
+                                                    <FieldRenderer key={field.key} field={field} data={sectionData}
+                                                        onChange={(key, value) => handleFieldChange(section.id, key, value)} />
+                                                ))}
+                                            </CollapsibleSection>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {/* ── Bottom padding for sticky bar ── */}
+                    <div className="h-20" />
+                </div>
+
+                {/* ── RIGHT: Live preview pane ── */}
+                {showPreview && (
+                    <div className="w-1/2 flex flex-col gap-2 sticky top-0 h-screen">
+                        <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm">
+                            <Eye className="w-4 h-4 text-green-600" />
+                            <span className="text-sm font-bold text-slate-700">معاينة مباشرة</span>
+                            <div className="mr-auto flex items-center gap-1">
+                                <button type="button" onClick={() => setPreviewDevice("desktop")}
+                                    className={`p-1.5 rounded-lg transition-colors ${previewDevice === "desktop" ? "bg-green-100 text-green-700" : "text-slate-400 hover:bg-slate-100"}`}>
+                                    <Monitor className="w-4 h-4" />
+                                </button>
+                                <button type="button" onClick={() => setPreviewDevice("mobile")}
+                                    className={`p-1.5 rounded-lg transition-colors ${previewDevice === "mobile" ? "bg-green-100 text-green-700" : "text-slate-400 hover:bg-slate-100"}`}>
+                                    <Smartphone className="w-4 h-4" />
+                                </button>
+                                <a href={pageHref} target="_blank" rel="noreferrer"
+                                    className="mr-2 flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors">
+                                    <PanelRight className="w-3.5 h-3.5" /> فتح
+                                </a>
+                            </div>
+                        </div>
+                        <div className={`flex-1 bg-gray-100 rounded-xl overflow-hidden border border-gray-200 flex items-start justify-center ${previewDevice === "mobile" ? "p-4" : ""}`}>
+                            <iframe
+                                src={pageHref}
+                                title="معاينة"
+                                className={`border-0 bg-white shadow-lg transition-all duration-300 ${previewDevice === "mobile" ? "w-[390px] rounded-2xl" : "w-full"} h-full min-h-[600px]`}
+                            />
+                        </div>
+                    </div>
+                )}
             </div>
 
-            {advancedMode ? (
-                /* ── Advanced JSON Mode ── */
-                <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-                    <div className="px-6 py-4 border-b border-gray-50 bg-amber-50/30 flex items-center gap-2">
-                        <Code2 className="w-5 h-5 text-amber-600" />
-                        <span className="text-sm font-bold text-amber-800">الوضع المتقدم — تعديل JSON مباشر</span>
+            {/* ── Sticky Save Bar ── */}
+            <div className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 ${isDirty || loading ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"}`}>
+                <div className="bg-white border-t border-gray-200 shadow-2xl px-6 py-3 flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                        <span className="text-sm font-bold text-slate-600">
+                            {loading ? "جاري الحفظ..." : "لديك تغييرات غير محفوظة"}
+                        </span>
                     </div>
-                    <div className="p-4">
-                        <textarea
-                            value={rawJson}
-                            onChange={(e) => setRawJson(e.target.value)}
-                            rows={24}
-                            dir="ltr"
-                            className="w-full px-4 py-3 bg-slate-900 text-green-400 border border-slate-700 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all font-mono text-xs resize-y text-left leading-relaxed"
-                        />
+                    <span className="text-xs text-slate-400 hidden sm:block">اضغط Ctrl+S للحفظ السريع</span>
+                    <div className="mr-auto flex items-center gap-3">
+                        <button type="button" onClick={() => { setFormData(parseInitialData()); setIsDirty(false); }}
+                            className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-200 transition-colors">
+                            <RotateCcw className="w-4 h-4" /> تجاهل
+                        </button>
+                        <button type="submit" disabled={loading}
+                            className="flex items-center gap-2 bg-gradient-to-l from-green-600 to-green-700 text-white px-8 py-2.5 rounded-xl font-bold text-sm hover:from-green-700 hover:to-green-800 transition-all shadow-lg shadow-green-600/20 disabled:opacity-50 active:scale-[0.97]">
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Zap className="w-4 h-4" /> حفظ الآن</>}
+                        </button>
                     </div>
-                </div>
-            ) : (
-                /* ── Visual Mode ── */
-                <div className="space-y-4">
-                    {sections.map((section, sIdx) => {
-                        const sectionData = formData[section.id] || {};
-
-                        // ── Special: Hero Slides Panel ──
-                        if (section.id === "heroSlides") {
-                            return (
-                                <CollapsibleSection
-                                    key={section.id}
-                                    title={section.title}
-                                    emoji={section.emoji}
-                                    description={section.description}
-                                    defaultOpen={true}
-                                >
-                                    <HeroSlidesPanel
-                                        data={sectionData}
-                                        onChange={(key, value) =>
-                                            handleFieldChange(section.id, key, value)
-                                        }
-                                    />
-                                </CollapsibleSection>
-                            );
-                        }
-
-                        // ── Special: Hero Design Panel ──
-                        if (section.id === "heroDesign") {
-                            return (
-                                <CollapsibleSection
-                                    key={section.id}
-                                    title={section.title}
-                                    emoji={section.emoji}
-                                    description={section.description}
-                                    defaultOpen={true}
-                                >
-                                    <HeroDesignPanel
-                                        data={sectionData}
-                                        onChange={(key, value) =>
-                                            handleFieldChange(section.id, key, value)
-                                        }
-                                    />
-                                </CollapsibleSection>
-                            );
-                        }
-
-                        return (
-                            <CollapsibleSection
-                                key={section.id}
-                                title={section.title}
-                                emoji={section.emoji}
-                                description={section.description}
-                                defaultOpen={sIdx < 2}
-                            >
-                                {section.fields.map((field) => (
-                                    <FieldRenderer
-                                        key={field.key}
-                                        field={field}
-                                        data={sectionData}
-                                        onChange={(key, value) =>
-                                            handleFieldChange(section.id, key, value)
-                                        }
-                                    />
-                                ))}
-                            </CollapsibleSection>
-                        );
-                    })}
-                </div>
-            )}
-
-            {/* Actions */}
-            <div className="flex items-center justify-between pt-2">
-                <Link
-                    href="/admin/pages"
-                    className="inline-flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold text-sm transition-colors"
-                >
-                    <ArrowRight className="w-5 h-5" />
-                    العودة لقائمة الصفحات
-                </Link>
-                <div className="flex items-center gap-3">
-                    <a
-                        href={`/${slug === "home" ? "" : slug}`}
-                        target="_blank"
-                        className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-200 transition-colors"
-                    >
-                        <Eye className="w-5 h-5" />
-                        معاينة الصفحة
-                    </a>
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="inline-flex items-center gap-2 bg-gradient-to-l from-green-600 to-green-700 text-white px-8 py-3 rounded-xl font-bold text-sm hover:from-green-700 hover:to-green-800 transition-all shadow-lg shadow-green-600/15 disabled:opacity-50 active:scale-[0.97]"
-                    >
-                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                        حفظ المحتوى
-                    </button>
                 </div>
             </div>
         </form>

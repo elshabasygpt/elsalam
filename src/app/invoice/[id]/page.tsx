@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
+import { Leaf } from "lucide-react";
 import PrintButton from "./PrintButton";
 
 export default async function InvoicePage({ params }: { params: Promise<{ id: string }> }) {
@@ -19,13 +20,22 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
         }
     });
 
+    const settingsList = await prisma.$queryRawUnsafe<any[]>('SELECT * FROM "SiteSettings" LIMIT 1');
+    const siteSettings = settingsList?.[0] || null;
+
     if (!order) {
         notFound();
     }
 
     return (
         <div className="min-h-screen bg-slate-100 flex py-10 print:py-0 print:bg-white justify-center items-start font-sans" dir="ltr">
-            <div className="w-full max-w-[800px] bg-white rounded-xl shadow-2xl print:shadow-none print:w-full p-10 md:p-14 relative mx-4 print:mx-0 print:p-0">
+            <style dangerouslySetInnerHTML={{ __html: `
+                @media print {
+                    @page { size: A4; margin: 0; }
+                    body { -webkit-print-color-adjust: exact; margin: 0; padding: 0; }
+                }
+            `}} />
+            <div className="flex flex-col w-full max-w-[210mm] min-h-[297mm] bg-white rounded-xl shadow-2xl print:shadow-none print:rounded-none print:w-[210mm] print:min-h-[297mm] p-10 md:p-14 relative mx-4 print:mx-auto print:p-12 overflow-hidden">
                 {/* Print Button Wrapper */}
                 <div className="absolute top-6 right-6 print:hidden">
                     <PrintButton />
@@ -33,11 +43,26 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
 
                 <div className="flex justify-between items-start border-b-2 border-slate-200 pb-8 mb-8">
                     <div>
-                        <h1 className="text-4xl font-black text-slate-900 mb-2 tracking-tight">ELSALAM</h1>
-                        <p className="text-slate-500 text-[13px] font-medium tracking-wide">Industrial High-Quality Oils & Fats</p>
+                        {siteSettings?.invoiceShowLogo ? (
+                            (siteSettings?.invoiceLogoUrl || siteSettings?.logoUrl) ? (
+                                <img src={siteSettings.invoiceLogoUrl || siteSettings.logoUrl} alt="Logo" className="object-contain mb-2" crossOrigin="anonymous" style={{ height: `${siteSettings?.invoiceLogoSize || 64}px` }} />
+                            ) : (
+                                <div className="rounded-xl flex items-center justify-center mb-3 shadow-md print:shadow-none print:border print:border-green-800" style={{ backgroundImage: siteSettings?.invoiceColor ? 'none' : 'linear-gradient(to bottom right, #16a34a, #047857)', backgroundColor: siteSettings?.invoiceColor || '#16a34a', width: `${siteSettings?.invoiceLogoSize || 64}px`, height: `${siteSettings?.invoiceLogoSize || 64}px` }}>
+                                    <Leaf className="text-white" style={{ width: `${(siteSettings?.invoiceLogoSize || 64) * 0.6}px`, height: `${(siteSettings?.invoiceLogoSize || 64) * 0.6}px` }} />
+                                </div>
+                            )
+                        ) : (
+                            <h1 className="text-4xl font-black mb-2 tracking-tight" style={{ color: siteSettings?.invoiceColor || '#0f172a' }}>{siteSettings?.siteNameEn || "ELSALAM"}</h1>
+                        )}
+                        {siteSettings?.invoiceSubtitle && (
+                            <p className="text-slate-500 text-[13px] font-medium tracking-wide">{siteSettings.invoiceSubtitle}</p>
+                        )}
+                        {siteSettings?.invoiceCompanyDetails && (
+                            <p className="text-slate-500 text-xs mt-2 whitespace-pre-wrap leading-relaxed">{siteSettings.invoiceCompanyDetails}</p>
+                        )}
                     </div>
                     <div className="text-right">
-                        <h2 className="text-2xl font-black text-slate-800 mb-1 tracking-widest text-[#15803d]">INVOICE</h2>
+                        <h2 className="text-2xl font-black tracking-widest uppercase mb-1" style={{ color: siteSettings?.invoiceColor || '#15803d' }}>INVOICE</h2>
                         <p className="text-slate-600 font-mono text-lg font-bold mb-1">#{order.id.toString().padStart(6, '0')}</p>
                         <p className="text-slate-500 text-sm font-medium">{format(order.createdAt, "PPP p")}</p>
                     </div>
@@ -109,14 +134,26 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                         )}
                         <div className="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
                             <span className="text-lg font-black text-slate-800 uppercase tracking-wide">Total:</span>
-                            <span className="text-xl font-black text-[#15803d]">{order.totalAmount.toLocaleString()} EGP</span>
+                            <span className="text-xl font-black" style={{ color: siteSettings?.invoiceColor || '#15803d' }}>{order.totalAmount.toLocaleString()} EGP</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center justify-center text-center">
-                    <p className="text-slate-500 font-medium italic mb-1">Thank you for your business. We appreciate your trust.</p>
-                    <p className="font-bold text-slate-700 tracking-wide text-sm">www.elsalamoil.com</p>
+
+                {/* Notes Section */}
+                {(order as any).notes && (
+                    <div className="mt-8 bg-amber-50 border border-amber-100 rounded-xl p-5 mb-8 print:border-gray-200 print:bg-transparent text-right" dir="rtl">
+                        <h4 className="text-amber-800 font-bold mb-2 flex items-center gap-2 print:text-gray-800">
+                            ملاحظات الطلب:
+                        </h4>
+                        <p className="text-amber-900 text-sm whitespace-pre-wrap leading-relaxed print:text-gray-600 font-medium">{(order as any).notes}</p>
+                    </div>
+                )}
+                <div className="mt-auto pt-8 border-t-2 border-slate-100 text-center text-slate-500 text-sm font-medium print:break-inside-avoid">
+                    <p className="whitespace-pre-wrap">{siteSettings?.invoiceNotesEn || "Thank you for choosing Elsalam Oils & Fats"}</p>
+                    {siteSettings?.invoiceWebsiteUrl && (
+                        <p className="mt-2 font-mono text-xs text-slate-400">{siteSettings.invoiceWebsiteUrl}</p>
+                    )}
                 </div>
             </div>
         </div>
