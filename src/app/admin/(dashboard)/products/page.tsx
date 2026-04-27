@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Plus, Package, Pencil, Star, Globe, Search, Filter, Eye } from "lucide-react";
 import { DeleteProductButton } from "./delete-button";
 
+import { ProductImportButton } from "./product-import-button";
+
 export default async function AdminProductsPage() {
     const products = await prisma.product.findMany({
         include: { category: true },
@@ -17,13 +19,16 @@ export default async function AdminProductsPage() {
                     <h1 className="text-2xl font-black text-slate-800">إدارة المنتجات</h1>
                     <p className="text-slate-400 text-sm mt-1">إضافة وتعديل وحذف المنتجات المعروضة على الموقع</p>
                 </div>
-                <Link
-                    href="/admin/products/new"
-                    className="inline-flex items-center gap-2 bg-gradient-to-l from-green-600 to-green-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:from-green-700 hover:to-green-800 transition-all shadow-lg shadow-green-600/15 active:scale-[0.97]"
-                >
-                    <Plus className="w-5 h-5" />
-                    إضافة منتج جديد
-                </Link>
+                <div className="flex items-center gap-3">
+                    <ProductImportButton />
+                    <Link
+                        href="/admin/products/new"
+                        className="inline-flex items-center gap-2 bg-gradient-to-l from-green-600 to-green-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:from-green-700 hover:to-green-800 transition-all shadow-lg shadow-green-600/15 active:scale-[0.97]"
+                    >
+                        <Plus className="w-5 h-5" />
+                        إضافة منتج جديد
+                    </Link>
+                </div>
             </div>
 
             {products.length === 0 ? (
