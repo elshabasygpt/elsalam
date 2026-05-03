@@ -8,79 +8,80 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?       @unique
   emailVerified DateTime?
   image         String?
   password      String?
-  role          String    @default("USER") // ADMIN, USER, SALES_REP, SALES_MANAGER
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
+  role          String        @default("USER")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   repClients    Client[]      @relation("RepClients")
   repOrders     ClientOrder[] @relation("RepOrders")
   webOrders     WebOrder[]
 }
 
 model SiteSettings {
-  id                String   @id @default(cuid())
-  siteNameAr        String   @default("مصنع السلام للزيوت النباتية")
-  siteNameEn        String   @default("Elsalam Vegetable Oils Factory")
-  siteDescriptionAr String?
-  siteDescriptionEn String?
-  contactEmail      String?
-  contactPhone      String?
-  addressAr         String?
-  addressEn         String?
-  facebookUrl       String?
-  twitterUrl        String?
-  instagramUrl      String?
-  linkedinUrl       String?
-  smtpHost          String?
-  smtpPort          Int?     @default(587)
-  smtpUser          String?
-  smtpPass          String?
-  smtpFrom          String?
-  smtpFromName      String?
-  smtpSecure        String?  @default("tls")
-
-  imapHost          String?
-  imapPort          Int?     @default(993)
-  imapSecure        String?  @default("tls") // none, ssl, tls
-  imapUser          String?
-  imapPass          String?
-
-  logoUrl           String?
-  invoiceNotesAr    String?
-  invoiceNotesEn    String?
-  invoiceShowLogo   Boolean  @default(true)
-  invoiceLogoUrl    String?
-  invoiceLogoSize   Int?     @default(64)
-  invoiceColor      String?  @default("#15803d")
-  invoiceSubtitle   String?  @default("Industrial High-Quality Oils & Fats")
-  invoiceWebsiteUrl String?  @default("www.elsalamoils.com")
+  id                    String   @id @default(cuid())
+  siteNameAr            String   @default("مصنع السلام للزيوت النباتية")
+  siteNameEn            String   @default("Elsalam Vegetable Oils Factory")
+  siteDescriptionAr     String?
+  siteDescriptionEn     String?
+  contactEmail          String?
+  contactPhone          String?
+  addressAr             String?
+  addressEn             String?
+  facebookUrl           String?
+  twitterUrl            String?
+  instagramUrl          String?
+  linkedinUrl           String?
+  smtpHost              String?
+  smtpPort              Int?     @default(587)
+  smtpUser              String?
+  smtpPass              String?
+  smtpFrom              String?
+  smtpFromName          String?
+  smtpSecure            String?  @default("tls")
+  logoUrl               String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  googleAnalyticsId     String?
+  imapHost              String?
+  imapPass              String?
+  imapPort              Int?     @default(993)
+  imapSecure            String?  @default("tls")
+  imapUser              String?
+  invoiceNotesAr        String?
+  invoiceNotesEn        String?
+  invoiceShowLogo       Boolean  @default(true)
+  invoiceLogoUrl        String?
+  invoiceColor          String?  @default("#15803d")
   invoiceCompanyDetails String?
-
-  googleAnalyticsId String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  invoiceLogoSize       Int?     @default(64)
+  invoiceSubtitle       String?  @default("Industrial High-Quality Oils & Fats")
+  invoiceWebsiteUrl     String?  @default("www.elsalamoils.com")
+  geminiApiKey          String?
+  stabilityApiKey       String?
+  huggingFaceApiKey     String?
+  imageAiProvider       String?  @default("pollinations")
+  textAiProvider        String?  @default("gemini")
 }
 
 model PageContent {
   id        String   @id @default(cuid())
   pageSlug  String   @unique
-  content   String   // JSON string containing sections data
+  content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model PageContentHistory {
-  id        String   @id @default(cuid())
-  pageSlug  String
-  content   String
-  savedAt   DateTime @default(now())
-  label     String   @default("")
+  id       String   @id @default(cuid())
+  pageSlug String
+  content  String
+  savedAt  DateTime @default(now())
+  label    String   @default("")
 
   @@index([pageSlug, savedAt])
 }
@@ -90,16 +91,16 @@ model Category {
   name_ar   String
   name_en   String
   slug      String    @unique
-  imageUrl  String?   @db.Text
-  sortOrder Int       @default(0)
-  products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  imageUrl  String?
+  sortOrder Int       @default(0)
+  products  Product[]
 }
 
 model Product {
-  id                   Int       @id @default(autoincrement())
-  slug                 String    @unique
+  id                   Int                    @id @default(autoincrement())
+  slug                 String                 @unique
   name_ar              String
   name_en              String
   short_description_ar String?
@@ -112,96 +113,98 @@ model Product {
   price                Float?
   price_unit_ar        String?
   price_unit_en        String?
-  is_exportable        Boolean   @default(false)
-  is_featured          Boolean   @default(false)
+  is_exportable        Boolean                @default(false)
+  is_featured          Boolean                @default(false)
   icon                 String?
   gradient_from        String?
   gradient_to          String?
   categoryId           Int?
-  stock                Int       @default(100)
-  activePromotionId    Int?      @unique
+  activePromotionId    Int?                   @unique
+  pdf_datasheet        String?
+  meta_title           String?
+  meta_description     String?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  stock                Int                    @default(100)
+  orderItems           OrderItem[]
+  category             Category?              @relation(fields: [categoryId], references: [id])
+  certifications       ProductCertification[]
+  features             ProductFeature[]
+  images               ProductImage[]
+  packagings           ProductPackaging[]
+  specs                ProductSpec[]
+  promotions           Promotion[]
+  technical_specs      TechnicalSpec[]
+  webOrderItems        WebOrderItem[]
 
-  category       Category?       @relation(fields: [categoryId], references: [id])
-  features       ProductFeature[]
-  certifications ProductCertification[]
-  pdf_datasheet  String?
-  meta_title     String?
-  meta_description String?
-  specs          ProductSpec[]
-  technical_specs TechnicalSpec[]
-  images         ProductImage[]
-  packagings     ProductPackaging[]
-  promotions     Promotion[]
-  orderItems     OrderItem[]
-  webOrderItems  WebOrderItem[]
-
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  @@index([categoryId])
+  @@index([is_featured])
+  @@index([stock])
+  @@index([createdAt])
 }
 
 model ProductFeature {
-  id        Int     @id @default(autoincrement())
-  productId Int
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id         Int     @id @default(autoincrement())
+  productId  Int
   feature_ar String
   feature_en String
+  product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model ProductCertification {
   id        Int     @id @default(autoincrement())
   productId Int
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   name      String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model ProductSpec {
   id        Int     @id @default(autoincrement())
   productId Int
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   label_ar  String
   label_en  String
   value_ar  String
   value_en  String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model TechnicalSpec {
   id          Int     @id @default(autoincrement())
   productId   Int
-  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   property_ar String
   property_en String
   value_ar    String
   value_en    String
   unit_ar     String?
   unit_en     String?
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model ProductImage {
   id        Int     @id @default(autoincrement())
   productId Int
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   url       String
   alt_text  String?
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model ProductPackaging {
   id        Int     @id @default(autoincrement())
   productId Int
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   size_ar   String
   size_en   String
   price     Float?
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Promotion {
   id             Int       @id @default(autoincrement())
   productId      Int?
-  product        Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
   title_ar       String
   title_en       String
   description_ar String?
   description_en String?
-  discount_type  String    // e.g., 'percentage', 'fixed'
+  discount_type  String
   discount_value Float
   original_price Float?
   promo_price    Float?
@@ -210,10 +213,10 @@ model Promotion {
   featured_image String?
   starts_at      DateTime?
   ends_at        DateTime
-    isActive       Boolean   @default(true)
-
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+  isActive       Boolean   @default(true)
+  product        Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model News {
@@ -240,116 +243,121 @@ model News {
 }
 
 model Message {
-  id          Int       @id @default(autoincrement())
-  name        String
-  email       String
-  phone       String?
-  company     String?
-  subject     String
-  body        String
-  type        String    @default("inquiry") // inquiry, complaint, suggestion, order, partnership
-  status      String    @default("new")     // new, read, replied, archived
-  priority    String    @default("normal")  // low, normal, high, urgent
-  reply       String?
-  repliedAt   DateTime?
-  repliedBy   String?
-  notes       String?
-  isStarred   Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  subject   String
+  body      String
+  type      String    @default("inquiry")
+  status    String    @default("new")
+  priority  String    @default("normal")
+  reply     String?
+  repliedAt DateTime?
+  repliedBy String?
+  notes     String?
+  isStarred Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Client {
-  id             Int      @id @default(autoincrement())
-  name           String
-  company        String?
-  industry       String?
-  storeType      String?  // سوبرماركت، محل غذائي، عطارة
-  mainPhone      String?
-  secondaryPhone String?
-  storeImage     String?
-  lat            Float?
-  lng            Float?
-  locationUrl    String?
-  notes          String?
-  status         String   @default("LEAD")
-  creditLimit    Float    @default(0)
-  outstandingBalance Float @default(0)
-  repId          String?
-  rep            User?    @relation("RepClients", fields: [repId], references: [id])
-  contacts       ClientContact[]
-  orders         ClientOrder[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                 Int             @id @default(autoincrement())
+  name               String
+  company            String?
+  industry           String?
+  notes              String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  lat                Float?
+  lng                Float?
+  locationUrl        String?
+  mainPhone          String?
+  repId              String?
+  secondaryPhone     String?
+  storeImage         String?
+  storeType          String?
+  creditLimit        Float           @default(0)
+  outstandingBalance Float           @default(0)
+  status             String          @default("LEAD")
+  rep                User?           @relation("RepClients", fields: [repId], references: [id])
+  contacts           ClientContact[]
+  orders             ClientOrder[]
 }
 
 model ClientContact {
-  id          Int      @id @default(autoincrement())
-  clientId    Int
-  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  personName  String?
-  department  String   // e.g., "المبيعات", "المالية"
-  email       String
-  phone       String?
+  id         Int     @id @default(autoincrement())
+  clientId   Int
+  personName String?
+  department String
+  email      String
+  phone      String?
+  client     Client  @relation(fields: [clientId], references: [id], onDelete: Cascade)
 }
 
 model ClientOrder {
-  id              Int      @id @default(autoincrement())
+  id              Int         @id @default(autoincrement())
   clientId        Int
-  client          Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   repId           String
-  rep             User     @relation("RepOrders", fields: [repId], references: [id])
-  status          String   @default("NEW") // NEW, REVIEW, APPROVED, DELIVERING, DELIVERED
-  totalAmount     Float    @default(0)
+  status          String      @default("NEW")
+  totalAmount     Float       @default(0)
   notes           String?
   rejectionReason String?
   expectedDate    DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  client          Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  rep             User        @relation("RepOrders", fields: [repId], references: [id])
   items           OrderItem[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 }
 
 model OrderItem {
-  id         Int         @id @default(autoincrement())
-  orderId    Int
-  order      ClientOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId  Int
-  product    Product     @relation(fields: [productId], references: [id])
-  quantity   Int
-  unitPrice  Float       @default(0)
-  subtotal   Float       @default(0)
+  id        Int         @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  unitPrice Float       @default(0)
+  subtotal  Float       @default(0)
+  order     ClientOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product     @relation(fields: [productId], references: [id])
 }
 
 model WebOrder {
   id              Int            @id @default(autoincrement())
-  userId          String?
-  user            User?          @relation(fields: [userId], references: [id])
   customerName    String
   customerEmail   String?
   customerPhone   String
   governorate     String
+  city            String?
   shippingAddress String
-  shippingFee     Float          @default(0)
-  paymentMethod   String         @default("COD")
   totalAmount     Float          @default(0)
-  status          String         @default("PENDING") // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
-  items           WebOrderItem[]
+  status          String         @default("PENDING")
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
-  promoCode      String?
-  discountAmount Float   @default(0)
-  notes          String?
+  paymentMethod   String         @default("COD")
+  shippingFee     Float          @default(0)
+  userId          String?
+  discountAmount  Float          @default(0)
+  promoCode       String?
+  notes           String?
+  user            User?          @relation(fields: [userId], references: [id])
+  items           WebOrderItem[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([userId])
 }
 
 model WebOrderItem {
-  id         Int      @id @default(autoincrement())
-  orderId    Int
-  order      WebOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId  Int
-  product    Product  @relation(fields: [productId], references: [id])
-  quantity   Int
-  unitPrice  Float    @default(0)
-  subtotal   Float    @default(0)
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  unitPrice Float    @default(0)
+  subtotal  Float    @default(0)
+  order     WebOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id])
 }
 
 model ShippingZone {
@@ -363,15 +371,17 @@ model ShippingZone {
 }
 
 model PromoCode {
-  id             Int       @id @default(autoincrement())
-  code           String    @unique
-  type           String    // PERCENTAGE or FIXED
-  value          Float
-  minOrderValue  Float?
-  maxUses        Int?
-  usedCount      Int       @default(0)
-  isActive       Boolean   @default(true)
-  expiresAt      DateTime?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id            Int       @id @default(autoincrement())
+  code          String    @unique
+  type          String
+  value         Float
+  minOrderValue Float?
+  maxUses       Int?
+  usedCount     Int       @default(0)
+  isActive      Boolean   @default(true)
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([isActive])
 }

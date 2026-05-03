@@ -150,7 +150,12 @@ function CheckoutContent() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    ...formData,
+                    customerName: formData.customerName,
+                    customerPhone: formData.customerPhone,
+                    customerEmail: formData.customerEmail,
+                    governorate: formData.governorate,
+                    city: formData.city,
+                    shippingAddress: formData.shippingAddress,
                     shippingFee,
                     promoCode: appliedPromo?.code || null,
                     items: items.map(item => ({
@@ -294,7 +299,7 @@ function CheckoutContent() {
                             </div>
                             <div>
                                 <h3 className="font-bold text-slate-700 uppercase tracking-widest text-xs mb-3">{locale === "ar" ? "عنوان الشحن" : "Shipping Address"}</h3>
-                                <p className="font-bold text-lg mb-1">{locale === "ar" ? orderDetails.formData.governorate : orderDetails.formData.governorate}</p>
+                                <p className="font-bold text-lg mb-1">{orderDetails.formData.governorate}</p>
                                 <p className="text-slate-600">{orderDetails.formData.city}</p>
                                 <p className="text-slate-600 mt-1">{orderDetails.formData.shippingAddress}</p>
                             </div>

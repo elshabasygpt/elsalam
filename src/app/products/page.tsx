@@ -6,6 +6,12 @@ export const metadata: Metadata = {
     description: 'تصفح قائمة منتجاتنا من زيوت الطعام، السمن النباتي، والشورتنج المصنعة بأعلى معايير الجودة العالمية.',
 };
 
+import { Suspense } from 'react';
+
 export default function ProductsPage() {
-    return <ProductsClient />;
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-surface-soft flex items-center justify-center p-24 text-green-700">جاري التحميل...</div>}>
+            <ProductsClient />
+        </Suspense>
+    );
 }

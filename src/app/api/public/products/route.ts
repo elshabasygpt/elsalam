@@ -8,15 +8,26 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const perPage = 20;
 
+    const search = searchParams.get("search");
+
     const where: any = {};
     if (category) where.category = { slug: category };
     if (featured === "1") where.is_featured = true;
+    if (search) {
+        where.OR = [
+            { name_ar: { contains: search, mode: 'insensitive' } },
+            { name_en: { contains: search, mode: 'insensitive' } },
+            { short_description_ar: { contains: search, mode: 'insensitive' } },
+            { short_description_en: { contains: search, mode: 'insensitive' } },
+        ];
+    }
 
     const [products, total] = await Promise.all([
         prisma.product.findMany({
             where,
             include: {
                 category: true,
+                packagings: true,
                 promotions: {
                     where: { ends_at: { gte: new Date() } },
                     take: 1,
@@ -60,6 +71,7 @@ export async function GET(req: NextRequest) {
                   ends_at: p.promotions[0].ends_at.toISOString(),
               }
             : null,
+        packagings: p.packagings || [],
     }));
 
     return NextResponse.json({

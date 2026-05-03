@@ -1,12 +1,12 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
     LayoutDashboard, Package, FileText, Settings, Newspaper,
     LogOut, Home, ExternalLink, Menu, X, ChevronLeft, ChevronDown,
-    Leaf, Tag, Percent, Mail, Users, PackageOpen, BadgeCheck, ShoppingBag, MapPin, TicketPercent
+    Leaf, Tag, Percent, Mail, Users, PackageOpen, BadgeCheck, ShoppingBag, MapPin, TicketPercent, Key
 } from "lucide-react";
 
 type NavItem = {
@@ -44,6 +44,7 @@ const NAV_ITEMS: NavItem[] = [
         children: [
             { id: "general_settings", label: "إعدادات الموقع", href: "/admin/settings", icon: Settings },
             { id: "invoice_settings", label: "إعدادات الفاتورة", href: "/admin/settings/invoice", icon: FileText },
+            { id: "api_settings", label: "مفاتيح الذكاء الاصطناعي", href: "/admin/settings/apis", icon: Key },
         ]
     },
 ];
@@ -54,9 +55,21 @@ export function AdminShell({ children, userName, userRole = "USER", pendingOrder
 
     const filteredNavItems = NAV_ITEMS.filter(item => !item.roles || item.roles.includes(userRole));
 
-    // Auto-expand Products dropdown if on sub-pages
+    // Auto-expand relevant dropdowns based on current path
     const isProductsSection = pathname.startsWith("/admin/products") || pathname.startsWith("/admin/categories") || pathname.startsWith("/admin/promotions");
+    const isSettingsSection = pathname.startsWith("/admin/settings");
+    const isClientsSection = pathname.startsWith("/admin/clients");
+    
     const [productsOpen, setProductsOpen] = useState(isProductsSection);
+    const [settingsOpen, setSettingsOpen] = useState(isSettingsSection);
+    const [clientsOpen, setClientsOpen] = useState(isClientsSection);
+
+    // Sync dropdown state when navigating
+    useEffect(() => {
+        if (isProductsSection) setProductsOpen(true);
+        if (isSettingsSection) setSettingsOpen(true);
+        if (isClientsSection) setClientsOpen(true);
+    }, [pathname, isProductsSection, isSettingsSection, isClientsSection]);
 
     const isActive = (href: string, exact?: boolean) => {
         if (exact) return pathname === href;
@@ -77,45 +90,59 @@ export function AdminShell({ children, userName, userRole = "USER", pendingOrder
     };
 
     /* ─── Desktop Nav Item ─── */
-    const DesktopNavItem = ({ item }: { item: NavItem }) => {
+    const renderDesktopNavItem = (item: NavItem) => {
         const hasChildren = item.children && item.children.length > 0;
         const active = isActive(item.href, item.exact);
         const childActive = item.children?.some(c => isActive(c.href));
         const isHighlighted = active || childActive;
+        const isOpen = item.id === "settings" ? settingsOpen : item.id === "clients" ? clientsOpen : productsOpen;
+
         let badgeCount = 0;
         if (item.id === "web_orders") badgeCount = pendingOrdersCount;
         if (item.id === "inbox") badgeCount = newMessagesCount;
 
         if (hasChildren) {
             return (
-                <div>
+                <div key={item.id} className="flex flex-col">
                     {/* Parent with dropdown toggle */}
-                    <div className="flex items-center gap-0.5">
+                    <div className={`
+                        flex items-center rounded-xl transition-all duration-300 group cursor-pointer
+                        ${isHighlighted
+                            ? "bg-emerald-500/10 shadow-[inset_0px_1px_1px_rgba(255,255,255,0.03)]"
+                            : "hover:bg-slate-800/40"
+                        }
+                    `}>
                         <Link
                             href={item.href}
                             className={`
-                                flex-1 flex items-center gap-3 px-4 py-2.5 rounded-r-xl text-[13px] font-bold transition-all duration-200 group relative
-                                ${isHighlighted
-                                    ? "bg-gradient-to-l from-green-500/15 to-green-500/5 text-white shadow-sm"
-                                    : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
-                                }
+                                flex-1 flex items-center gap-3.5 px-4 py-3 text-[13px] font-bold transition-all duration-300 relative rounded-r-xl
+                                ${isHighlighted ? "text-emerald-400" : "text-slate-400 group-hover:text-slate-200"}
                             `}
                         >
-                            {isHighlighted && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-green-500 rounded-l-full" />}
-                            <item.icon className={`w-[18px] h-[18px] transition-colors ${isHighlighted ? "text-green-400" : "text-slate-500 group-hover:text-slate-400"}`} />
-                            <span>{item.label}</span>
+                            {isHighlighted && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-emerald-500 rounded-l-full shadow-[0_0_12px_rgba(16,185,129,0.5)]" />}
+                            <item.icon className={`w-5 h-5 transition-all duration-300 ${isHighlighted ? "text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]" : "text-slate-500 group-hover:text-slate-300"}`} strokeWidth={isHighlighted ? 2.5 : 2} />
+                            <span className="tracking-wide">{item.label}</span>
                         </Link>
                         <button
-                            onClick={() => setProductsOpen(!productsOpen)}
-                            className={`p-2 rounded-l-xl transition-all duration-200 ${isHighlighted ? "text-green-400 hover:bg-green-500/10" : "text-slate-500 hover:bg-slate-800/60 hover:text-slate-300"}`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                if (item.id === "settings") setSettingsOpen(!settingsOpen);
+                                else if (item.id === "clients") setClientsOpen(!clientsOpen);
+                                else setProductsOpen(!productsOpen);
+                            }}
+                            className={`p-3 rounded-l-xl transition-all duration-300 flex items-center justify-center ${
+                                isHighlighted ? "text-emerald-400 hover:text-emerald-300" : "text-slate-500 hover:text-slate-300"
+                            }`}
                         >
-                            <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${productsOpen ? "rotate-180" : ""}`} />
+                            <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
                         </button>
                     </div>
 
                     {/* Children dropdown */}
-                    <div className={`overflow-hidden transition-all duration-200 ease-out ${productsOpen ? "max-h-40 opacity-100 mt-0.5" : "max-h-0 opacity-0"}`}>
-                        <div className="mr-4 pr-3 border-r border-slate-800/50 space-y-0.5">
+                    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                        isOpen ? "max-h-56 opacity-100 mt-1" : "max-h-0 opacity-0"
+                    }`}>
+                        <div className="mr-[22px] pr-4 border-r-2 border-slate-800/50 space-y-1 py-1">
                             {item.children!.map((child) => {
                                 const cActive = isActive(child.href);
                                 return (
@@ -123,14 +150,14 @@ export function AdminShell({ children, userName, userRole = "USER", pendingOrder
                                         key={child.id}
                                         href={child.href}
                                         className={`
-                                            flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-bold transition-all duration-200
+                                            flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-semibold transition-all duration-200
                                             ${cActive
-                                                ? "bg-green-500/10 text-green-400"
-                                                : "text-slate-500 hover:bg-slate-800/50 hover:text-slate-300"
+                                                ? "bg-slate-800/60 text-emerald-400"
+                                                : "text-slate-500 hover:bg-slate-800/30 hover:text-slate-300"
                                             }
                                         `}
                                     >
-                                        <child.icon className={`w-[18px] h-[18px] ${cActive ? "text-green-400" : "text-slate-600"}`} />
+                                        <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${cActive ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] scale-125" : "bg-slate-600"}`} />
                                         <span>{child.label}</span>
                                     </Link>
                                 );
@@ -143,64 +170,77 @@ export function AdminShell({ children, userName, userRole = "USER", pendingOrder
 
         return (
             <Link
+                key={item.id}
                 href={item.href}
                 className={`
-                    flex items-center justify-between px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200 group relative
+                    flex items-center justify-between px-4 py-3 rounded-xl text-[13px] font-bold transition-all duration-300 group relative
                     ${active
-                        ? "bg-gradient-to-l from-green-500/15 to-green-500/5 text-white shadow-sm"
-                        : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
+                        ? "bg-emerald-500/10 text-emerald-400 shadow-[inset_0px_1px_1px_rgba(255,255,255,0.03)]"
+                        : "text-slate-400 hover:bg-slate-800/40 hover:text-slate-200"
                     }
                 `}
             >
-                <div className="flex items-center gap-3">
-                    {active && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-green-500 rounded-l-full" />}
-                    <item.icon className={`w-[18px] h-[18px] transition-colors ${active ? "text-green-400" : "text-slate-500 group-hover:text-slate-400"}`} />
-                    <span>{item.label}</span>
+                <div className="flex items-center gap-3.5">
+                    {active && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-emerald-500 rounded-l-full shadow-[0_0_12px_rgba(16,185,129,0.5)]" />}
+                    <item.icon className={`w-5 h-5 transition-all duration-300 ${active ? "text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]" : "text-slate-500 group-hover:text-slate-300"}`} strokeWidth={active ? 2.5 : 2} />
+                    <span className="tracking-wide">{item.label}</span>
                 </div>
-                {badgeCount > 0 ? (
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${active ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
+                {badgeCount > 0 && (
+                    <span className={`px-2 py-0.5 rounded-md text-[11px] font-black shadow-sm transition-colors ${active ? "bg-emerald-500 text-white" : "bg-slate-700 text-slate-300 group-hover:bg-slate-600"}`}>
                         {badgeCount}
                     </span>
-                ) : (
-                    active && <div className="mr-auto w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                 )}
             </Link>
         );
     };
 
     /* ─── Mobile Nav Item ─── */
-    const MobileNavItem = ({ item }: { item: NavItem }) => {
+    const renderMobileNavItem = (item: NavItem) => {
         const hasChildren = item.children && item.children.length > 0;
         const active = isActive(item.href, item.exact);
         const childActive = item.children?.some(c => isActive(c.href));
         const isHighlighted = active || childActive;
+        const isOpen = item.id === "settings" ? settingsOpen : item.id === "clients" ? clientsOpen : productsOpen;
+
         let badgeCount = 0;
         if (item.id === "web_orders") badgeCount = pendingOrdersCount;
         if (item.id === "inbox") badgeCount = newMessagesCount;
 
         if (hasChildren) {
             return (
-                <div>
-                    <div className="flex items-center gap-0.5">
+                <div key={item.id} className="flex flex-col">
+                    <div className={`
+                        flex items-center rounded-xl transition-all duration-300 group relative
+                        ${isHighlighted ? "bg-emerald-500/10" : "hover:bg-slate-800/40"}
+                    `}>
                         <Link
                             href={item.href}
                             onClick={() => setMobileOpen(false)}
-                            className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-r-xl text-sm font-bold transition-all relative
-                                ${isHighlighted ? "bg-green-500/10 text-white" : "text-slate-400 hover:bg-slate-800/60 hover:text-white"}`}
+                            className={`flex-1 flex items-center gap-3.5 px-4 py-3.5 text-sm font-bold transition-all relative rounded-r-xl
+                                ${isHighlighted ? "text-emerald-400" : "text-slate-400 hover:text-slate-200"}`}
                         >
-                            {isHighlighted && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-green-500 rounded-l-full" />}
-                            <item.icon className={`w-5 h-5 ${isHighlighted ? "text-green-400" : "text-slate-500"}`} />
-                            <span>{item.label}</span>
+                            {isHighlighted && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-emerald-500 rounded-l-full shadow-[0_0_12px_rgba(16,185,129,0.5)]" />}
+                            <item.icon className={`w-5 h-5 ${isHighlighted ? "text-emerald-400" : "text-slate-500"}`} strokeWidth={isHighlighted ? 2.5 : 2} />
+                            <span className="tracking-wide">{item.label}</span>
                         </Link>
                         <button
-                            onClick={() => setProductsOpen(!productsOpen)}
-                            className={`p-2.5 rounded-l-xl transition-all ${isHighlighted ? "text-green-400" : "text-slate-500 hover:text-slate-300"}`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                if (item.id === "settings") setSettingsOpen(!settingsOpen);
+                                else if (item.id === "clients") setClientsOpen(!clientsOpen);
+                                else setProductsOpen(!productsOpen);
+                            }}
+                            className={`p-3.5 px-4 rounded-l-xl transition-all duration-300 flex items-center justify-center ${
+                                isHighlighted ? "text-emerald-400" : "text-slate-500"
+                            }`}
                         >
-                            <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${productsOpen ? "rotate-180" : ""}`} />
+                            <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
                         </button>
                     </div>
-                    <div className={`overflow-hidden transition-all duration-200 ${productsOpen ? "max-h-40 opacity-100 mt-0.5" : "max-h-0 opacity-0"}`}>
-                        <div className="mr-5 pr-3 border-r border-slate-800/50 space-y-0.5">
+                    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                        isOpen ? "max-h-56 opacity-100 mt-1" : "max-h-0 opacity-0"
+                    }`}>
+                        <div className="mr-[22px] pr-4 border-r-2 border-slate-800/50 space-y-1 py-1">
                             {item.children!.map((child) => {
                                 const cActive = isActive(child.href);
                                 return (
@@ -208,10 +248,10 @@ export function AdminShell({ children, userName, userRole = "USER", pendingOrder
                                         key={child.id}
                                         href={child.href}
                                         onClick={() => setMobileOpen(false)}
-                                        className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] font-bold transition-all
-                                            ${cActive ? "bg-green-500/10 text-green-400" : "text-slate-500 hover:bg-slate-800/50 hover:text-slate-300"}`}
+                                        className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-semibold transition-all
+                                            ${cActive ? "bg-slate-800/60 text-emerald-400" : "text-slate-500 hover:bg-slate-800/30 hover:text-slate-300"}`}
                                     >
-                                        <child.icon className={`w-5 h-5 ${cActive ? "text-green-400" : "text-slate-600"}`} />
+                                        <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${cActive ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] scale-125" : "bg-slate-600"}`} />
                                         <span>{child.label}</span>
                                     </Link>
                                 );
@@ -224,18 +264,19 @@ export function AdminShell({ children, userName, userRole = "USER", pendingOrder
 
         return (
             <Link
+                key={item.id}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all relative
-                    ${active ? "bg-green-500/10 text-white" : "text-slate-400 hover:bg-slate-800/60 hover:text-white"}`}
+                className={`flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-bold transition-all relative
+                    ${active ? "bg-emerald-500/10 text-emerald-400" : "text-slate-400 hover:bg-slate-800/40 hover:text-slate-200"}`}
             >
-                <div className="flex items-center gap-3">
-                    {active && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-green-500 rounded-l-full" />}
-                    <item.icon className={`w-5 h-5 ${active ? "text-green-400" : "text-slate-500"}`} />
-                    <span>{item.label}</span>
+                <div className="flex items-center gap-3.5">
+                    {active && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-emerald-500 rounded-l-full shadow-[0_0_12px_rgba(16,185,129,0.5)]" />}
+                    <item.icon className={`w-5 h-5 ${active ? "text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]" : "text-slate-500"}`} strokeWidth={active ? 2.5 : 2} />
+                    <span className="tracking-wide">{item.label}</span>
                 </div>
                 {badgeCount > 0 && (
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${active ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
+                    <span className={`px-2 py-0.5 rounded-md text-[11px] font-black shadow-sm ${active ? "bg-emerald-500 text-white" : "bg-slate-700 text-slate-300"}`}>
                         {badgeCount}
                     </span>
                 )}
@@ -259,8 +300,8 @@ export function AdminShell({ children, userName, userRole = "USER", pendingOrder
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 overflow-y-auto px-3 py-5 space-y-1">
-                    {filteredNavItems.map((item) => <DesktopNavItem key={item.id} item={item} />)}
+                <nav className="flex-1 overflow-y-auto px-4 py-5 space-y-1.5 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+                    {filteredNavItems.map(item => renderDesktopNavItem(item))}
                 </nav>
 
                 {/* Bottom */}
@@ -293,7 +334,7 @@ export function AdminShell({ children, userName, userRole = "USER", pendingOrder
                     </button>
                 </div>
                 <nav className="p-3 space-y-1 overflow-y-auto h-[calc(100%-72px-80px)]">
-                    {NAV_ITEMS.map((item) => <MobileNavItem key={item.id} item={item} />)}
+                    {filteredNavItems.map(item => renderMobileNavItem(item))}
                 </nav>
                 <div className="p-3 border-t border-slate-800/60">
                     <a href="/api/auth/signout" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-400/80 hover:bg-red-500/10 transition-all">

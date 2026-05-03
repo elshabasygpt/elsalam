@@ -1,15 +1,20 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { rateLimit } from "@/lib/rate-limit";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+    // Rate limit: 5 checkout attempts per minute per IP
+    const limited = rateLimit(req, { limit: 5, windowMs: 60_000 });
+    if (limited) return limited;
+
     try {
         const session = await getServerSession(authOptions);
         const userId = session?.user?.id || null;
 
         const body = await req.json();
-        const { customerName, customerPhone, customerEmail, governorate, shippingAddress, items } = body;
+        const { customerName, customerPhone, customerEmail, governorate, city, shippingAddress, items } = body;
 
         if (!customerName || !customerPhone || !governorate || !shippingAddress || !items || items.length === 0) {
             return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
@@ -34,15 +39,33 @@ export async function POST(req: Request) {
 
             for (const item of items) {
                 const product = await tx.product.findUnique({
-                    where: { id: parseInt(item.productId) }
+                    where: { id: parseInt(item.productId) },
+                    include: {
+                        packagings: true,
+                        promotions: {
+                            where: { isActive: true, ends_at: { gte: new Date() } },
+                            orderBy: { createdAt: 'desc' },
+                            take: 1
+                        }
+                    }
                 });
 
                 if (!product) {
                     throw new Error(`Product not found`);
                 }
-                
+
                 if (product.stock < Number(item.quantity)) {
                     throw new Error(`Out of stock: ${product.name_ar}`);
+                }
+
+                // ✅ SECURITY: Always use DB price — never trust client-supplied price
+                let serverPrice: number;
+                if (item.packagingId) {
+                    const packaging = product.packagings.find(p => p.id === parseInt(item.packagingId));
+                    serverPrice = packaging?.price ?? product.price ?? 0;
+                } else {
+                    // Use promo price if active, else base price
+                    serverPrice = product.promotions[0]?.promo_price ?? product.price ?? 0;
                 }
 
                 // Deduct stock
@@ -51,14 +74,13 @@ export async function POST(req: Request) {
                     data: { stock: { decrement: Number(item.quantity) } }
                 });
 
-                const requestedPrice = Number(item.price);
-                const subtotal = requestedPrice * Number(item.quantity);
+                const subtotal = serverPrice * Number(item.quantity);
                 totalAmount += subtotal;
 
                 validItems.push({
                     productId: product.id,
                     quantity: Number(item.quantity),
-                    unitPrice: requestedPrice,
+                    unitPrice: serverPrice,
                     subtotal: subtotal
                 });
             }
@@ -103,6 +125,7 @@ export async function POST(req: Request) {
                     customerPhone,
                     customerEmail: customerEmail || null,
                     governorate,
+                    city: city || null,
                     shippingAddress,
                     shippingFee: secureShippingFee,
                     promoCode: usedPromo,
@@ -120,7 +143,7 @@ export async function POST(req: Request) {
 
     } catch (error: any) {
         console.error("[WEB_ORDER_POST]", error);
-        if (error.message.includes('Out of stock') || error.message.includes('Products not found')) {
+        if (error.message.includes('Out of stock') || error.message.includes('Product not found')) {
             return NextResponse.json({ success: false, message: error.message }, { status: 400 });
         }
         return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });

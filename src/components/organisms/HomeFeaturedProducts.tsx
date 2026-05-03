@@ -48,19 +48,42 @@ export const HomeFeaturedProducts = () => {
     useEffect(() => {
         const el = carouselRef.current;
         if (!el) return;
+        
+        let timeoutId: NodeJS.Timeout;
         const onScroll = () => {
-            const idx = Math.round(el.scrollLeft / el.offsetWidth);
-            setActiveIdx(Math.max(0, idx));
+            // Debounce for better performance
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                // Handle RTL scroll (where scrollLeft is negative or reversed)
+                const maxScroll = Math.max(1, el.scrollWidth - el.clientWidth);
+                const absoluteScroll = Math.abs(el.scrollLeft);
+                // In RTL, some browsers treat scrollLeft as positive but reversed, some negative.
+                // Using the absolute ratio of scroll position over max scroll is safest.
+                const ratio = absoluteScroll / maxScroll;
+                const idx = Math.round(ratio * (products.length - 1));
+                
+                setActiveIdx(Math.min(products.length - 1, Math.max(0, idx || 0)));
+            }, 50);
         };
+        
         el.addEventListener("scroll", onScroll, { passive: true });
-        return () => el.removeEventListener("scroll", onScroll);
+        return () => {
+            el.removeEventListener("scroll", onScroll);
+            clearTimeout(timeoutId);
+        };
     }, [products.length]);
 
     const scrollTo = (idx: number) => {
-        carouselRef.current?.scrollTo({
-            left: idx * (carouselRef.current.offsetWidth * 0.85 + 12),
+        const el = carouselRef.current;
+        if (!el || !el.children[idx]) return;
+        
+        // Use scrollIntoView to bypass complex RTL math calculations
+        (el.children[idx] as HTMLElement).scrollIntoView({
             behavior: "smooth",
+            block: "nearest",
+            inline: "center"
         });
+        setActiveIdx(idx);
     };
 
     // CMS Values
@@ -88,7 +111,7 @@ export const HomeFeaturedProducts = () => {
                         </div>
                         <Link
                             href="/products"
-                            className="group flex w-full md:w-auto items-center justify-center gap-2 px-8 py-3.5 bg-white border-2 border-gray-100 text-primary-dark font-bold text-[15px] rounded-2xl hover:border-primary-green hover:bg-green-50 shadow-sm transition-all duration-300"
+                            className="hidden md:flex group w-auto items-center justify-center gap-2 px-8 py-3.5 bg-white border-2 border-gray-100 text-primary-dark font-bold text-[15px] rounded-2xl hover:border-primary-green hover:bg-green-50 shadow-sm transition-all duration-300"
                         >
                             {viewAll}
                             <ArrowLeft className={`w-5 h-5 group-hover:-translate-x-1.5 transition-transform ${!isRTL ? "rotate-180" : ""}`} />
@@ -108,14 +131,15 @@ export const HomeFeaturedProducts = () => {
                 ) : (
                     <>
                         {/* ── Mobile: Horizontal Swipe Carousel ── */}
-                        <div className="block md:hidden relative -mx-4 px-4 overflow-hidden">
+                        <div className="block md:hidden relative -mx-4 overflow-hidden">
                             <div
                                 ref={carouselRef}
                                 className="
                                     flex gap-4 overflow-x-auto
-                                    snap-carousel scrollbar-hide scroll-momentum-x
-                                    pb-8 pt-2 items-stretch
+                                    snap-x snap-mandatory scrollbar-hide touch-pan-x touch-pan-y
+                                    pb-8 pt-2 items-stretch px-4
                                 "
+                                style={{ scrollBehavior: 'smooth' }}
                             >
                                 {products.map((product) => {
                                     const title       = locale === "ar" ? product.name_ar       : product.name_en;
@@ -148,18 +172,29 @@ export const HomeFeaturedProducts = () => {
                             </div>
 
                             {/* Dot indicators */}
-                            <div className="flex items-center justify-center gap-2 mt-0 mb-2 relative z-10">
+                            <div className="flex items-center justify-center gap-2 mt-2 mb-6 relative z-10">
                                 {products.map((_, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => scrollTo(idx)}
                                         className={`rounded-full transition-all duration-300 ${
                                             idx === activeIdx
-                                                ? "w-6 h-2 bg-green-600"
+                                                ? "w-8 h-2 bg-green-600"
                                                 : "w-2 h-2 bg-green-200"
                                         }`}
                                     />
                                 ))}
+                            </div>
+
+                            {/* Mobile View All Button */}
+                            <div className="px-4 mb-4">
+                                <Link
+                                    href="/products"
+                                    className="group flex w-full items-center justify-center gap-2 px-8 py-4 bg-white border border-gray-200 text-primary-dark font-black text-[16px] rounded-[1.25rem] hover:border-primary-green hover:bg-green-50 shadow-sm active:scale-[0.98] transition-all duration-300"
+                                >
+                                    {viewAll}
+                                    <ArrowLeft className={`w-5 h-5 group-hover:-translate-x-1.5 transition-transform ${!isRTL ? "rotate-180" : ""}`} />
+                                </Link>
                             </div>
                         </div>
 

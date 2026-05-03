@@ -320,6 +320,7 @@ export const Navbar = () => {
                     )}
                 </div>
             </Container>
+            </header>
 
             {/* Premium Cinematic Mobile Menu */}
             <AnimatePresence>
@@ -487,7 +488,6 @@ export const Navbar = () => {
                     </>
                 )}
             </AnimatePresence>
-            </header>
 
             {/* Mount CartDrawer outside of the header to prevent backdrop-filter containing block issues */}
             <CartDrawer />

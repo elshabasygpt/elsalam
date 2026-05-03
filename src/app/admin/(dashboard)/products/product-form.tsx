@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import {
     Save, Loader2, ArrowRight, Tag, ImageIcon, Info, Upload, X,
-    Plus, Trash2, Award, Ruler, Package, Zap
+    Plus, Trash2, Award, Ruler, Package, Zap, Sparkles, Wand2
 } from "lucide-react";
 import Link from "next/link";
+import { AiImageModal } from "./ai-image-modal";
 
 interface Category {
     id: number;
@@ -70,6 +72,8 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
     const [imageUploading, setImageUploading] = useState(false);
     const [dragOver, setDragOver] = useState(false);
     const [galleryUploading, setGalleryUploading] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [isAiModalOpen, setIsAiModalOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const galleryInputRef = useRef<HTMLInputElement>(null);
 
@@ -98,6 +102,148 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
     const [images, setImages] = useState<ImageItem[]>(initialData?.images || []);
 
     const isEditing = !!initialData?.id;
+
+    // Draft Recovery
+    const [showDraftBanner, setShowDraftBanner] = useState(false);
+    const initialRender = useRef(true);
+    
+    useEffect(() => {
+        if (!isEditing && typeof window !== 'undefined') {
+            const draft = localStorage.getItem('product-draft');
+            if (draft) {
+                setShowDraftBanner(true);
+            }
+        }
+    }, [isEditing]);
+
+    useEffect(() => {
+        if (initialRender.current) {
+            initialRender.current = false;
+            return;
+        }
+        if (!isEditing && typeof window !== 'undefined') {
+            const draftObj = {
+                form, features, specs, packagings, certifications, images
+            };
+            localStorage.setItem('product-draft', JSON.stringify(draftObj));
+            setShowDraftBanner(false);
+        }
+    }, [form, features, specs, packagings, certifications, images, isEditing]);
+
+    const restoreDraft = () => {
+        try {
+            const draft = localStorage.getItem('product-draft');
+            if (draft) {
+                const parsed = JSON.parse(draft);
+                if (parsed.form) setForm(parsed.form);
+                if (parsed.features) setFeatures(parsed.features);
+                if (parsed.specs) setSpecs(parsed.specs);
+                if (parsed.packagings) setPackagings(parsed.packagings);
+                if (parsed.certifications) setCertifications(parsed.certifications);
+                if (parsed.images) setImages(parsed.images);
+                setShowDraftBanner(false);
+                toast.success("تم استعادة المسودة بنجاح");
+            }
+        } catch (error) {
+            toast.error("فشل استعادة المسودة");
+        }
+    };
+
+    const discardDraft = () => {
+        localStorage.removeItem('product-draft');
+        setShowDraftBanner(false);
+    };
+
+    const [isTranslating, setIsTranslating] = useState<string | null>(null);
+    const [aiProvider, setAiProvider] = useState<"gemini" | "huggingface">("huggingface");
+
+    const translateField = async (text: string, targetLang: string, onTranslate: (translated: string) => void, fieldId: string) => {
+        if (!text) {
+            toast.error("لا يوجد نص لترجمته");
+            return;
+        }
+        setIsTranslating(fieldId);
+        try {
+            const res = await fetch("/api/admin/translate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text, targetLang, provider: aiProvider })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                onTranslate(data.translation);
+                toast.success("تمت الترجمة بنجاح ✨");
+            } else {
+                const err = await res.json();
+                toast.error(err.error || "فشل الترجمة");
+            }
+        } catch (error) {
+            toast.error("حدث خطأ أثناء الاتصال بخدمة الترجمة");
+        } finally {
+            setIsTranslating(null);
+        }
+    };
+
+    const generateWithAI = async () => {
+        if (!form.name_ar && !form.name_en) {
+            toast.error("يرجى إدخال اسم المنتج أولاً لتوليد الوصف");
+            return;
+        }
+        setIsGenerating(true);
+        try {
+            const res = await fetch("/api/admin/generate-content", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    productName: form.name_ar || form.name_en,
+                    category: categories.find(c => c.id.toString() === form.categoryId)?.name_ar,
+                    features: features.map(f => f.feature_ar).join(", "),
+                    provider: aiProvider
+                })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setForm(prev => ({
+                    ...prev,
+                    name_en: data.name_en || prev.name_en,
+                    short_description_ar: data.short_ar || prev.short_description_ar,
+                    short_description_en: data.short_en || prev.short_description_en,
+                    description_ar: data.long_ar || prev.description_ar,
+                    description_en: data.long_en || prev.description_en,
+                }));
+                
+                if (data.generated_features && Array.isArray(data.generated_features)) {
+                    setFeatures(data.generated_features);
+                }
+                
+                if (data.generated_specifications && Array.isArray(data.generated_specifications)) {
+                    const mappedSpecs = data.generated_specifications.map((s: any) => ({
+                        property_ar: s.spec_key_ar || "",
+                        property_en: s.spec_key_en || "",
+                        value_ar: s.spec_value_ar || "",
+                        value_en: s.spec_value_en || ""
+                    }));
+                    setSpecs(mappedSpecs);
+                }
+                
+                if (data.generated_certifications && Array.isArray(data.generated_certifications)) {
+                    const mappedCerts = data.generated_certifications.map((c: any) => ({
+                        name: c.cert_name || c.cert_name_en || c.cert_name_ar || ""
+                    })).filter((c: any) => c.name.trim() !== "");
+                    setCertifications(mappedCerts);
+                }
+
+                toast.success("تم التوليد بنجاح ✨");
+            } else {
+                const err = await res.json();
+                toast.error(err.error || "فشل توليد الوصف");
+            }
+        } catch (e) {
+            toast.error("خطأ في الاتصال بالذكاء الاصطناعي");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     const generateSlug = (name: string) =>
         name.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
@@ -188,6 +334,7 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
             });
 
             if (res.ok) {
+                if (!isEditing) localStorage.removeItem('product-draft');
                 router.push("/admin/products");
                 router.refresh();
             } else {
@@ -203,11 +350,33 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
+            {showDraftBanner && (
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-amber-50 border border-amber-200 rounded-2xl animate-in fade-in slide-in-from-top-4">
+                    <div>
+                        <h3 className="text-amber-800 font-bold text-sm">يوجد مسودة غير محفوظة!</h3>
+                        <p className="text-amber-700/80 text-xs mt-1">لقد قمت بإدخال بيانات سابقاً ولم يتم حفظها. هل تريد استعادتها؟</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                        <button type="button" onClick={discardDraft} className="px-4 py-2 text-xs font-bold text-amber-700 hover:bg-amber-100 rounded-lg transition-colors">إلغاء المسودة</button>
+                        <button type="button" onClick={restoreDraft} className="px-4 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-lg shadow-sm transition-colors">استعادة البيانات</button>
+                    </div>
+                </div>
+            )}
+
             {error && (
                 <div className="flex items-center gap-2 p-4 bg-red-50 text-red-600 rounded-xl font-bold text-sm border border-red-100">
                     <span>❌</span> {error}
                 </div>
             )}
+
+            {/* AI Provider Toggle */}
+            <div className="flex items-center justify-end mb-4">
+                <div className="bg-white border border-gray-200 rounded-xl p-1 inline-flex items-center shadow-sm">
+                    <div className="text-xs font-bold text-gray-500 mr-4 ml-2">محرك الذكاء الاصطناعي:</div>
+                    <button type="button" onClick={() => setAiProvider("huggingface")} className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${aiProvider === "huggingface" ? "bg-purple-100 text-purple-700" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"}`}>🤗 Hugging Face</button>
+                    <button type="button" onClick={() => setAiProvider("gemini")} className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${aiProvider === "gemini" ? "bg-blue-100 text-blue-700" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"}`}>✨ Google Gemini</button>
+                </div>
+            </div>
 
             {/* ── Basic Info ── */}
             <FormSection title="المعلومات الأساسية" icon={Info}>
@@ -228,6 +397,19 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
                         <span className="text-slate-400 font-normal mr-2">— يُستخدم في عنوان URL</span>
                     </label>
                     <input type="text" required dir="ltr" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className={`${inputCls} text-left font-mono text-xs`} placeholder="refined-soybean-oil" />
+                </div>
+
+                <div className="flex items-center justify-between border-t border-slate-100 pt-5 mt-2">
+                    <h3 className="font-bold text-sm text-slate-800">الوصف التسويقي</h3>
+                    <button 
+                        type="button" 
+                        onClick={generateWithAI}
+                        disabled={isGenerating || (!form.name_ar && !form.name_en)}
+                        className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-xl font-bold text-xs hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg shadow-purple-500/20 disabled:opacity-50"
+                    >
+                        {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+                        {isGenerating ? "جاري التوليد..." : "توليد الوصف بالذكاء الاصطناعي"}
+                    </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -263,7 +445,18 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
                     </div>
                     <div>
                         <label className="block text-xs font-bold text-slate-500 mb-2">Price Unit (English)</label>
-                        <input type="text" dir="ltr" value={form.price_unit_en} onChange={(e) => setForm({ ...form, price_unit_en: e.target.value })} className={`${inputCls} text-left`} placeholder="e.g. per jerry can" />
+                        <div className="relative">
+                            <input type="text" dir="ltr" value={form.price_unit_en} onChange={(e) => setForm({ ...form, price_unit_en: e.target.value })} className={`${inputCls} text-left pr-8`} placeholder="e.g. per jerry can" />
+                            <button
+                                type="button"
+                                onClick={() => translateField(form.price_unit_ar, 'en', (val) => setForm({ ...form, price_unit_en: val }), 'price_unit_en')}
+                                disabled={isTranslating === 'price_unit_en' || !form.price_unit_ar}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all disabled:opacity-50"
+                                title="Translate from Arabic using AI"
+                            >
+                                {isTranslating === 'price_unit_en' ? <Loader2 className="w-6 h-6 animate-spin" /> : <Sparkles className="w-6 h-6" />}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </FormSection>
@@ -346,7 +539,17 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
 
             {/* ── Image Gallery (معرض الصور) ── */}
             <FormSection title="معرض الصور" icon={ImageIcon}>
-                <p className="text-xs text-slate-400 -mt-2">أضف صور إضافية للمنتج (تظهر بجوار الصورة الرئيسية)</p>
+                <div className="flex items-center justify-between -mt-2 mb-4">
+                    <p className="text-xs text-slate-400">أضف صور إضافية للمنتج (تظهر بجوار الصورة الرئيسية)</p>
+                    <button
+                        type="button"
+                        onClick={() => setIsAiModalOpen(true)}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-50 text-purple-600 hover:bg-purple-100 rounded-lg text-xs font-bold transition-colors border border-purple-100"
+                    >
+                        <Wand2 className="w-4 h-4" />
+                        استوديو الذكاء الاصطناعي
+                    </button>
+                </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {images.map((img, i) => (
                         <div key={i} className="relative group p-2 bg-slate-50 border border-slate-100 rounded-xl aspect-square flex flex-col justify-center">
@@ -479,13 +682,24 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
                                 className={miniInputCls}
                                 placeholder="الحجم (عربي) — مثال: 1 لتر"
                             />
-                            <input
-                                type="text" dir="ltr"
-                                value={pkg.size_en}
-                                onChange={(e) => { const arr = [...packagings]; arr[i].size_en = e.target.value; setPackagings(arr); }}
-                                className={`${miniInputCls} text-left`}
-                                placeholder="Size (EN) — e.g. 1 Liter"
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text" dir="ltr"
+                                    value={pkg.size_en}
+                                    onChange={(e) => { const arr = [...packagings]; arr[i].size_en = e.target.value; setPackagings(arr); }}
+                                    className={`${miniInputCls} text-left pr-8`}
+                                    placeholder="Size (EN) — e.g. 1 Liter"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => translateField(pkg.size_ar, 'en', (val) => { const arr = [...packagings]; arr[i].size_en = val; setPackagings(arr); }, `pkg_${i}`)}
+                                    disabled={isTranslating === `pkg_${i}` || !pkg.size_ar}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all disabled:opacity-50"
+                                    title="Translate from Arabic using AI"
+                                >
+                                    {isTranslating === `pkg_${i}` ? <Loader2 className="w-6 h-6 animate-spin" /> : <Sparkles className="w-6 h-6" />}
+                                </button>
+                            </div>
                             <input
                                 type="number" step="0.01" dir="ltr"
                                 value={pkg.price}
@@ -539,6 +753,14 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
                     {isEditing ? "حفظ التعديلات" : "إضافة المنتج"}
                 </button>
             </div>
+
+            <AiImageModal 
+                isOpen={isAiModalOpen} 
+                onClose={() => setIsAiModalOpen(false)} 
+                onAccept={(url) => {
+                    setImages([...images, { url }]);
+                }} 
+            />
         </form>
     );
 }

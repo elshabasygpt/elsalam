@@ -57,9 +57,11 @@ export async function POST(req: NextRequest) {
              return NextResponse.json({ error: "Missing required fields (clientId, items)" }, { status: 400 });
         }
 
+        const client = await prisma.client.findUnique({ where: { id: parseInt(body.clientId) } });
+        if (!client) return NextResponse.json({ error: "Client not found" }, { status: 404 });
+
         // Validate client belongs to rep (if role is SALES_REP)
         if (role === "SALES_REP") {
-            const client = await prisma.client.findUnique({ where: { id: parseInt(body.clientId) } });
             if (!client || client.repId !== session.user.id) {
                 return NextResponse.json({ error: "Client not found or unassigned to you." }, { status: 403 });
             }
@@ -85,21 +87,41 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        const newOrder = await prisma.clientOrder.create({
-            data: {
-                clientId: parseInt(body.clientId),
-                repId: repId,
-                status: "NEW", // NEW, REVIEW, APPROVED, DELIVERING, DELIVERED
-                totalAmount: totalAmount,
-                notes: body.notes || null,
-                expectedDate: body.expectedDate ? new Date(body.expectedDate) : null,
-                items: {
-                    create: processedItems
-                }
-            },
-            include: {
-                items: true
+        // ✅ Enforce Credit Limit — reject if new order would exceed it
+        if (client.creditLimit > 0) {
+            const newOutstanding = client.outstandingBalance + totalAmount;
+            if (newOutstanding > client.creditLimit) {
+                return NextResponse.json({
+                    error: `تجاوز حد الائتمان. الحد المتاح: ${client.creditLimit.toFixed(2)} ج.م، الرصيد الحالي: ${client.outstandingBalance.toFixed(2)} ج.م، قيمة الطلب: ${totalAmount.toFixed(2)} ج.م`
+                }, { status: 400 });
             }
+        }
+
+        const newOrder = await prisma.$transaction(async (tx) => {
+            const order = await tx.clientOrder.create({
+                data: {
+                    clientId: parseInt(body.clientId),
+                    repId: repId,
+                    status: "NEW",
+                    totalAmount: totalAmount,
+                    notes: body.notes || null,
+                    expectedDate: body.expectedDate ? new Date(body.expectedDate) : null,
+                    items: {
+                        create: processedItems
+                    }
+                },
+                include: {
+                    items: true
+                }
+            });
+
+            // ✅ Auto-update outstanding balance
+            await tx.client.update({
+                where: { id: parseInt(body.clientId) },
+                data: { outstandingBalance: { increment: totalAmount } }
+            });
+
+            return order;
         });
 
         return NextResponse.json(newOrder);

@@ -44,7 +44,7 @@ export default async function AdminDashboardPage() {
             bg: "bg-blue-50",
             text: "text-blue-600",
             ring: "ring-blue-500/10",
-            href: "/admin/products",
+            href: "/admin/categories",
         },
         {
             label: "صفحات محفوظة",

@@ -564,6 +564,38 @@ export const en: TranslationKeys = {
         contactDesc: "If you have any questions regarding our privacy policy, please feel free to contact us.",
     },
 
+    // ── Terms Page ──
+    termsPage: {
+        heroTitle: "Terms & Conditions",
+        heroSubtitle: "This document outlines the terms and conditions for using our website and Elsalam Vegetable Oils services.",
+        lastUpdated: "Last Updated: April 2026",
+        intro: "Please read these terms and conditions carefully before using our website. By using this site, you agree to be bound by these terms.",
+        sections: [
+            {
+                title: "1. Acceptance of Terms",
+                content: "By accessing and using this site, you accept and agree to be bound by these terms and conditions. If you do not agree to these terms, please do not use our site."
+            },
+            {
+                title: "2. Intellectual Property Rights",
+                content: "All content on this site, including text, graphics, logos, and images, is the property of Elsalam Factory and is protected by copyright and intellectual property laws."
+            },
+            {
+                title: "3. Use of the Site",
+                content: "You are permitted to use our site for lawful purposes only. Any use of the site that may cause damage to the site or disrupt others' access is strictly prohibited."
+            },
+            {
+                title: "4. Disclaimer",
+                content: "We strive to ensure the accuracy of the information on our site, but we make no express or implied warranties regarding the accuracy, completeness, or reliability of this information."
+            },
+            {
+                title: "5. Modifications to Terms",
+                content: "Elsalam Factory reserves the right to modify these terms and conditions at any time. Changes will be posted on this page, and your continued use of the site constitutes acceptance of the modified terms."
+            }
+        ],
+        contactTitle: "Questions About Terms?",
+        contactDesc: "If you have any inquiries regarding our terms and conditions, please contact us.",
+    },
+
     // ── WhatsApp ──
     whatsapp: {
         tooltip: "Chat with us on WhatsApp",

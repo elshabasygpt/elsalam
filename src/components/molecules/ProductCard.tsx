@@ -97,7 +97,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                     {subtitle && (
                         <p className="text-green-600 text-[10px] md:text-[11px] font-black mb-1.5 tracking-widest uppercase">{subtitle}</p>
                     )}
-                    <h3 className="font-extrabold text-slate-800 text-lg md:text-[22px] leading-tight group-hover:text-green-700 transition-colors">{title}</h3>
+                    <h3 className="font-extrabold text-slate-800 text-lg md:text-[22px] leading-relaxed pb-1 group-hover:text-green-700 transition-colors">{title}</h3>
                 </div>
 
                 {/* Description */}

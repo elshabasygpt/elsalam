@@ -748,6 +748,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             fields: [
                 { key: "title", labelAr: "العنوان", labelEn: "Title", type: "text", bilingual: true, required: true },
                 { key: "subtitle", labelAr: "الوصف", labelEn: "Subtitle", type: "textarea", bilingual: true },
+                { key: "image", labelAr: "صورة الغلاف (Hero)", labelEn: "Hero Image URL", type: "url", bilingual: false, placeholder: "https://images.unsplash.com/..." },
             ],
         },
         {
@@ -766,6 +767,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
                     bilingual: false,
                     listFields: [
                         { key: "text", labelAr: "نص الفحص", labelEn: "Check Text", type: "text", bilingual: true },
+                        { key: "image", labelAr: "صورة الفحص", labelEn: "Check Image", type: "url", bilingual: false, placeholder: "https://images.unsplash.com/..." },
                     ],
                 },
             ],
@@ -1123,6 +1125,39 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
                         { key: "name", labelAr: "اسم الفرع", labelEn: "Branch Name", type: "text", bilingual: true },
                         { key: "address", labelAr: "العنوان", labelEn: "Address", type: "text", bilingual: true },
                         { key: "phone", labelAr: "رقم الهاتف", labelEn: "Phone", type: "text", bilingual: false },
+                    ],
+                },
+            ],
+        },
+    ],
+    production: [
+        {
+            id: "hero",
+            title: "القسم الافتتاحي (Hero)",
+            emoji: "🌟",
+            description: "العنوان الرئيسي والخلفية لصفحة مراحل الإنتاج",
+            fields: [
+                { key: "title", labelAr: "العنوان الرئيسي", labelEn: "Hero Title", type: "text", bilingual: true, placeholder: "مراحل الإنتاج" },
+                { key: "subtitle", labelAr: "النص التوضيحي", labelEn: "Hero Subtitle", type: "textarea", bilingual: true },
+                { key: "backgroundImage", labelAr: "صورة الخلفية", labelEn: "Background Image URL", type: "url", bilingual: false, placeholder: "رابط الصورة عالية الجودة" },
+            ],
+        },
+        {
+            id: "steps",
+            title: "مسار الإنتاج (Production Steps)",
+            emoji: "🏭",
+            description: "خطوات عملية الإنتاج المعروضة في مسار متتابع",
+            fields: [
+                {
+                    key: "items",
+                    labelAr: "خطوة",
+                    labelEn: "Step",
+                    type: "list",
+                    bilingual: false,
+                    listFields: [
+                        { key: "title", labelAr: "عنوان الخطوة", labelEn: "Step Title", type: "text", bilingual: true },
+                        { key: "description", labelAr: "تفاصيل الخطوة", labelEn: "Step Description", type: "textarea", bilingual: true },
+                        { key: "image", labelAr: "صورة الخطوة", labelEn: "Step Image URL", type: "url", bilingual: false, placeholder: "رابط صورة تعبر عن الخطوة" },
                     ],
                 },
             ],

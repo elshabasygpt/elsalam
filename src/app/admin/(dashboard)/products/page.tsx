@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Plus, Package, Pencil, Star, Globe, Search, Filter, Eye } from "lucide-react";
+import { Plus, Package, Pencil, Star, Globe, Search, Filter, Eye, Copy } from "lucide-react";
 import { DeleteProductButton } from "./delete-button";
 
 import { ProductImportButton } from "./product-import-button";
@@ -21,6 +21,15 @@ export default async function AdminProductsPage() {
                 </div>
                 <div className="flex items-center gap-3">
                     <ProductImportButton />
+                    <Link
+                        href="/admin/print-products"
+                        target="_blank"
+                        className="inline-flex items-center gap-2 bg-white border border-gray-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm active:scale-[0.97]"
+                        title="طباعة قائمة الأسعار (PDF)"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-printer"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                        تصدير PDF
+                    </Link>
                     <Link
                         href="/admin/products/new"
                         className="inline-flex items-center gap-2 bg-gradient-to-l from-green-600 to-green-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:from-green-700 hover:to-green-800 transition-all shadow-lg shadow-green-600/15 active:scale-[0.97]"
@@ -132,6 +141,13 @@ export default async function AdminProductsPage() {
                                                         title="تعديل"
                                                     >
                                                         <Pencil className="w-5 h-5" />
+                                                    </Link>
+                                                    <Link
+                                                        href={`/admin/products/new?clone=${product.id}`}
+                                                        className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
+                                                        title="تكرار المنتج"
+                                                    >
+                                                        <Copy className="w-5 h-5" />
                                                     </Link>
                                                     <DeleteProductButton productId={product.id} productName={product.name_ar} />
                                                 </div>

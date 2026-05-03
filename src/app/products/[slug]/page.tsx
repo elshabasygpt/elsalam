@@ -176,8 +176,8 @@ export default function ProductDetailPage() {
                                     <ShieldCheck className="w-8 h-8 sm:w-12 sm:h-12 text-green-600" />
                                     <span className="text-xs sm:text-sm font-black uppercase text-gray-800 leading-tight text-center">ISO<br/>22000</span>
                                 </div>
-                                <div className={`absolute bottom-4 sm:bottom-8 ${isRTL ? '-left-2 sm:-left-6' : '-right-2 sm:-right-6'} bg-white shadow-lg px-4 py-3 sm:px-5 sm:py-4 rounded-xl flex items-center justify-center gap-2 border border-gray-100 scale-90 sm:scale-100 z-30`}>
-                                    <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500 shrink-0" />
+                                <div className={`absolute bottom-4 sm:bottom-8 ${isRTL ? '-left-2 sm:-left-6' : '-right-2 sm:-right-6'} bg-white shadow-lg px-4 py-3 sm:px-5 sm:py-4 rounded-xl flex items-center justify-center gap-3 border border-gray-100 scale-90 sm:scale-100 z-30`}>
+                                    <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 text-yellow-500 shrink-0" />
                                     <span className="text-sm sm:text-base font-black text-gray-800 leading-none">100%<br/><span className="text-[10px] sm:text-xs text-gray-500 font-medium">{locale === "ar" ? "طبيعي ونقي" : "Pure & Natural"}</span></span>
                                 </div>
                             </motion.div>
@@ -218,8 +218,8 @@ export default function ProductDetailPage() {
                                 )}
                             </div>
 
-                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-2 leading-tight drop-shadow-sm">{title}</h1>
-                            <p className="text-gray-400 text-sm md:text-base font-bold tracking-[0.2em] uppercase font-english mb-6">{subtitle}</p>
+                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4 pb-3 leading-relaxed drop-shadow-sm">{title}</h1>
+                            <p className="text-gray-400 text-sm md:text-base font-bold tracking-[0.2em] uppercase font-english mb-8 pt-2">{subtitle}</p>
 
                             <div className="mb-8">
                                 <PriceTag
@@ -414,18 +414,18 @@ export default function ProductDetailPage() {
                             {/* Panel: Packaging */}
                             {activeTab === "packaging" && (
                                 <div className="max-w-4xl animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                    <h3 className="text-lg sm:text-xl font-black text-gray-900 mb-6 pb-4 flex items-center gap-2">
-                                        <Package className="w-7 h-7 sm:w-8 sm:h-8 text-green-600 shrink-0" />
+                                    <h3 className="text-lg sm:text-2xl font-black text-gray-900 mb-6 pb-4 flex items-center gap-3">
+                                        <Package className="w-8 h-8 sm:w-10 sm:h-10 text-green-600 shrink-0" />
                                         {locale === "ar" ? "خيارات التعبئة والأوزان" : "Packaging Options"}
                                     </h3>
                                     <PackagingPriceTable packagings={product.packagings} />
                                     
                                     {product.is_exportable && (
                                         <div className="mt-8 bg-blue-50 border border-blue-100 rounded-xl p-5 sm:p-6 flex items-start gap-4">
-                                            <Globe className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600 shrink-0 mt-0.5" />
+                                            <Globe className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600 shrink-0 mt-0.5" />
                                             <div>
-                                                <h4 className="font-bold text-blue-900 mb-1">{locale === "ar" ? "مخارج الشحن والتصدير" : "Shipping & Export Logistics"}</h4>
-                                                <p className="text-sm text-blue-800/80 leading-relaxed max-w-2xl">{locale === "ar" ? "يتم ترتيب باليتات التحميل وفق المعايير الدولية للشحن البحري (20ft / 40ft containers). نرجو التواصل مع قسم المبيعات لتنسيق حمولة الحاويات." : "Loading pallets are arranged according to international sea freight standards. Please contact sales to coordinate container loads."}</p>
+                                                <h4 className="font-bold text-blue-900 text-lg mb-1">{locale === "ar" ? "مخارج الشحن والتصدير" : "Shipping & Export Logistics"}</h4>
+                                                <p className="text-sm sm:text-base text-blue-800/80 leading-relaxed max-w-2xl">{locale === "ar" ? "يتم ترتيب باليتات التحميل وفق المعايير الدولية للشحن البحري (20ft / 40ft containers). نرجو التواصل مع قسم المبيعات لتنسيق حمولة الحاويات." : "Loading pallets are arranged according to international sea freight standards. Please contact sales to coordinate container loads."}</p>
                                             </div>
                                         </div>
                                     )}
@@ -453,7 +453,7 @@ export default function ProductDetailPage() {
                                         <div>
                                             <h3 className="text-lg sm:text-xl font-black text-gray-900 mb-6 border-b border-gray-100 pb-4">{locale === "ar" ? "الملفات المرفقة التقنية" : "Technical Attachments"}</h3>
                                             <a
-                                                href={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"}/products/${product.slug}/pdf`}
+                                                href={product.pdf_datasheet}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="inline-flex items-center gap-5 bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 hover:border-green-400 hover:shadow-md transition-all group max-w-md w-full"

@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
+    // Rate limit: 10 promo checks per minute per IP (prevent brute force)
+    const limited = rateLimit(req, { limit: 10, windowMs: 60_000 });
+    if (limited) return limited;
+
     try {
         const body = await req.json();
         const { code, totalAmount } = body;

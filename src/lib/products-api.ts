@@ -1,7 +1,7 @@
 // Use relative URL so it works on any port (dev: 3000/3001, prod: 80/443)
 const API_BASE = typeof window !== "undefined"
     ? `${window.location.origin}/api/public`
-    : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/public");
+    : `${process.env.NEXT_PUBLIC_API_URL || process.env.NEXTAUTH_URL || "http://localhost:3001"}/api/public`;
 
 export interface ProductCategory {
     id: number;
@@ -40,6 +40,7 @@ export interface ProductItem {
     gradient_to: string | null;
     category: ProductCategory | null;
     active_promotion: ActivePromotion | null;
+    packagings?: ProductPackaging[];
 }
 
 export interface ProductPackaging {
@@ -79,6 +80,7 @@ export interface ProductDetail extends Omit<ProductItem, 'active_promotion'> {
     }[];
     images: { url: string; alt_text: string | null }[];
     packagings: ProductPackaging[];
+    // Full promotions array (contains title_ar, title_en, etc.)
     promotions: {
         id: number;
         title_ar: string;
@@ -91,6 +93,8 @@ export interface ProductDetail extends Omit<ProductItem, 'active_promotion'> {
         promo_price: number | null;
         ends_at: string;
     }[];
+    // Convenience alias for the first active promotion (from API)
+    active_promotion: ActivePromotion | null;
 }
 
 export interface PromotionItem {
@@ -129,11 +133,13 @@ export async function getProducts(params?: {
     category?: string;
     featured?: boolean;
     page?: number;
+    search?: string;
 }): Promise<PaginatedResponse<ProductItem>> {
     const searchParams = new URLSearchParams();
     if (params?.category) searchParams.set("category", params.category);
     if (params?.featured) searchParams.set("featured", "1");
     if (params?.page) searchParams.set("page", params.page.toString());
+    if (params?.search) searchParams.set("search", params.search);
 
     const res = await fetch(`${API_BASE}/products?${searchParams.toString()}`, {
         cache: "no-store",

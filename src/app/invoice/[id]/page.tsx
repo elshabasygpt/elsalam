@@ -20,8 +20,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
         }
     });
 
-    const settingsList = await prisma.$queryRawUnsafe<any[]>('SELECT * FROM "SiteSettings" LIMIT 1');
-    const siteSettings = settingsList?.[0] || null;
+    const siteSettings = await prisma.siteSettings.findFirst();
 
     if (!order) {
         notFound();
@@ -45,7 +44,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                     <div>
                         {siteSettings?.invoiceShowLogo ? (
                             (siteSettings?.invoiceLogoUrl || siteSettings?.logoUrl) ? (
-                                <img src={siteSettings.invoiceLogoUrl || siteSettings.logoUrl} alt="Logo" className="object-contain mb-2" crossOrigin="anonymous" style={{ height: `${siteSettings?.invoiceLogoSize || 64}px` }} />
+                                <img src={(siteSettings.invoiceLogoUrl || siteSettings.logoUrl) ?? undefined} alt="Logo" className="object-contain mb-2" crossOrigin="anonymous" style={{ height: `${siteSettings?.invoiceLogoSize || 64}px` }} />
                             ) : (
                                 <div className="rounded-xl flex items-center justify-center mb-3 shadow-md print:shadow-none print:border print:border-green-800" style={{ backgroundImage: siteSettings?.invoiceColor ? 'none' : 'linear-gradient(to bottom right, #16a34a, #047857)', backgroundColor: siteSettings?.invoiceColor || '#16a34a', width: `${siteSettings?.invoiceLogoSize || 64}px`, height: `${siteSettings?.invoiceLogoSize || 64}px` }}>
                                     <Leaf className="text-white" style={{ width: `${(siteSettings?.invoiceLogoSize || 64) * 0.6}px`, height: `${(siteSettings?.invoiceLogoSize || 64) * 0.6}px` }} />

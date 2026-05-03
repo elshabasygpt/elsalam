@@ -4,17 +4,38 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-// GET all products
-export async function GET() {
+// GET all products (with pagination)
+export async function GET(req: NextRequest) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const products = await prisma.product.findMany({
-        include: { category: true },
-        orderBy: { createdAt: "desc" },
-    });
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const perPage = parseInt(searchParams.get("perPage") || "50");
+    const search = searchParams.get("search") || "";
 
-    return NextResponse.json(products);
+    const where: any = search ? {
+        OR: [
+            { name_ar: { contains: search, mode: 'insensitive' } },
+            { name_en: { contains: search, mode: 'insensitive' } },
+        ]
+    } : {};
+
+    const [products, total] = await Promise.all([
+        prisma.product.findMany({
+            where,
+            include: { category: true },
+            orderBy: { createdAt: "desc" },
+            skip: (page - 1) * perPage,
+            take: perPage,
+        }),
+        prisma.product.count({ where })
+    ]);
+
+    return NextResponse.json({
+        data: products,
+        meta: { total, page, perPage, lastPage: Math.ceil(total / perPage) }
+    });
 }
 
 // POST create product
@@ -29,7 +50,17 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "الاسم والرابط مطلوبان" }, { status: 400 });
         }
 
-        const existing = await prisma.product.findUnique({ where: { slug: body.slug } });
+        // ✅ Sanitize slug: lowercase, remove special chars, replace spaces with hyphens
+        const sanitizedSlug = body.slug
+            .toString()
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\u0600-\u06ff\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+
+        const existing = await prisma.product.findUnique({ where: { slug: sanitizedSlug } });
         if (existing) {
             return NextResponse.json({ error: "هذا الرابط مستخدم بالفعل" }, { status: 400 });
         }
@@ -38,7 +69,7 @@ export async function POST(req: NextRequest) {
             data: {
                 name_ar: body.name_ar,
                 name_en: body.name_en,
-                slug: body.slug,
+                slug: sanitizedSlug,
                 short_description_ar: body.short_description_ar || null,
                 short_description_en: body.short_description_en || null,
                 description_ar: body.description_ar || null,

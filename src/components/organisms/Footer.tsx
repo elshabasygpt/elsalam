@@ -44,9 +44,9 @@ export const Footer = () => {
     const displayLogoStr = cmsFooter?.logo;
 
     const SOCIAL = [
-        { icon: <Facebook  className="w-5 h-5" strokeWidth={1.8} />, href: displayFB, label: "Facebook",  color: "hover:bg-blue-600/80  hover:border-blue-500" },
-        { icon: <Instagram className="w-5 h-5" strokeWidth={1.8} />, href: displayIG, label: "Instagram", color: "hover:bg-pink-600/80   hover:border-pink-500" },
-        { icon: <Linkedin  className="w-5 h-5" strokeWidth={1.8} />, href: displayLI, label: "LinkedIn",  color: "hover:bg-sky-600/80    hover:border-sky-500" },
+        { icon: <Facebook  className="w-6 h-6 md:w-5 md:h-5" strokeWidth={1.8} />, href: displayFB, label: "Facebook",  color: "hover:bg-blue-600/80  hover:border-blue-500" },
+        { icon: <Instagram className="w-6 h-6 md:w-5 md:h-5" strokeWidth={1.8} />, href: displayIG, label: "Instagram", color: "hover:bg-pink-600/80   hover:border-pink-500" },
+        { icon: <Linkedin  className="w-6 h-6 md:w-5 md:h-5" strokeWidth={1.8} />, href: displayLI, label: "LinkedIn",  color: "hover:bg-sky-600/80    hover:border-sky-500" },
     ];
 
     const handleSubscribe = (e: React.FormEvent) => {
@@ -103,12 +103,15 @@ export const Footer = () => {
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-10 mb-14 pb-14 border-b border-white/[0.06]">
 
                         {/* ── Col 1: Brand + About ─────────────────── */}
-                        <div className="md:col-span-4 space-y-6">
-                            {/* Logo + Name */}
-                            <div className="flex items-center gap-4">
-                                <div className="relative w-20 h-20 rounded-2xl overflow-hidden border border-green-500/20 shadow-lg shadow-green-900/30 flex-shrink-0 bg-white/5">
+                        <div className="md:col-span-4 flex flex-col items-center md:items-start text-center md:text-start space-y-6">
+                                {/* Logo + Name */}
+                            <div className="flex flex-col md:flex-row items-center gap-5">
+                                <div 
+                                    className="relative rounded-3xl overflow-hidden border border-green-500/20 shadow-[0_0_40px_rgba(34,197,94,0.2)] flex-shrink-0 bg-white/5"
+                                    style={{ width: "140px", height: "140px", minWidth: "140px" }}
+                                >
                                     {displayLogoStr ? (
-                                        <img src={displayLogoStr} alt={displayBrand} className="w-full h-full object-contain p-1" />
+                                        <img src={displayLogoStr} alt={displayBrand} className="w-full h-full object-contain p-2" />
                                     ) : (
                                         <Image
                                             src="/icon.png"
@@ -120,44 +123,44 @@ export const Footer = () => {
                                     )}
                                 </div>
                                 <div>
-                                    <p className="text-white font-black text-xl leading-tight">{displayBrand}</p>
-                                    <p className="text-green-400/70 text-[11px] font-semibold tracking-widest uppercase font-english mt-0.5">
+                                    <p className="text-white font-black text-2xl md:text-xl leading-tight">{displayBrand}</p>
+                                    <p className="text-green-400/70 text-xs md:text-[11px] font-semibold tracking-widest uppercase font-english mt-1 md:mt-0.5">
                                         Elsalam Oils
                                     </p>
-                                    <div className="flex items-center gap-1.5 mt-1.5">
+                                    <div className="flex items-center justify-center md:justify-start gap-1.5 mt-2 md:mt-1.5">
                                         <span className="w-5 h-0.5 bg-gradient-to-r from-green-500 to-transparent rounded-full" />
-                                        <span className="text-green-500/50 text-[9px] font-bold uppercase tracking-widest font-english">Est. 2000</span>
+                                        <span className="text-green-500/50 text-[10px] md:text-[9px] font-bold uppercase tracking-widest font-english">Est. 2000</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Description */}
-                            <p className="text-white/40 text-sm leading-relaxed">
+                            <p className="text-white/50 text-sm leading-relaxed max-w-sm">
                                 {displayDesc}
                             </p>
 
                             {/* Stats pills */}
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap justify-center md:justify-start gap-2 pt-2">
                                 {[
                                     { val: "25+", label: locale === "ar" ? "عاماً" : "Years" },
                                     { val: "500T", label: locale === "ar" ? "يومياً" : "Daily" },
                                     { val: "15+", label: locale === "ar" ? "دولة" : "Countries" },
                                 ].map((s, i) => (
                                     <div key={i}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/8 bg-white/4 backdrop-blur-sm">
-                                        <span className="text-green-400 font-black text-sm font-english">{s.val}</span>
-                                        <span className="text-white/30 text-xs">{s.label}</span>
+                                        className="flex items-center gap-1.5 px-4 py-2 md:px-3 md:py-1.5 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-inner">
+                                        <span className="text-green-400 font-black text-sm md:text-sm font-english">{s.val}</span>
+                                        <span className="text-white/40 text-xs">{s.label}</span>
                                     </div>
                                 ))}
                             </div>
 
                             {/* Social icons */}
-                            <div className="flex items-center gap-3 pt-1">
+                            <div className="flex items-center justify-center md:justify-start gap-4 md:gap-3 pt-4 md:pt-1">
                                 {SOCIAL.map((s, i) => (
                                     <a key={i} href={s.href} target="_blank" rel="noopener noreferrer"
                                         aria-label={s.label}
-                                        className={`w-14 h-14 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center
-                                                    text-white/50 hover:text-white transition-all duration-300
+                                        className={`w-14 h-14 md:w-12 md:h-12 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center
+                                                    text-white/60 hover:text-white transition-all duration-300
                                                     hover:scale-110 hover:shadow-lg ${s.color}`}>
                                         {s.icon}
                                     </a>
@@ -165,85 +168,89 @@ export const Footer = () => {
                             </div>
                         </div>
 
-                        {/* ── Col 2: Quick Links ───────────────────── */}
-                        <div className="md:col-span-2">
-                            <h4 className="text-white font-bold text-sm mb-5 flex items-center gap-2">
-                                <span className="w-1 h-4 bg-green-500 rounded-full" />
-                                {t.footer.quickLinksTitle}
-                            </h4>
-                            <ul className="space-y-3">
-                                {t.footer.quickLinks.map((label, i) => (
-                                    <li key={i}>
-                                        <Link href={QUICK_LINK_HREFS[i]}
-                                            className="group flex items-center gap-2 text-white/40 hover:text-white text-sm transition-all duration-300">
-                                            <ChevronRight className={`w-5 h-5 text-green-500/0 group-hover:text-green-400 transition-all duration-300 flex-shrink-0 ${!isRTL ? "rotate-180" : ""}`} />
-                                            <span className="group-hover:translate-x-0.5 transition-transform duration-300">{label}</span>
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                        {/* ── Col 2 & 3: Links (Side-by-side on mobile inside a sleek card) ───────────────────── */}
+                        <div className="md:col-span-4 grid grid-cols-2 gap-4 md:gap-10 bg-white/[0.02] md:bg-transparent rounded-3xl p-6 md:p-0 border border-white/[0.05] md:border-none shadow-xl shadow-black/20 md:shadow-none">
+                            
+                            {/* Quick Links */}
+                            <div>
+                                <h4 className="text-white font-bold text-base md:text-sm mb-5 flex items-center gap-2">
+                                    <span className="w-1.5 h-4 bg-green-500 rounded-full" />
+                                    {t.footer.quickLinksTitle}
+                                </h4>
+                                <ul className="space-y-4 md:space-y-3.5">
+                                    {t.footer.quickLinks.map((label, i) => (
+                                        <li key={i}>
+                                            <Link href={QUICK_LINK_HREFS[i]}
+                                                className="group flex items-center gap-2.5 text-white/60 hover:text-white text-base md:text-sm transition-all duration-300">
+                                                <ChevronRight className={`w-5 h-5 md:w-4 md:h-4 text-green-500/70 group-hover:text-green-400 transition-all duration-300 flex-shrink-0 ${!isRTL ? "rotate-180" : ""}`} />
+                                                <span className="group-hover:translate-x-1 transition-transform duration-300 font-medium">{label}</span>
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
 
-                        {/* ── Col 3: Products ──────────────────────── */}
-                        <div className="md:col-span-2">
-                            <h4 className="text-white font-bold text-sm mb-5 flex items-center gap-2">
-                                <span className="w-1 h-4 bg-amber-500 rounded-full" />
-                                {t.footer.productsTitle}
-                            </h4>
-                            <ul className="space-y-3">
-                                {t.footer.productLinks.map((label, i) => (
-                                    <li key={i}>
-                                        <Link href={PRODUCT_LINK_HREFS[i]}
-                                            className="group flex items-center gap-2 text-white/40 hover:text-white text-sm transition-all duration-300">
-                                            <ChevronRight className={`w-5 h-5 text-amber-500/0 group-hover:text-amber-400 transition-all duration-300 flex-shrink-0 ${!isRTL ? "rotate-180" : ""}`} />
-                                            <span className="group-hover:translate-x-0.5 transition-transform duration-300">{label}</span>
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
+                            {/* Products */}
+                            <div>
+                                <h4 className="text-white font-bold text-base md:text-sm mb-5 flex items-center gap-2">
+                                    <span className="w-1.5 h-4 bg-amber-500 rounded-full" />
+                                    {t.footer.productsTitle}
+                                </h4>
+                                <ul className="space-y-4 md:space-y-3.5">
+                                    {t.footer.productLinks.map((label, i) => (
+                                        <li key={i}>
+                                            <Link href={PRODUCT_LINK_HREFS[i]}
+                                                className="group flex items-center gap-2.5 text-white/60 hover:text-white text-base md:text-sm transition-all duration-300">
+                                                <ChevronRight className={`w-5 h-5 md:w-4 md:h-4 text-amber-500/70 group-hover:text-amber-400 transition-all duration-300 flex-shrink-0 ${!isRTL ? "rotate-180" : ""}`} />
+                                                <span className="group-hover:translate-x-1 transition-transform duration-300 font-medium">{label}</span>
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
 
                         {/* ── Col 4: Contact + Newsletter ──────────── */}
                         <div className="md:col-span-4 space-y-6">
                             {/* Contact */}
-                            <div>
-                                <h4 className="text-white font-bold text-sm mb-5 flex items-center gap-2">
-                                    <span className="w-1 h-4 bg-sky-500 rounded-full" />
+                            <div className="bg-white/[0.02] md:bg-transparent rounded-3xl p-6 md:p-0 border border-white/[0.05] md:border-none shadow-xl shadow-black/20 md:shadow-none">
+                                <h4 className="text-white font-bold text-base md:text-sm mb-6 flex items-center gap-2">
+                                    <span className="w-1.5 h-4 bg-sky-500 rounded-full" />
                                     {t.footer.addressTitle}
                                 </h4>
-                                <ul className="space-y-3.5">
+                                <ul className="space-y-5 md:space-y-4">
                                     {[
                                         {
-                                            icon: <MapPin className="w-6 h-6" strokeWidth={1.5} />,
+                                            icon: <MapPin className="w-6 h-6 md:w-5 md:h-5" strokeWidth={1.5} />,
                                             label: t.footer.addressTitle,
                                             value: displayAddress,
                                             color: "text-green-400",
                                             bg: "bg-green-500/10"
                                         },
                                         {
-                                            icon: <Phone className="w-6 h-6" strokeWidth={1.5} />,
+                                            icon: <Phone className="w-6 h-6 md:w-5 md:h-5" strokeWidth={1.5} />,
                                             label: t.contact.phone,
                                             value: displayPhone,
-                                            color: "text-green-400",
-                                            bg: "bg-green-500/10",
+                                            color: "text-sky-400",
+                                            bg: "bg-sky-500/10",
                                             ltr: true,
                                         },
                                         {
-                                            icon: <Mail className="w-6 h-6" strokeWidth={1.5} />,
+                                            icon: <Mail className="w-6 h-6 md:w-5 md:h-5" strokeWidth={1.5} />,
                                             label: t.contact.emailLabel,
                                             value: displayEmail,
-                                            color: "text-green-400",
-                                            bg: "bg-green-500/10",
+                                            color: "text-amber-400",
+                                            bg: "bg-amber-500/10",
                                             ltr: true,
                                         },
                                     ].map((item, i) => (
                                         <li key={i} className="flex items-start gap-4">
-                                            <span className={`w-12 h-12 rounded-2xl ${item.bg} flex items-center justify-center flex-shrink-0 mt-0.5 ${item.color}`}>
+                                            <span className={`w-12 h-12 rounded-2xl ${item.bg} flex items-center justify-center flex-shrink-0 ${item.color}`}>
                                                 {item.icon}
                                             </span>
-                                            <div>
-                                                <p className="text-white/50 text-xs font-medium mb-0.5">{item.label}</p>
-                                                <p className={`text-white/70 text-xs ${item.ltr ? "font-english" : ""}`} dir={item.ltr ? "ltr" : undefined}>
+                                            <div className="flex-1 mt-0.5">
+                                                <p className="text-white/40 text-[11px] md:text-xs font-semibold mb-0.5 uppercase tracking-wider">{item.label}</p>
+                                                <p className={`text-white/90 text-sm md:text-sm font-medium ${item.ltr ? "font-english" : ""}`} dir={item.ltr ? "ltr" : undefined}>
                                                     {item.value}
                                                 </p>
                                             </div>
@@ -275,9 +282,9 @@ export const Footer = () => {
                                                        focus:outline-none focus:border-green-500/50 focus:bg-white/12 transition-all duration-200"
                                         />
                                         <button type="submit"
-                                            className="px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-xl text-xs font-bold
+                                            className="px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-xl text-sm md:text-xs font-bold
                                                        transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20 flex-shrink-0">
-                                            <Send className="w-3.5 h-3.5" />
+                                            <Send className="w-4 h-4 md:w-3.5 md:h-3.5" />
                                         </button>
                                     </form>
                                 )}
