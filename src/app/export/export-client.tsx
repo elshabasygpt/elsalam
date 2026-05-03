@@ -14,12 +14,20 @@ import { Globe, Plane, Ship, Anchor, Truck, Package, ShieldCheck, ArrowRight, Ar
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-export function ExportClient() {
+import { PageContentProvider } from "@/lib/page-content-context";
+
+export function ExportClient({ cmsContent = {} }: { cmsContent?: Record<string, any> }) {
     const { t, locale, isRTL } = useLanguage();
     const CtaArrow = isRTL ? ArrowLeft : ArrowRight;
 
+    // Use CMS Data if available
+    const heroTitle = cmsContent?.hero?.title_ar ? (isRTL ? cmsContent.hero.title_ar : cmsContent.hero.title_en) : (locale === 'ar' ? 'نصدر جودة مصرية' : 'Exporting Egyptian Quality');
+    const heroTitleHighlight = cmsContent?.hero?.titleHighlight_ar ? (isRTL ? cmsContent.hero.titleHighlight_ar : cmsContent.hero.titleHighlight_en) : (locale === 'ar' ? 'بمعايير عالمية' : 'With Global Standards');
+    const heroSubtitle = cmsContent?.hero?.subtitle_ar ? (isRTL ? cmsContent.hero.subtitle_ar : cmsContent.hero.subtitle_en) : t.export.heroSubtitle;
+    const heroCta = cmsContent?.hero?.cta_ar ? (isRTL ? cmsContent.hero.cta_ar : cmsContent.hero.cta_en) : t.export.heroCta;
+
     // Logistics features specifically for B2B export
-    const logistics = [
+    const logistics = cmsContent?.logistics?.items?.length > 0 ? cmsContent.logistics.items : [
         {
             icon: <Ship className="w-10 h-10 text-blue-500" />,
             title_ar: "الشحن البحري",
@@ -51,11 +59,12 @@ export function ExportClient() {
     ];
 
     return (
+        <PageContentProvider content={cmsContent}>
         <main className={`min-h-screen bg-surface-soft ${isRTL ? "font-arabic" : ""}`} dir={isRTL ? "rtl" : "ltr"}>
             <Navbar />
 
             {/* Premium Export Hero */}
-            <section className="relative pt-32 pb-24 lg:pt-40 lg:pb-32 bg-gradient-to-br from-slate-900 to-primary-dark overflow-hidden">
+            <section className="relative pt-32 pb-24 lg:pt-40 lg:pb-32 bg-gradient-to-b from-slate-900 via-primary-dark/90 to-primary-dark overflow-hidden">
                 {/* Background Video/Image Overlay */}
                 <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center mix-blend-overlay"></div>
 
@@ -65,33 +74,33 @@ export function ExportClient() {
                     <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-green-500/10 blur-[150px] rounded-full" />
                 </div>
 
-                {/* Curved bottom edge */}
-                <div className="absolute bottom-0 left-0 right-0 h-16 bg-surface-soft" style={{ clipPath: "ellipse(100% 100% at 50% 100%)" }} />
+                {/* Seamless Transition to Stats */}
+                <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-primary-dark to-transparent z-0" />
 
                 <Container className="relative z-10 text-center">
                     <ScrollReveal>
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full mb-6">
-                            <Globe className="w-5 h-5 text-blue-300" />
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full mb-6 shadow-xl">
+                            <Globe className="w-5 h-5 text-blue-300 animate-pulse" />
                             <span className="text-white/90 text-sm font-bold uppercase tracking-wider">
                                 {locale === 'ar' ? 'شبكة تصدير عالمية' : 'Global Export Network'}
                             </span>
                         </div>
 
-                        <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white mb-6 drop-shadow-xl leading-tight max-w-4xl mx-auto">
-                            {locale === 'ar' ? 'نصدر جودة مصرية' : 'Exporting Egyptian Quality Globally'}
+                        <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white mb-6 drop-shadow-2xl leading-tight max-w-4xl mx-auto">
+                            {heroTitle}
                             <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-400">
-                                {locale === 'ar' ? 'بمعايير عالمية' : 'With Global Standards'}
+                                {heroTitleHighlight}
                             </span>
                         </h1>
 
-                        <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10">
-                            {t.export.heroSubtitle}
+                        <p className="text-white/80 text-lg md:text-2xl max-w-2xl mx-auto leading-relaxed mb-10 text-balance">
+                            {heroSubtitle}
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <a href="#export-inquiry" className="inline-flex items-center gap-3 px-8 py-4 bg-green-600 text-white font-black rounded-xl hover:bg-green-500 hover:shadow-[0_0_30px_rgba(34,197,94,0.4)] transition-all w-full sm:w-auto justify-center">
-                                {t.export.heroCta}
+                            <a href="#export-inquiry" className="inline-flex items-center gap-3 px-8 py-4 bg-green-600 text-white font-black rounded-xl hover:bg-green-500 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(34,197,94,0.4)] transition-all w-full sm:w-auto justify-center">
+                                {heroCta}
                                 <CtaArrow className="w-5 h-5" />
                             </a>
                         </div>
@@ -100,7 +109,7 @@ export function ExportClient() {
             </section>
 
             {/* Global Reach Stats */}
-            <div className="relative z-20 -mt-10 lg:-mt-16">
+            <div className="relative z-20">
                 <StatsCounter />
             </div>
 
@@ -123,11 +132,13 @@ export function ExportClient() {
                     </ScrollReveal>
 
                     <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {logistics.map((item, i) => (
+                        {logistics.map((item: any, i: number) => (
                             <StaggerItem key={i}>
-                                <div className="bg-white rounded-3xl p-8 shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-gray-100 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:border-blue-100 transition-all duration-300 h-full">
-                                    <div className="w-20 h-20 rounded-2xl bg-slate-50 flex items-center justify-center mb-6 shadow-sm border border-slate-100">
-                                        {item.icon}
+                                <div className="bg-white rounded-3xl p-8 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-surface-light hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:border-blue-100 transition-all duration-300 h-full group">
+                                    <div className="w-20 h-20 rounded-2xl bg-slate-50 flex items-center justify-center mb-6 shadow-sm border border-slate-100 group-hover:bg-blue-50 group-hover:scale-110 transition-all duration-300">
+                                        <div className="scale-150 transition-transform duration-300 group-hover:scale-[1.75]">
+                                            {item.icon}
+                                        </div>
                                     </div>
                                     <h3 className="text-xl font-bold text-gray-900 mb-3">
                                         {locale === "ar" ? item.title_ar : item.title_en}
@@ -182,12 +193,12 @@ export function ExportClient() {
                                 <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-4">
                                     {locale === 'ar' ? 'معلومات التصدير القياسية' : 'Standard Export Information'}
                                 </h3>
-                                <table className="w-full text-left" dir={isRTL ? 'rtl' : 'ltr'}>
+                                <table className="w-full text-start" dir={isRTL ? 'rtl' : 'ltr'}>
                                     <tbody>
-                                        {t.export.complianceData.map((row, i) => (
+                                        {t.export.complianceData.map((row: any, i: number) => (
                                             <tr key={i} className="border-b border-slate-200 last:border-0 hover:bg-white transition-colors">
-                                                <td className="py-4 pr-4 font-bold text-sm text-slate-900 w-1/3">{row.label}</td>
-                                                <td className="py-4 text-sm text-slate-600 font-medium">{row.value}</td>
+                                                <td className="py-4 pe-4 font-bold text-sm md:text-base text-slate-900 w-1/2">{row.label}</td>
+                                                <td className="py-4 text-sm md:text-base text-slate-600 font-medium">{row.value}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -212,12 +223,14 @@ export function ExportClient() {
                         />
                     </ScrollReveal>
                     <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12" staggerDelay={0.1}>
-                        {t.export.markets.map((m, i) => (
+                        {t.export.markets.map((m: any, i: number) => (
                             <StaggerItem key={i}>
-                                <div className="p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/10 transition-all hover:-translate-y-2 group">
-                                    <Anchor className="w-8 h-8 text-blue-400 mb-4 opacity-50 group-hover:opacity-100 transition-opacity" />
-                                    <h3 className="text-xl font-bold text-white mb-2">{m.region}</h3>
-                                    <p className="text-white/60 text-sm leading-relaxed">{m.countries}</p>
+                                <div className="p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/10 transition-all hover:-translate-y-2 group flex flex-col items-center text-center h-full">
+                                    <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-6 border border-white/10 group-hover:scale-110 group-hover:bg-blue-500/10 transition-all duration-500">
+                                        <Anchor className="w-8 h-8 text-blue-400 opacity-70 group-hover:opacity-100 transition-opacity" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-white mb-3">{m.region}</h3>
+                                    <p className="text-white/60 text-base leading-relaxed text-balance">{m.countries}</p>
                                 </div>
                             </StaggerItem>
                         ))}
@@ -225,13 +238,12 @@ export function ExportClient() {
                 </Container>
             </section>
 
-            <CertificationsBanner />
-
             <div id="export-inquiry" className="scroll-mt-20">
                 <ExportInquiryForm />
             </div>
 
             <Footer />
         </main>
+        </PageContentProvider>
     );
 }

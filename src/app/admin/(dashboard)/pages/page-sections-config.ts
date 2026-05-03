@@ -824,6 +824,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             fields: [
                 { key: "title", labelAr: "العنوان", labelEn: "Title", type: "text", bilingual: true, required: true },
                 { key: "subtitle", labelAr: "الوصف", labelEn: "Subtitle", type: "textarea", bilingual: true },
+                { key: "backgroundImage", labelAr: "صورة الخلفية", labelEn: "Background Image URL", type: "url", bilingual: false, placeholder: "رابط الصورة عالية الجودة" },
             ],
         },
         {
@@ -977,6 +978,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             fields: [
                 { key: "title", labelAr: "العنوان", labelEn: "Title", type: "text", bilingual: true, required: true },
                 { key: "subtitle", labelAr: "الوصف", labelEn: "Subtitle", type: "textarea", bilingual: true },
+                { key: "backgroundImage", labelAr: "صورة الخلفية", labelEn: "Background Image URL", type: "url", bilingual: false, placeholder: "رابط الصورة عالية الجودة" },
                 { key: "ctaQuote", labelAr: "نص زر عرض السعر", labelEn: "Quote Button Text", type: "text", bilingual: true, placeholder: "طلب عرض سعر" },
                 { key: "ctaCatalog", labelAr: "نص زر الكتالوج", labelEn: "Catalog Button Text", type: "text", bilingual: true, placeholder: "تحميل الكتالوج PDF" },
             ],
@@ -1056,6 +1058,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             fields: [
                 { key: "title", labelAr: "العنوان", labelEn: "Title", type: "text", bilingual: true, required: true },
                 { key: "subtitle", labelAr: "الوصف", labelEn: "Subtitle", type: "textarea", bilingual: true },
+                { key: "backgroundImage", labelAr: "صورة الخلفية", labelEn: "Background Image", type: "url", bilingual: false, placeholder: "https://images.unsplash.com/..." },
             ],
         },
         {
@@ -1125,76 +1128,6 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
                         { key: "name", labelAr: "اسم الفرع", labelEn: "Branch Name", type: "text", bilingual: true },
                         { key: "address", labelAr: "العنوان", labelEn: "Address", type: "text", bilingual: true },
                         { key: "phone", labelAr: "رقم الهاتف", labelEn: "Phone", type: "text", bilingual: false },
-                    ],
-                },
-            ],
-        },
-    ],
-    production: [
-        {
-            id: "hero",
-            title: "القسم الافتتاحي (Hero)",
-            emoji: "🌟",
-            description: "العنوان الرئيسي والخلفية لصفحة مراحل الإنتاج",
-            fields: [
-                { key: "title", labelAr: "العنوان الرئيسي", labelEn: "Hero Title", type: "text", bilingual: true, placeholder: "مراحل الإنتاج" },
-                { key: "subtitle", labelAr: "النص التوضيحي", labelEn: "Hero Subtitle", type: "textarea", bilingual: true },
-                { key: "backgroundImage", labelAr: "صورة الخلفية", labelEn: "Background Image URL", type: "url", bilingual: false, placeholder: "رابط الصورة عالية الجودة" },
-            ],
-        },
-        {
-            id: "steps",
-            title: "مسار الإنتاج (Production Steps)",
-            emoji: "🏭",
-            description: "خطوات عملية الإنتاج المعروضة في مسار متتابع",
-            fields: [
-                {
-                    key: "items",
-                    labelAr: "خطوة",
-                    labelEn: "Step",
-                    type: "list",
-                    bilingual: false,
-                    listFields: [
-                        { key: "title", labelAr: "عنوان الخطوة", labelEn: "Step Title", type: "text", bilingual: true },
-                        { key: "description", labelAr: "تفاصيل الخطوة", labelEn: "Step Description", type: "textarea", bilingual: true },
-                        { key: "image", labelAr: "صورة الخطوة", labelEn: "Step Image URL", type: "url", bilingual: false, placeholder: "رابط صورة تعبر عن الخطوة" },
-                    ],
-                },
-            ],
-        },
-    ],
-    b2b: [
-        {
-            id: "hero",
-            title: "القسم الافتتاحي (Hero)",
-            emoji: "🌟",
-            description: "العنوان الرئيسي والخلفية لصفحة الشراكات الصناعية",
-            fields: [
-                { key: "badge", labelAr: "الشارة (Badge)", labelEn: "Badge Text", type: "text", bilingual: true, placeholder: "بوابة الشركاء" },
-                { key: "title", labelAr: "العنوان الرئيسي", labelEn: "Hero Title", type: "text", bilingual: true, placeholder: "بوابة الشراكات الصناعية" },
-                { key: "subtitle", labelAr: "النص التوضيحي", labelEn: "Hero Subtitle", type: "textarea", bilingual: true },
-                { key: "backgroundImage", labelAr: "صورة الخلفية", labelEn: "Background Image URL", type: "url", bilingual: false, placeholder: "رابط الصورة عالية الجودة" },
-                { key: "ctaQuote", labelAr: "نص زر طلب التسعيرة", labelEn: "Quote CTA Text", type: "text", bilingual: true, placeholder: "طلب عرض سعر" },
-                { key: "ctaCatalog", labelAr: "نص زر تحميل الكتالوج", labelEn: "Catalog CTA Text", type: "text", bilingual: true, placeholder: "تحميل الكتالوج PDF" },
-            ],
-        },
-        {
-            id: "advantages",
-            title: "لماذا مصنع السلام؟ (Advantages)",
-            emoji: "✨",
-            description: "المزايا التي نقدمها لشركاء الأعمال",
-            fields: [
-                { key: "title", labelAr: "عنوان القسم", labelEn: "Section Title", type: "text", bilingual: true, placeholder: "لماذا تختار مصنع السلام لشركتك؟" },
-                { key: "subtitle", labelAr: "النص التوضيحي", labelEn: "Section Subtitle", type: "textarea", bilingual: true, placeholder: "مزايا تنافسية تجعلنا الخيار الأول لكبرى الشركات والمصانع" },
-                {
-                    key: "items",
-                    labelAr: "ميزة",
-                    labelEn: "Advantage",
-                    type: "list",
-                    bilingual: false,
-                    listFields: [
-                        { key: "title", labelAr: "عنوان الميزة", labelEn: "Advantage Title", type: "text", bilingual: true },
-                        { key: "desc", labelAr: "وصف الميزة", labelEn: "Advantage Description", type: "textarea", bilingual: true },
                     ],
                 },
             ],

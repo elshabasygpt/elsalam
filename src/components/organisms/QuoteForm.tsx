@@ -99,9 +99,9 @@ Notes: ${formData.notes}
     const PrevIcon = isRTL ? ArrowRight : ArrowLeft;
 
     return (
-        <section className="py-24 bg-surface-soft relative overflow-hidden" id="quote-form">
+        <section className="py-24 bg-white border-b border-gray-100 relative overflow-hidden" id="quote-form">
             {/* Background Decorations */}
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-green-100/50 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-green-50/50 rounded-full blur-[100px] pointer-events-none" />
 
             <Container className="max-w-4xl relative z-10">
                 <SectionHeader

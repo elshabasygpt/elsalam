@@ -47,67 +47,61 @@ export function B2BClient({ cmsContent = {} }: { cmsContent?: Record<string, any
             <main className="min-h-screen bg-surface-soft font-arabic">
             <Navbar />
 
-            {/* Premium B2B Hero */}
-            <section className="relative min-h-[60vh] flex flex-col items-center justify-center overflow-hidden pt-20 pb-20">
-                {/* Background Image & Overlays */}
-                <div className="absolute inset-0 z-0">
-                    <img 
-                        src={heroBgImage} 
-                        alt={heroTitle} 
-                        className="w-full h-full object-cover"
-                    />
-                    {/* Deep green to dark gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-primary-dark/80 via-primary-dark/90 to-primary-dark z-0" />
-                    {/* Subtle grid pattern */}
-                    <div className="absolute inset-0 opacity-10 bg-[url('/images/pattern-grid.svg')] z-0" />
-                    {/* Bottom seamless blend to next section */}
-                    <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-primary-dark to-transparent z-0" />
+            {/* Premium B2B Hero (Matching Export) */}
+            <section className="relative pt-32 pb-24 lg:pt-40 lg:pb-32 bg-gradient-to-b from-slate-900 via-primary-dark/90 to-primary-dark overflow-hidden">
+                {/* Background Image Overlay */}
+                <div 
+                    className="absolute inset-0 opacity-20 bg-cover bg-center mix-blend-overlay"
+                    style={{ backgroundImage: `url('${heroBgImage}')` }}
+                ></div>
+
+                {/* Dynamic Glow Backgrounds */}
+                <div className="absolute inset-0 opacity-40 mix-blend-screen pointer-events-none">
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/20 blur-[120px] rounded-full" />
+                    <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-green-500/10 blur-[150px] rounded-full" />
                 </div>
 
-                <Container className="relative z-10 text-center flex flex-col items-center">
+                {/* Seamless Transition to Next Section */}
+                <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-primary-dark to-transparent z-0" />
+
+                <Container className="relative z-10 text-center">
                     <ScrollReveal>
                         {/* Premium Badge */}
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-8 mx-auto shadow-xl">
-                            <Handshake className="w-4 h-4 text-primary-green animate-pulse" />
-                            <span className="text-white text-sm font-bold tracking-widest uppercase">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full mb-6 shadow-xl">
+                            <Handshake className="w-5 h-5 text-green-400 animate-pulse" />
+                            <span className="text-white/90 text-sm font-bold uppercase tracking-wider">
                                 {heroBadge}
                             </span>
                         </div>
                         
-                        <Typography variant="h1" align="center" className="text-white mb-6 drop-shadow-2xl text-5xl md:text-6xl lg:text-7xl font-black w-full leading-tight">
+                        <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white mb-6 drop-shadow-2xl leading-tight max-w-4xl mx-auto">
                             {heroTitle}
-                        </Typography>
+                        </h1>
                         
-                        <Typography variant="body-lg" align="center" className="text-white/90 max-w-3xl mx-auto text-lg md:text-2xl font-medium leading-relaxed drop-shadow-md text-balance mb-12">
+                        <p className="text-white/80 text-lg md:text-2xl max-w-2xl mx-auto leading-relaxed mb-10 text-balance">
                             {heroSubtitle}
-                        </Typography>
+                        </p>
                         
-                        <div className="flex flex-wrap justify-center gap-6">
-                            <Button size="lg" variant="secondary" className="bg-white text-primary-dark hover:bg-slate-100 font-bold px-8 h-14 rounded-full shadow-[0_8px_30px_rgb(255,255,255,0.15)] hover:shadow-[0_8px_30px_rgb(255,255,255,0.25)] transition-all hover:-translate-y-1">
-                                <a href="#quote-form" className="flex items-center gap-2">
-                                    <BadgeDollarSign className="w-5 h-5" />
-                                    {ctaQuote}
-                                </a>
-                            </Button>
-                            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 font-bold px-8 h-14 rounded-full backdrop-blur-sm transition-all hover:-translate-y-1">
-                                <a href="/catalog.pdf" download="elsalam_products_catalog.pdf" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                                    <Package className="w-5 h-5" />
-                                    {ctaCatalog}
-                                </a>
-                            </Button>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <a href="#quote-form" className="inline-flex items-center gap-3 px-8 py-4 bg-green-600 text-white font-black rounded-xl hover:bg-green-500 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(34,197,94,0.4)] transition-all w-full sm:w-auto justify-center">
+                                <BadgeDollarSign className="w-5 h-5" />
+                                {ctaQuote}
+                            </a>
+                            <a href="/catalog.pdf" download="elsalam_products_catalog.pdf" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-8 py-4 bg-white/10 text-white font-black rounded-xl backdrop-blur-sm border border-white/20 hover:bg-white/20 hover:-translate-y-1 transition-all w-full sm:w-auto justify-center">
+                                <Package className="w-5 h-5" />
+                                {ctaCatalog}
+                            </a>
                         </div>
                     </ScrollReveal>
                 </Container>
                 
-                {/* Scroll Indicator */}
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce hidden md:block">
-                    <div className="w-8 h-12 rounded-full border-2 border-white/30 flex items-start justify-center p-2 bg-black/20 backdrop-blur-sm">
-                        <div className="w-1.5 h-3 rounded-full bg-white/70 animate-pulse" />
-                    </div>
-                </div>
             </section>
 
             <StatsCounter />
+
+            <div id="quote-form" className="scroll-mt-20">
+                <QuoteForm />
+            </div>
 
             {/* Premium Why Choose Us Section */}
             <section className="py-24 relative bg-surface-soft overflow-hidden">
@@ -156,8 +150,6 @@ export function B2BClient({ cmsContent = {} }: { cmsContent?: Record<string, any
                 </Container>
             </section>
 
-
-            <QuoteForm />
             <ClientLogos />
             <Footer />
         </main>

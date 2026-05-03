@@ -9,9 +9,22 @@ export const metadata: Metadata = {
 
 export const revalidate = 60; // optionally revalidate every 60 seconds
 
+export const dynamic = 'force-dynamic';
+
 export default async function ContactPage() {
     // Fetch site settings server-side to pass verified whatsapp / map urls
     const settings = await prisma.siteSettings.findFirst();
 
-    return <ContactClient settings={settings} />;
+    let cmsContent: Record<string, any> = {};
+    
+    try {
+        const contactContent = await prisma.pageContent.findUnique({ where: { pageSlug: "contact" } });
+        if (contactContent?.content) {
+            cmsContent = JSON.parse(contactContent.content);
+        }
+    } catch (e) {
+        console.error("Failed to load contact page content:", e);
+    }
+
+    return <ContactClient settings={settings} cmsContent={cmsContent} />;
 }
