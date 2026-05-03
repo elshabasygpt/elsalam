@@ -1163,4 +1163,41 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             ],
         },
     ],
+    b2b: [
+        {
+            id: "hero",
+            title: "القسم الافتتاحي (Hero)",
+            emoji: "🌟",
+            description: "العنوان الرئيسي والخلفية لصفحة الشراكات الصناعية",
+            fields: [
+                { key: "badge", labelAr: "الشارة (Badge)", labelEn: "Badge Text", type: "text", bilingual: true, placeholder: "بوابة الشركاء" },
+                { key: "title", labelAr: "العنوان الرئيسي", labelEn: "Hero Title", type: "text", bilingual: true, placeholder: "بوابة الشراكات الصناعية" },
+                { key: "subtitle", labelAr: "النص التوضيحي", labelEn: "Hero Subtitle", type: "textarea", bilingual: true },
+                { key: "backgroundImage", labelAr: "صورة الخلفية", labelEn: "Background Image URL", type: "url", bilingual: false, placeholder: "رابط الصورة عالية الجودة" },
+                { key: "ctaQuote", labelAr: "نص زر طلب التسعيرة", labelEn: "Quote CTA Text", type: "text", bilingual: true, placeholder: "طلب عرض سعر" },
+                { key: "ctaCatalog", labelAr: "نص زر تحميل الكتالوج", labelEn: "Catalog CTA Text", type: "text", bilingual: true, placeholder: "تحميل الكتالوج PDF" },
+            ],
+        },
+        {
+            id: "advantages",
+            title: "لماذا مصنع السلام؟ (Advantages)",
+            emoji: "✨",
+            description: "المزايا التي نقدمها لشركاء الأعمال",
+            fields: [
+                { key: "title", labelAr: "عنوان القسم", labelEn: "Section Title", type: "text", bilingual: true, placeholder: "لماذا تختار مصنع السلام لشركتك؟" },
+                { key: "subtitle", labelAr: "النص التوضيحي", labelEn: "Section Subtitle", type: "textarea", bilingual: true, placeholder: "مزايا تنافسية تجعلنا الخيار الأول لكبرى الشركات والمصانع" },
+                {
+                    key: "items",
+                    labelAr: "ميزة",
+                    labelEn: "Advantage",
+                    type: "list",
+                    bilingual: false,
+                    listFields: [
+                        { key: "title", labelAr: "عنوان الميزة", labelEn: "Advantage Title", type: "text", bilingual: true },
+                        { key: "desc", labelAr: "وصف الميزة", labelEn: "Advantage Description", type: "textarea", bilingual: true },
+                    ],
+                },
+            ],
+        },
+    ],
 };

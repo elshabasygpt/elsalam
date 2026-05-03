@@ -18,12 +18,12 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
     className,
 }) => {
     return (
-        <div className={`mb-16 ${align === "center" ? "text-center" : "text-start"} ${className ?? ""}`}>
-            <Typography variant="h2" className="text-primary-dark mb-4">
+        <div className={`mb-16 flex flex-col items-center gap-6 ${align === "center" ? "text-center" : "text-start"} ${className ?? ""}`}>
+            <Typography variant="h2" align={align} className="text-primary-dark font-black text-4xl md:text-5xl drop-shadow-sm leading-tight">
                 {title}
             </Typography>
             {subtitle && (
-                <Typography variant="body-lg" className="text-text-dark/70 max-w-2xl mx-auto">
+                <Typography variant="body-lg" align={align} className="text-text-dark/70 max-w-3xl mx-auto text-lg md:text-xl text-balance leading-relaxed">
                     {subtitle}
                 </Typography>
             )}
