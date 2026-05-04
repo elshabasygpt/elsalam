@@ -1,3 +1,4 @@
+import { handleApiError } from "@/lib/error-handler";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -7,7 +8,9 @@ import { revalidatePath } from "next/cache";
 // PUT update page content
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
     const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const { slug } = await params;
 
@@ -19,6 +22,20 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug
             JSON.parse(body.content);
         } catch {
             return NextResponse.json({ error: "صيغة JSON غير صحيحة" }, { status: 400 });
+        }
+
+        // Fetch old content for versioning
+        const oldContent = await prisma.pageContent.findUnique({ where: { pageSlug: slug } });
+        
+        // Save to history if exists
+        if (oldContent && oldContent.content !== body.content) {
+            await prisma.pageContentHistory.create({
+                data: {
+                    pageSlug: slug,
+                    content: oldContent.content,
+                    label: "Auto-save before update"
+                }
+            });
         }
 
         const pageContent = await prisma.pageContent.upsert({
@@ -34,6 +51,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug
 
         return NextResponse.json({ data: pageContent });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return handleApiError(error);
     }
 }

@@ -9,8 +9,10 @@ interface RateLimitOptions {
 }
 
 export function rateLimit(req: NextRequest, options: RateLimitOptions): NextResponse | null {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim()
+    // ✅ SECURITY: Prevent X-Forwarded-For spoofing by checking trusted proxy headers first
+    const ip = req.headers.get("x-vercel-forwarded-for") 
         || req.headers.get("x-real-ip")
+        || req.headers.get("x-forwarded-for")?.split(",")[0].trim() 
         || "unknown";
 
     const key = `${req.nextUrl.pathname}::${ip}`;

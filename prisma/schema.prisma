@@ -141,6 +141,7 @@ model Product {
   @@index([is_featured])
   @@index([stock])
   @@index([createdAt])
+  @@index([name_ar])
 }
 
 model ProductFeature {
@@ -284,6 +285,11 @@ model Client {
   rep                User?           @relation("RepClients", fields: [repId], references: [id])
   contacts           ClientContact[]
   orders             ClientOrder[]
+
+  @@index([repId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([name])
 }
 
 model ClientContact {
@@ -341,12 +347,14 @@ model WebOrder {
   discountAmount  Float          @default(0)
   promoCode       String?
   notes           String?
+  isQuotation     Boolean        @default(false)
   user            User?          @relation(fields: [userId], references: [id])
   items           WebOrderItem[]
 
   @@index([status])
   @@index([createdAt])
   @@index([userId])
+  @@index([isQuotation])
 }
 
 model WebOrderItem {

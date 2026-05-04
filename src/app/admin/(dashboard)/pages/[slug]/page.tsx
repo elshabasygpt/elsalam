@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { VisualPageEditor } from "../visual-page-editor";
-import { PAGE_SECTIONS } from "../page-sections-config";
+import { getPageSectionsConfig } from "../page-sections-loader";
 import { FileText } from "lucide-react";
 import { getHomePageDefaultContent } from "../home-default-content";
 import { getAboutPageDefaultContent } from "../about-default-content";
@@ -24,9 +24,9 @@ const PAGES_CONFIG: Record<string, { nameAr: string; nameEn: string; emoji: stri
 export default async function EditPageContentPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
     const pageConfig = PAGES_CONFIG[slug];
-    const sections = PAGE_SECTIONS[slug];
+    const sections = await getPageSectionsConfig(slug);
 
-    if (!pageConfig || !sections) notFound();
+    if (!pageConfig || sections.length === 0) notFound();
 
     const pageContent = await prisma.pageContent.findUnique({
         where: { pageSlug: slug },

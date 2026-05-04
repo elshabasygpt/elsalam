@@ -1,3 +1,4 @@
+import { handleApiError } from "@/lib/error-handler";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -22,6 +23,6 @@ export async function GET(
         const content = JSON.parse(page.content || "{}");
         return NextResponse.json({ data: content });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return handleApiError(error);
     }
 }

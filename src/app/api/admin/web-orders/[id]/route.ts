@@ -1,3 +1,4 @@
+import { handleApiError } from "@/lib/error-handler";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
@@ -61,7 +62,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         return NextResponse.json({ success: true, order: result });
     } catch (error: any) {
         console.error("[ADMIN_WEB_ORDERS_PUT]", error);
-        return NextResponse.json({ success: false, message: error.message || "Failed to update order" }, { status: 500 });
+        return handleApiError(error);
     }
 }
 

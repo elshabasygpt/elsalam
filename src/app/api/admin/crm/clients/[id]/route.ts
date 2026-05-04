@@ -1,3 +1,4 @@
+import { handleApiError } from "@/lib/error-handler";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
         return NextResponse.json(client);
     } catch (e: any) {
-        return NextResponse.json({ error: "Failed to fetch client", details: e.message }, { status: 500 });
+        return handleApiError(e, "Failed to fetch client");
     }
 }
 
@@ -84,7 +85,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
         return NextResponse.json(updatedClient);
     } catch (e: any) {
-        return NextResponse.json({ error: "Failed to update client", details: e.message }, { status: 500 });
+        return handleApiError(e, "Failed to update client");
     }
 }
 
@@ -115,6 +116,6 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
         return NextResponse.json({ success: true });
     } catch (e: any) {
-        return NextResponse.json({ error: "Failed to delete client", details: e.message }, { status: 500 });
+        return handleApiError(e, "Failed to delete client");
     }
 }

@@ -1,3 +1,4 @@
+import { handleApiError } from "@/lib/error-handler";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -91,7 +92,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
         return NextResponse.json(updated);
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return handleApiError(error);
     }
 }
 
@@ -106,6 +107,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
         await prisma.message.delete({ where: { id: parseInt(id) } });
         return NextResponse.json({ success: true });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return handleApiError(error);
     }
 }

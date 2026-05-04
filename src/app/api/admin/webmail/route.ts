@@ -1,3 +1,4 @@
+import { handleApiError } from "@/lib/error-handler";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -132,6 +133,6 @@ export async function GET(req: NextRequest) {
 
     } catch (error: any) {
         console.error("IMAP Error:", error);
-        return NextResponse.json({ error: "فشل الاتصال بخادم البريد الوارد IMAP", details: error.message }, { status: 500 });
+        return handleApiError(error, "فشل الاتصال بخادم البريد الوارد IMAP");
     }
 }

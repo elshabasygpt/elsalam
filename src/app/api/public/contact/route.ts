@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import nodemailer from "nodemailer";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
+    // Rate limit: 3 requests per minute per IP to prevent spam
+    const limited = rateLimit(req as any, { limit: 3, windowMs: 60_000 });
+    if (limited) return limited;
+
     try {
         const body = await req.json();
         

@@ -1,3 +1,4 @@
+import { handleApiError } from "@/lib/error-handler";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -28,6 +29,6 @@ export async function POST(req: NextRequest) {
         // Return the public URL
         return NextResponse.json({ url: `/uploads/crm/${filename}` });
     } catch (e: any) {
-        return NextResponse.json({ error: "File upload failed.", details: e.message }, { status: 500 });
+        return handleApiError(e, "File upload failed.");
     }
 }

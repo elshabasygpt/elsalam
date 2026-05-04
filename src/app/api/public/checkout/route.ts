@@ -1,3 +1,4 @@
+import { handleApiError } from "@/lib/error-handler";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest) {
         const userId = session?.user?.id || null;
 
         const body = await req.json();
-        const { customerName, customerPhone, customerEmail, governorate, city, shippingAddress, items } = body;
+        const { customerName, customerPhone, customerEmail, governorate, city, shippingAddress, items, isQuotation } = body;
 
         if (!customerName || !customerPhone || !governorate || !shippingAddress || !items || items.length === 0) {
             return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
@@ -54,10 +55,6 @@ export async function POST(req: NextRequest) {
                     throw new Error(`Product not found`);
                 }
 
-                if (product.stock < Number(item.quantity)) {
-                    throw new Error(`Out of stock: ${product.name_ar}`);
-                }
-
                 // ✅ SECURITY: Always use DB price — never trust client-supplied price
                 let serverPrice: number;
                 if (item.packagingId) {
@@ -68,11 +65,22 @@ export async function POST(req: NextRequest) {
                     serverPrice = product.promotions[0]?.promo_price ?? product.price ?? 0;
                 }
 
-                // Deduct stock
-                await tx.product.update({
-                    where: { id: product.id },
-                    data: { stock: { decrement: Number(item.quantity) } }
-                });
+                // ✅ SECURITY: Atomic stock deduction to prevent TOCTOU race condition (skip if quotation)
+                if (!isQuotation) {
+                    const updateResult = await tx.product.updateMany({
+                        where: { id: product.id, stock: { gte: Number(item.quantity) } },
+                        data: { stock: { decrement: Number(item.quantity) } }
+                    });
+
+                    if (updateResult.count === 0) {
+                        throw new Error(`Out of stock: ${product.name_ar}`);
+                    }
+                } else {
+                    // Just verify stock exists without deducting it
+                    if (product.stock < Number(item.quantity)) {
+                        throw new Error(`Out of stock for quote: ${product.name_ar}`);
+                    }
+                }
 
                 const subtotal = serverPrice * Number(item.quantity);
                 totalAmount += subtotal;
@@ -106,11 +114,20 @@ export async function POST(req: NextRequest) {
                     }
                     if (appliedDiscount > productsSubtotal) appliedDiscount = productsSubtotal;
                     
-                    // Increment usage
-                    await tx.promoCode.update({
-                        where: { id: promo.id },
-                        data: { usedCount: { increment: 1 } }
-                    });
+                    // ✅ SECURITY: Atomic increment to prevent TOCTOU promo limits (skip if quotation)
+                    if (!isQuotation) {
+                        const updatedPromo = await tx.promoCode.updateMany({
+                            where: { 
+                                id: promo.id,
+                                ...(promo.maxUses ? { usedCount: { lt: promo.maxUses } } : {})
+                            },
+                            data: { usedCount: { increment: 1 } }
+                        });
+                        
+                        if (updatedPromo.count === 0) {
+                            throw new Error(`Promo code usage limit reached`);
+                        }
+                    }
                     usedPromo = promo.code;
                 }
             }
@@ -131,7 +148,8 @@ export async function POST(req: NextRequest) {
                     promoCode: usedPromo,
                     discountAmount: appliedDiscount,
                     totalAmount,
-                    status: "PENDING",
+                    isQuotation: !!isQuotation,
+                    status: isQuotation ? "QUOTE_PENDING" : "PENDING",
                     items: {
                         create: validItems
                     }

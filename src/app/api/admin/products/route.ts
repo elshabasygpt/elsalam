@@ -3,11 +3,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { handleApiError } from "@/lib/error-handler";
 
 // GET all products (with pagination)
 export async function GET(req: NextRequest) {
     const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get("page") || "1");
@@ -41,7 +44,9 @@ export async function GET(req: NextRequest) {
 // POST create product
 export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     try {
         const body = await req.json();
@@ -130,6 +135,6 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(product, { status: 201 });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return handleApiError(error, "CREATE_PRODUCT");
     }
 }

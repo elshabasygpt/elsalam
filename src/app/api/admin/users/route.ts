@@ -1,3 +1,4 @@
+import { handleApiError } from "@/lib/error-handler";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -63,6 +64,6 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(user, { status: 201 });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return handleApiError(error);
     }
 }

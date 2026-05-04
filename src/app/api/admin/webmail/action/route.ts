@@ -1,3 +1,4 @@
+import { handleApiError } from "@/lib/error-handler";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -68,6 +69,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true });
     } catch (error: any) {
         console.error("IMAP Action Error:", error);
-        return NextResponse.json({ error: "فشل تنفيذ العملية", details: error.message }, { status: 500 });
+        return handleApiError(error, "فشل تنفيذ العملية");
     }
 }

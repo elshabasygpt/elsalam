@@ -1,3 +1,4 @@
+import { handleApiError } from "@/lib/error-handler";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -152,6 +153,6 @@ export async function POST(req: NextRequest) {
 
     } catch (error: any) {
         console.error("AI Image Error:", error);
-        return NextResponse.json({ error: error.message || "Failed to generate image" }, { status: 500 });
+        return handleApiError(error);
     }
 }

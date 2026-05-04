@@ -1,3 +1,4 @@
+import { handleApiError } from "@/lib/error-handler";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -36,7 +37,7 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json(orders);
     } catch (e: any) {
-        return NextResponse.json({ error: "Failed to fetch orders", details: e.message }, { status: 500 });
+        return handleApiError(e, "Failed to fetch orders");
     }
 }
 
@@ -126,6 +127,6 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(newOrder);
     } catch (e: any) {
-        return NextResponse.json({ error: "Failed to create order", details: e.message }, { status: 500 });
+        return handleApiError(e, "Failed to create order");
     }
 }

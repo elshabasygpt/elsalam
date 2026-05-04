@@ -1,8 +1,13 @@
+import { handleApiError } from "@/lib/error-handler";
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hash } from 'bcryptjs';
 
 export async function GET(req: Request) {
+    if (process.env.NODE_ENV === "production") {
+        return NextResponse.json({ error: "Not Found" }, { status: 404 });
+    }
+
     const { searchParams } = new URL(req.url);
     const secret = searchParams.get("secret");
 
@@ -40,6 +45,6 @@ export async function GET(req: Request) {
 
         return NextResponse.json({ success: true, user: user.email, settingsMsg });
     } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        return handleApiError(error);
     }
 }

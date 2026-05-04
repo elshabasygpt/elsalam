@@ -1,3 +1,4 @@
+import { handleApiError } from "@/lib/error-handler";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -20,6 +21,6 @@ export async function GET() {
             certifications: 4  // ISO, HACCP, etc.
         });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return handleApiError(error);
     }
 }

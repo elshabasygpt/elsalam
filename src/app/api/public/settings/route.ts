@@ -1,3 +1,4 @@
+import { handleApiError } from "@/lib/error-handler";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -5,17 +6,21 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
     try {
-        const settingsList = await prisma.$queryRawUnsafe<any[]>('SELECT * FROM "SiteSettings" LIMIT 1');
-        const settings = settingsList?.[0] || null;
+        const settings = await prisma.siteSettings.findFirst();
         
         if (settings) {
-            // Remove sensitive SMTP credentials before sending to client
-            const { smtpHost, smtpPort, smtpUser, smtpPass, smtpFrom, smtpFromName, smtpSecure, ...safeSettings } = settings as any;
+            // Remove ALL sensitive credentials before sending to client
+            const { 
+                smtpHost, smtpPort, smtpUser, smtpPass, smtpFrom, smtpFromName, smtpSecure,
+                imapHost, imapPort, imapUser, imapPass, imapSecure,
+                geminiApiKey, stabilityApiKey, huggingFaceApiKey,
+                ...safeSettings 
+            } = settings as any;
             return NextResponse.json(safeSettings);
         }
         
         return NextResponse.json(settings);
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return handleApiError(error);
     }
 }
