@@ -46,8 +46,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
     width: 'device-width',
     initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
+    maximumScale: 5, // Accessibility fix: Allow zooming up to 5x
     themeColor: '#16a34a',
     viewportFit: 'cover',
 }
@@ -100,12 +99,23 @@ const jsonLd = {
     "knowsAbout": ["Vegetable Oils Production", "Margarine", "Shortening", "B2B Export", "Food Safety"]
 };
 
+// Caching the database call to prevent blocking Static Site Generation (SSG)
+import { unstable_cache } from 'next/cache';
+
+const getSiteSettings = unstable_cache(
+    async () => {
+        return await prisma.siteSettings.findFirst();
+    },
+    ['site-settings-global'],
+    { revalidate: 3600, tags: ['settings'] }
+);
+
 export default async function RootLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
-    const settings = await prisma.siteSettings.findFirst();
+    const settings = await getSiteSettings();
     const gaId = settings?.googleAnalyticsId;
 
     return (

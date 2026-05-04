@@ -1,81 +1,103 @@
-# 🌟 مشروع السلام (Elsalam E-Commerce & ERP System)
+# Elsalam Oils - B2B Enterprise Platform 🏭
 
-منصة متكاملة تجمع بين قوة التجارة الإلكترونية (E-Commerce) ونظام إدارة موارد المؤسسات والعلاقات مع العملاء (ERP & CRM) مصممة ومبنية بأحدث تقنيات الويب لتوفير تجربة مستخدم استثنائية وإدارة سلسة للعمليات التجارية.
+**Bilingual (English & Arabic) Next.js 14 E-commerce & CMS Platform for Vegetable Oils Export.**
 
----
-
-## 🚀 نظرة عامة على المشروع
-
-تم تطوير "مشروع السلام" ليكون منصة أعمال شاملة لا تقتصر فقط على واجهة تسوق إلكترونية عصرية وجذابة للعملاء، بل تتضمن لوحة تحكم إدارية متقدمة (Admin Dashboard) تغطي كافة العمليات من إدارة المنتجات والمخزون، مروراً بإدارة المبيعات والعملاء، وصولاً إلى إصدار الفواتير وتحليل البيانات. 
-
-تم التركيز على **تجربة المستخدم (UI/UX)** باستخدام تصاميم حديثة (Glassmorphism، تأثيرات حركية ناعمة) تضاهي أكبر المنصات العالمية مثل WoodMart.
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![Next.js](https://img.shields.io/badge/Next.js-14_App_Router-black?logo=next.js)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?logo=tailwind-css)
 
 ---
 
-## ✨ المميزات الرئيسية (Features)
+## 🌍 Overview (نظرة عامة)
 
-### 1. 🛒 نظام التجارة الإلكترونية (E-Commerce)
-* **واجهة تسوق احترافية:** واجهات تفاعلية سريعة الاستجابة مع دعم للتأثيرات الحركية (Micro-animations).
-* **إدارة السلة والشراء (Cart & Checkout):** نظام سلة مشتريات سلس، مع صفحة دفع متطورة تدعم الحفظ التلقائي للبيانات والتحقق اللحظي.
-* **نظام الخصومات (Promo Codes):** إمكانية إنشاء كوبونات خصم من لوحة التحكم، وتطبيقها مباشرة أثناء الدفع مع حساب الخصومات ديناميكياً.
-* **إدارة الشحن (Shipping):** حساب تكاليف الشحن وتتبع حالات الطلب.
-* **حسابات المستخدمين (User Accounts):** نظام تسجيل دخول/إنشاء حساب يتيح للمستخدم تتبع طلباته السابقة (Order History) وإدارة حسابه.
+**[English]** 
+Elsalam Oils Platform is a state-of-the-art B2B web application engineered for high availability, security, and performance. Built to handle international export requests, quotation workflows, and dynamic CMS management with enterprise-grade safeguards.
 
-### 2. 👥 نظام إدارة علاقات العملاء (CRM)
-* **إدارة العملاء الشاملة:** إضافة وتعديل بيانات العملاء (شركات أو أفراد) مع دعم إضافة أكثر من جهة اتصال (Contacts) وقسم (Departments) لكل عميل.
-* **دورة المبيعات (Sales Pipeline):** نظام متقدم لتتبع مراحل المبيعات والصفقات، من التواصل الأول وحتى الإغلاق.
-* **إدارة جهات الاتصال ديناميكياً:** ارتباط قاعدة البيانات بعلاقات متداخلة (Nested Prisma Relations) لضمان دقة معلومات التواصل.
-
-### 3. ⚙️ نظام تخطيط موارد المؤسسات (ERP & Admin Panel)
-* **إدارة المنتجات والأصناف:** لوحة تحكم كاملة لإضافة المنتجات، الصور، المواصفات، وإدارة المخزون.
-* **نظام الفواتير (Invoicing):** إصدار فواتير احترافية ديناميكية للطلبات مع إمكانية الطباعة وتصديرها بتنسيق متوافق مع معايير الشركات.
-* **إدارة الطلبات (Orders Management):** شاشة مخصصة لمتابعة الطلبات وتحديث حالتها (قيد المراجعة، تم الشحن، مكتمل، الخ).
-* **التقارير والإحصائيات:** تحليلات وتتبع للأداء لتقديم رؤية شاملة للإدارة.
+**[العربية]**
+منصة مصنع السلام للزيوت هي تطبيق ويب B2B متطور مصمم لتحمل الضغط العالي وتوفير أقصى درجات الأمان والأداء. تم بناء المنصة للتعامل مع طلبات التصدير الدولية، دورات عروض الأسعار (RFQ)، ونظام إدارة محتوى ديناميكي بمعايير المؤسسات الكبرى.
 
 ---
 
-## 🛠️ التقنيات المستخدمة (Tech Stack)
+## 🏗️ Technical Architecture (المعمارية التقنية)
 
-تم بناء المشروع باستخدام أحدث التقنيات لضمان السرعة، الأمان، وسهولة التوسع:
-
-* **الإطار العام (Framework):** [Next.js](https://nextjs.org/) (App Router) لبناء الـ Frontend والـ Backend API في بيئة واحدة.
-* **لغة البرمجة:** [TypeScript](https://www.typescriptlang.org/) لضمان خلو الكود من الأخطاء أثناء التطوير (Type-Safety).
-* **قاعدة البيانات (Database):** PostgreSQL.
-* **أداة الربط بقاعدة البيانات (ORM):** [Prisma](https://www.prisma.io/) لإدارة الـ Schemas وإجراء الاستعلامات بسرعة وأمان.
-* **التصميم والواجهات (Styling):** 
-  * Tailwind CSS / Vanilla CSS مع دعم تصاميم الـ Glassmorphism و Dark Mode.
-  * تصميمات مبنية على مكونات متجاوبة (Responsive Design) لتعمل بشكل مثالي على الأجهزة المحمولة واللوحية.
+- **Framework:** Next.js 14 (App Router) - Utilizing Server Components & Server Actions.
+- **Database:** PostgreSQL with Prisma ORM (Serverless Connection Pooling Ready).
+- **State Management:** Zustand (Persisted & Hydration Mismatch Safe).
+- **Styling:** Tailwind CSS (High-Density B2B UI, Accessibility Compliant).
+- **Authentication:** NextAuth.js (JWT-based Edge Auth).
+- **Security:** In-memory Rate Limiting, OWASP Headers, Strict RBAC Middleware.
 
 ---
 
-## 🏗️ كيفية تشغيل المشروع (Getting Started)
+## ⭐ Exclusive Enterprise Features (الميزات الحصرية)
 
-للبدء في تشغيل المشروع على بيئتك المحلية، اتبع الخطوات التالية:
+### 1. Edge Security & WAF (حماية متقدمة على الحافة)
+- **Edge Middleware:** A robust firewall that validates JWT tokens before requests even hit the Node.js server.
+- **DDoS/Spam Protection:** In-memory Rate Limiting protecting Contact and Export inquiry APIs.
+- **Strict RBAC:** Role-Based Access Control ensuring only users with the `ADMIN` role can access dashboard routes.
 
-**1. تثبيت الحزم والمكتبات:**
-\`\`\`bash
-npm install
-\`\`\`
+### 2. B2B Quotation Engine (نظام عروض الأسعار للشركات)
+- **Draft to RFQ:** Replaces traditional B2C checkouts. Users build high-volume carts and submit them as Requests for Quotation (RFQ).
+- **Admin Discounts & Control:** Admins can review RFQs, apply custom volume discounts, add private notes, and approve/reject orders securely using atomic `prisma.$transaction`.
+- **High-Density Data Grid:** Excel-like table interfaces (QuickOrderTable) allowing merchants to order dozens of products in seconds.
 
-**2. إعداد قاعدة البيانات:**
-قم بتجهيز ملف \`.env\` وإضافة رابط قاعدة بيانات PostgreSQL في متغير \`DATABASE_URL\`، ثم قم بتشغيل أمر Prisma:
-\`\`\`bash
-npx prisma generate
-npx prisma db push
-\`\`\`
+### 3. Bulletproof CMS Versioning (نظام إصدارات المحتوى ضد الأخطاء)
+- **Snapshot Archiving:** Every page content update automatically archives the previous state in the database.
+- **1-Click Rollback:** Admins can instantly revert to older content versions safely without data corruption.
+- **Storage Optimization:** Auto-pruning of old historical versions to prevent database bloat over time.
 
-**3. تشغيل خادم التطوير:**
-\`\`\`bash
-npm run dev
-\`\`\`
-سيتم تشغيل المشروع على الرابط: \`http://localhost:3000\`
-
----
-
-## 🔒 الأمان وحماية البيانات
-* نظام تحقق قوي من البيانات من جهة السيرفر (Server-Side Validation) لجميع طلبات الـ API.
-* حماية مسارات لوحة التحكم (Admin Routes) ومسارات المستخدم (Protected Routes).
+### 4. Technical SEO & Observability (محركات البحث والمراقبة)
+- **Dynamic XML Sitemap:** Auto-generates based on real-time DB products, categories, and news articles.
+- **JSON-LD Schema:** Injects Google Rich Snippets automatically for products to increase Click-Through Rates (CTR).
+- **SRE Ready:** Implements a Global Error Boundary UI and APM placeholder (Sentry via `instrumentation.ts`) for proactive disaster detection.
 
 ---
 
-**تم تصميم وتطوير هذا النظام ليكون نقطة انطلاق قوية للتوسع المستقبلي وتلبية احتياجات الأسواق والشركات المتنامية.**
+## 💻 Local Setup (التشغيل المحلي)
+
+**[English]**
+1. Clone the repository and install dependencies:
+   ```bash
+   npm install
+   ```
+2. Copy `.env.example` to `.env` and fill in your PostgreSQL URL and NEXTAUTH_SECRET.
+3. Sync the database schema and generate the Prisma Client:
+   ```bash
+   npx prisma db push
+   npx prisma generate
+   ```
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+**[العربية]**
+1. قم بتثبيت المكتبات الخاصة بالمشروع:
+   `npm install`
+2. انسخ ملف البيئة `.env.example` إلى `.env` وضع روابط قاعدة البيانات (PostgreSQL) الخاصة بك.
+3. قم ببناء الجداول في قاعدة البيانات وتوليد مكتبة Prisma:
+   `npx prisma db push` 
+   ثم
+   `npx prisma generate`
+4. شغل سيرفر التطوير محلياً عبر أمر:
+   `npm run dev`
+
+---
+
+## 🚀 Deployment Commands (أوامر الرفع للإنتاج)
+
+When deploying to Vercel, AWS Amplify, or Docker, ensure you use the following command in the **Build Settings** to guarantee database synchronization and type safety before compilation:
+
+**Build Command:**
+```bash
+npx prisma generate && npx prisma migrate deploy && next build
+```
+
+**⚠️ Critical Vercel Environment Variables:**
+- `DATABASE_URL`: Must include `?pgbouncer=true&connection_limit=1` to prevent connection exhaustion under heavy load.
+- `DIRECT_URL`: Clean DB URL for `migrate deploy` without pgbouncer.
+- `NEXT_PUBLIC_SITE_URL`: Required for accurate absolute URLs in the XML sitemap (e.g., `https://elsalamoils.com`).
+
+---
+*Developed with ❤️ using Next.js App Router & Prisma.*

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { syncCartWithDb } from "@/actions/cart.actions";
 
 export interface CartItem {
     id: string; // Unique ID (productId + packaging details if any)
@@ -24,6 +25,10 @@ interface CartStore {
     clearCart: () => void;
     getTotalItems: () => number;
     getTotalPrice: () => number;
+    // Sync & Hydration
+    isHydrated: boolean;
+    setHydrated: (state: boolean) => void;
+    syncWithDb: () => Promise<void>;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -31,6 +36,8 @@ export const useCartStore = create<CartStore>()(
         (set, get) => ({
             items: [],
             isOpen: false,
+            isHydrated: false,
+            setHydrated: (state) => set({ isHydrated: state }),
             setIsOpen: (isOpen) => set({ isOpen }),
             toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
             
@@ -74,10 +81,25 @@ export const useCartStore = create<CartStore>()(
                 const { items } = get();
                 return items.reduce((total, item) => total + item.price * item.quantity, 0);
             },
+
+            syncWithDb: async () => {
+                const { items } = get();
+                try {
+                    const result = await syncCartWithDb(items);
+                    if (result.success && result.items) {
+                        set({ items: result.items });
+                    }
+                } catch (error) {
+                    console.error("Failed to sync cart with DB:", error);
+                }
+            },
         }),
         {
             name: "elsalam-cart-storage",
-            partialize: (state) => ({ items: state.items }), // Only persist items, not UI state (isOpen)
+            partialize: (state) => ({ items: state.items }), // Only persist items
+            onRehydrateStorage: () => (state) => {
+                state?.setHydrated(true);
+            },
         }
     )
 );

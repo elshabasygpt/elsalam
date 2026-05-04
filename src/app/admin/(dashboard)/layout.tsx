@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import { prisma } from "@/lib/prisma";
 import { AdminShell } from "./admin-shell";
+import { Toaster } from 'sonner';
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
     const session = await getServerSession(authOptions);
@@ -16,13 +17,17 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     const newMessagesCount = await prisma.message.count({ where: { status: "new" } });
 
     return (
-        <AdminShell 
-            userName={session.user?.name || "المدير"} 
-            userRole={session.user?.role || "USER"}
-            pendingOrdersCount={pendingOrdersCount}
-            newMessagesCount={newMessagesCount}
-        >
-            {children}
-        </AdminShell>
+        <>
+            <AdminShell 
+                userName={session.user?.name || "المدير"} 
+                userRole={session.user?.role || "USER"}
+                pendingOrdersCount={pendingOrdersCount}
+                newMessagesCount={newMessagesCount}
+            >
+                {children}
+            </AdminShell>
+            {/* Global Sonner Toaster for the Admin Dashboard */}
+            <Toaster richColors position="top-center" dir="rtl" closeButton />
+        </>
     );
 }

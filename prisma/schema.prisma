@@ -20,6 +20,8 @@ model User {
   repClients    Client[]      @relation("RepClients")
   repOrders     ClientOrder[] @relation("RepOrders")
   webOrders     WebOrder[]
+  cart          Cart?
+  quotations    Quotation[]
 }
 
 model SiteSettings {
@@ -136,6 +138,8 @@ model Product {
   promotions           Promotion[]
   technical_specs      TechnicalSpec[]
   webOrderItems        WebOrderItem[]
+  cartItems            CartItem[]
+  quotationItems       QuotationItem[]
 
   @@index([categoryId])
   @@index([is_featured])
@@ -392,4 +396,68 @@ model PromoCode {
   updatedAt     DateTime  @updatedAt
 
   @@index([isActive])
+}
+
+model OutboxEvent {
+  id        String   @id @default(cuid())
+  type      String   // e.g., "SEND_EMAIL", "UPDATE_INVENTORY"
+  payload   String   // JSON stringified payload
+  status    String   @default("PENDING") // PENDING, PROCESSED, FAILED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id            String   @id @default(cuid())
+  cartId        String
+  cart          Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId     Int
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity      Int
+  weightVariant String   @default("") // Ensures unique constraint works safely
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([cartId, productId, weightVariant])
+}
+
+model Quotation {
+  id             String          @id @default(cuid())
+  userId         String
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status         String          @default("PENDING") // PENDING, REVIEWING, APPROVED, REJECTED
+  discountAmount Float           @default(0)
+  totalAmount    Float           @default(0)
+  adminNotes     String?
+  clientNotes    String?
+  items          QuotationItem[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model QuotationItem {
+  id            String    @id @default(cuid())
+  quotationId   String
+  quotation     Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  productId     Int
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity      Int
+  price         Float     // Snapshot of the requested price
+  weightVariant String    @default("")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([quotationId])
 }

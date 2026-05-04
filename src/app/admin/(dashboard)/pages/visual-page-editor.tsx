@@ -9,7 +9,7 @@ import {
     Type, Palette, Maximize2, Square, LayoutTemplate,
     Link2, AlignLeft, Image as ImageIcon2, GripVertical,
     Monitor, Smartphone, History, RotateCcw, AlertCircle,
-    PanelRight, ChevronRight, Zap
+    PanelRight, ChevronRight, Zap, Star
 } from "lucide-react";
 import Link from "next/link";
 
@@ -387,28 +387,26 @@ function SlideCard({
 }) {
     const [open, setOpen] = useState(index === 0);
     const [tab, setTab]   = useState<SlideTabId>("content");
+    const [lang, setLang] = useState<"ar" | "en">("ar");
     const fileRef = useRef<HTMLInputElement>(null);
     const [uploading, setUploading] = useState(false);
 
-    const inputCls = "w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all";
-    const label    = (ar: string, en: string) => (
-        <div className="grid grid-cols-2 gap-3">
+    const inputCls = "w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all shadow-sm";
+    
+    const labelField = (ar: string, en: string, fieldAr: string, fieldEn: string) => {
+        const isAr = lang === "ar";
+        const key = isAr ? fieldAr : fieldEn;
+        const displayName = isAr ? ar : en;
+        return (
             <div>
-                <p className="text-[10px] font-bold text-slate-400 mb-1 flex items-center gap-1">{ar} <span className="px-1 py-0.5 bg-green-50 text-green-600 text-[8px] rounded font-black">عربي</span></p>
-                <input className={inputCls} dir="rtl"
-                    value={slide[ar === "اسم التبويب" ? "tabName_ar" : ar === "الشارة" ? "badge_ar" : ar === "السطر الأول" ? "titleLine1_ar" : ar === "السطر الثاني" ? "titleLine2_ar" : ar === "نص الزر الأساسي" ? "ctaPrimary_ar" : "ctaSecondary_ar"] || ""}
-                    onChange={e => onChange(ar === "اسم التبويب" ? "tabName_ar" : ar === "الشارة" ? "badge_ar" : ar === "السطر الأول" ? "titleLine1_ar" : ar === "السطر الثاني" ? "titleLine2_ar" : ar === "نص الزر الأساسي" ? "ctaPrimary_ar" : "ctaSecondary_ar", e.target.value)}
-                    placeholder={`أدخل ${ar} بالعربية`} />
+                <p className="text-xs font-bold text-slate-500 mb-1.5">{displayName}</p>
+                <input className={inputCls} dir={isAr ? "rtl" : "ltr"}
+                    value={slide[key] || ""}
+                    onChange={e => onChange(key, e.target.value)}
+                    placeholder={isAr ? `أدخل ${ar}` : `Enter ${en}`} />
             </div>
-            <div>
-                <p className="text-[10px] font-bold text-slate-400 mb-1 flex items-center gap-1">{en} <span className="px-1 py-0.5 bg-blue-50 text-blue-600 text-[8px] rounded font-black">EN</span></p>
-                <input className={`${inputCls} text-left`} dir="ltr"
-                    value={slide[ar === "اسم التبويب" ? "tabName_en" : ar === "الشارة" ? "badge_en" : ar === "السطر الأول" ? "titleLine1_en" : ar === "السطر الثاني" ? "titleLine2_en" : ar === "نص الزر الأساسي" ? "ctaPrimary_en" : "ctaSecondary_en"] || ""}
-                    onChange={e => onChange(ar === "اسم التبويب" ? "tabName_en" : ar === "الشارة" ? "badge_en" : ar === "السطر الأول" ? "titleLine1_en" : ar === "السطر الثاني" ? "titleLine2_en" : ar === "نص الزر الأساسي" ? "ctaPrimary_en" : "ctaSecondary_en", e.target.value)}
-                    placeholder={`Enter ${en} in English`} />
-            </div>
-        </div>
-    );
+        );
+    };
 
     const handleUpload = async (file: File) => {
         setUploading(true);
@@ -426,203 +424,219 @@ function SlideCard({
 
     return (
         <div className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
-            open ? "border-green-200 shadow-md" : "border-slate-200 hover:border-slate-300"
+            open ? "border-green-300 shadow-[0_8px_30px_rgb(0,0,0,0.04)]" : "border-slate-200 hover:border-green-400"
         }`}>
             {/* ── Card Header ── */}
             <div
-                className={`flex items-center gap-3 px-4 py-3 cursor-pointer ${
-                    open ? "bg-green-50" : "bg-slate-50 hover:bg-slate-100"
+                className={`flex items-center gap-4 px-5 py-4 cursor-pointer transition-colors ${
+                    open ? "bg-green-50/50" : "bg-white hover:bg-slate-50"
                 }`}
                 onClick={() => setOpen(!open)}
             >
-                {/* Drag handle */}
-                <GripVertical className="w-4 h-4 text-slate-300 flex-shrink-0" />
-
-                {/* Number badge */}
-                <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black flex-shrink-0 ${
-                    open ? "bg-green-600 text-white" : "bg-slate-200 text-slate-500"
-                }`}>{index + 1}</span>
+                {/* Number badge & Drag handle */}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                    <GripVertical className="w-5 h-5 text-slate-300 hover:text-slate-500 cursor-grab" />
+                    <span className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black shadow-sm ${
+                        open ? "bg-green-600 text-white" : "bg-slate-100 text-slate-500 border border-slate-200"
+                    }`}>{index + 1}</span>
+                </div>
 
                 {/* Thumbnail */}
                 {slide.image && (
-                    <img src={slide.image} alt="" className="w-10 h-7 rounded object-cover border border-slate-200 flex-shrink-0" />
+                    <img src={slide.image} alt="" className="w-12 h-8 rounded-md object-cover border border-slate-200 shadow-sm flex-shrink-0" />
                 )}
 
                 {/* Title */}
                 <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-slate-700 truncate">{tabName}</p>
-                    <p className="text-[10px] text-slate-400 truncate">{previewTitle}</p>
+                    <p className="text-sm font-bold text-slate-800 truncate">{tabName}</p>
+                    <p className="text-[11px] text-slate-500 truncate mt-0.5">{previewTitle}</p>
                 </div>
 
-                {/* Actions */}
-                <div className="flex items-center gap-1 flex-shrink-0" onClick={e => e.stopPropagation()}>
+                {/* Actions (Hover) */}
+                <div className="flex items-center gap-1.5 flex-shrink-0" onClick={e => e.stopPropagation()}>
                     {index > 0 && (
                         <button type="button" onClick={onMoveUp}
-                            className="p-1.5 rounded-lg hover:bg-white text-slate-400 hover:text-green-600 transition-colors" title="نقل لأعلى">
+                            className="p-2 rounded-lg hover:bg-white text-slate-400 hover:text-green-600 border border-transparent hover:border-slate-200 transition-all shadow-sm" title="نقل لأعلى">
                             <ChevronUp className="w-4 h-4" />
                         </button>
                     )}
                     {index < total - 1 && (
                         <button type="button" onClick={onMoveDown}
-                            className="p-1.5 rounded-lg hover:bg-white text-slate-400 hover:text-green-600 transition-colors" title="نقل لأسفل">
+                            className="p-2 rounded-lg hover:bg-white text-slate-400 hover:text-green-600 border border-transparent hover:border-slate-200 transition-all shadow-sm" title="نقل لأسفل">
                             <ChevronDown className="w-4 h-4" />
                         </button>
                     )}
                     <button type="button" onClick={onRemove}
-                        className="p-1.5 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500 transition-colors" title="حذف">
+                        className="p-2 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 border border-transparent hover:border-rose-100 transition-all shadow-sm ml-2" title="حذف الشريحة">
                         <Trash2 className="w-4 h-4" />
                     </button>
+                    
+                    <div className="w-px h-6 bg-slate-200 mx-1"></div>
+                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform flex-shrink-0 ml-1 ${
+                        open ? "rotate-180 text-green-600" : ""
+                    }`} />
                 </div>
-
-                <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform flex-shrink-0 ${
-                    open ? "rotate-180" : ""
-                }`} />
             </div>
 
             {/* ── Card Body ── */}
             {open && (
-                <div className="bg-white">
-                    {/* Inner Tab Bar */}
-                    <div className="flex border-b border-slate-100 bg-slate-50/50">
-                        {SLIDE_TABS.map(t => {
-                            const Icon = t.icon;
-                            const active = tab === t.id;
-                            return (
-                                <button key={t.id} type="button" onClick={() => setTab(t.id)}
-                                    className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold border-b-2 transition-all ${
-                                        active
-                                            ? "border-green-500 text-green-700 bg-white"
-                                            : "border-transparent text-slate-400 hover:text-slate-600"
+                <div className="bg-slate-50/50 p-6 border-t border-slate-100">
+                    
+                    {/* Language Switcher & Tabs Header */}
+                    <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 border-b border-slate-200 pb-4">
+                        
+                        {/* Segmented Control Tabs */}
+                        <div className="flex p-1 bg-slate-200/60 rounded-xl max-w-fit shadow-inner">
+                            {SLIDE_TABS.map(t => {
+                                const Icon = t.icon;
+                                const active = tab === t.id;
+                                return (
+                                    <button key={t.id} type="button" onClick={() => setTab(t.id)}
+                                        className={`flex items-center gap-2 px-5 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${
+                                            active
+                                                ? "bg-white text-slate-800 shadow-sm"
+                                                : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"
+                                        }`}>
+                                        <Icon className="w-4 h-4" />{t.label}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Language Switcher */}
+                        {(tab === "content" || tab === "buttons") && (
+                            <div className="flex p-1 bg-white border border-slate-200 rounded-xl shadow-sm">
+                                <button type="button" onClick={() => setLang("ar")}
+                                    className={`flex items-center gap-2 px-6 py-2 text-xs font-bold rounded-lg transition-all ${
+                                        lang === "ar" ? "bg-green-50 text-green-700" : "text-slate-500 hover:bg-slate-50"
                                     }`}>
-                                    <Icon className="w-3.5 h-3.5" />{t.label}
-                                    {active && <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />}
+                                    <span>🇪🇬</span> العربية
                                 </button>
-                            );
-                        })}
+                                <button type="button" onClick={() => setLang("en")}
+                                    className={`flex items-center gap-2 px-6 py-2 text-xs font-bold rounded-lg transition-all ${
+                                        lang === "en" ? "bg-blue-50 text-blue-700" : "text-slate-500 hover:bg-slate-50"
+                                    }`}>
+                                    <span>🇬🇧</span> English
+                                </button>
+                            </div>
+                        )}
                     </div>
 
-                    <div className="p-4 space-y-4">
+                    <div className="max-w-4xl mx-auto space-y-6">
                         {/* ── CONTENT TAB ── */}
                         {tab === "content" && (
                             <>
-                                {/* Tab Name */}
-                                <div>
-                                    <p className="text-xs font-bold text-slate-500 mb-2">📌 اسم التبويب (يظهر أسفل الهيرو)</p>
-                                    {label("اسم التبويب", "Tab Name")}
+                                {/* Row 1: Tab & Badge */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-5 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                                    {labelField("اسم التبويب (يظهر أسفل الهيرو)", "Tab Name (Below Hero)", "tabName_ar", "tabName_en")}
+                                    {labelField("الشارة الصغيرة (أعلى اليسار)", "Small Badge (Top Left)", "badge_ar", "badge_en")}
                                 </div>
-                                {/* Badge */}
-                                <div>
-                                    <p className="text-xs font-bold text-slate-500 mb-2">🏷 الشارة الصغيرة (أعلى اليسار)</p>
-                                    {label("الشارة", "Badge")}
-                                </div>
-                                {/* Title Lines */}
-                                <div className="rounded-xl border border-slate-100 p-3 space-y-3 bg-slate-50/50">
-                                    <p className="text-xs font-bold text-slate-500">📝 العنوان الرئيسي (H1) — سطرين</p>
-                                    <div>
-                                        <p className="text-[10px] text-slate-400 mb-1">السطر الأول — باللون العادي</p>
-                                        {label("السطر الأول", "Title Line 1")}
+
+                                {/* Row 2: Title Lines */}
+                                <div className="p-5 bg-white rounded-2xl border border-slate-100 shadow-sm space-y-5">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-1 h-4 bg-green-500 rounded-full"></div>
+                                        <p className="text-sm font-black text-slate-800">العنوان الرئيسي (H1)</p>
                                     </div>
-                                    <div>
-                                        <p className="text-[10px] text-slate-400 mb-1">السطر الثاني — باللون المميز (أخضر)</p>
-                                        {label("السطر الثاني", "Title Line 2")}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                        {labelField("السطر الأول (اللون العادي)", "First Line (Normal Color)", "titleLine1_ar", "titleLine1_en")}
+                                        {labelField("السطر الثاني (اللون المميز)", "Second Line (Accent Color)", "titleLine2_ar", "titleLine2_en")}
                                     </div>
                                 </div>
-                                {/* Subtitle */}
-                                <div>
-                                    <p className="text-xs font-bold text-slate-500 mb-2">💬 النص التوضيحي</p>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <p className="text-[10px] font-bold text-slate-400 mb-1">عربي</p>
-                                            <textarea className={`${inputCls} resize-none`} rows={3} dir="rtl"
-                                                value={slide.subtitle_ar || slide.subtitle || ""}
-                                                onChange={e => onChange("subtitle_ar", e.target.value)} />
-                                        </div>
-                                        <div>
-                                            <p className="text-[10px] font-bold text-slate-400 mb-1">English</p>
-                                            <textarea className={`${inputCls} resize-none text-left`} rows={3} dir="ltr"
-                                                value={slide.subtitle_en || ""}
-                                                onChange={e => onChange("subtitle_en", e.target.value)} />
-                                        </div>
-                                    </div>
+
+                                {/* Row 3: Subtitle */}
+                                <div className="p-5 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                                    <p className="text-xs font-bold text-slate-500 mb-2">{lang === "ar" ? "النص التوضيحي (الوصف الطويل)" : "Subtitle (Long Description)"}</p>
+                                    <textarea className={`${inputCls} resize-none min-h-[120px]`} dir={lang === "ar" ? "rtl" : "ltr"}
+                                        value={slide[lang === "ar" ? "subtitle_ar" : "subtitle_en"] || ""}
+                                        onChange={e => onChange(lang === "ar" ? "subtitle_ar" : "subtitle_en", e.target.value)} 
+                                        placeholder={lang === "ar" ? "اكتب تفاصيل الشريحة هنا..." : "Write slide details here..."}
+                                    />
                                 </div>
                             </>
                         )}
 
                         {/* ── BUTTONS TAB ── */}
                         {tab === "buttons" && (
-                            <>
-                                <div className="rounded-xl border border-green-100 bg-green-50/30 p-3 space-y-3">
-                                    <p className="text-xs font-bold text-green-700">⭐ الزر الأساسي (Primary)</p>
-                                    {label("نص الزر الأساسي", "Primary Button")}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Primary Button */}
+                                <div className="p-5 bg-white rounded-2xl border-2 border-green-100 shadow-sm space-y-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="p-1.5 bg-green-100 rounded-lg text-green-600"><Star className="w-4 h-4" /></div>
+                                        <p className="text-sm font-black text-slate-800">الزر الأساسي (Primary CTA)</p>
+                                    </div>
+                                    {labelField("نص الزر", "Button Text", "ctaPrimary_ar", "ctaPrimary_en")}
                                     <div>
-                                        <p className="text-[10px] font-bold text-slate-400 mb-1">🔗 رابط الزر الأساسي</p>
+                                        <p className="text-xs font-bold text-slate-500 mb-1.5">🔗 رابط الزر (URL)</p>
                                         <input className={`${inputCls} text-left font-mono text-xs`} dir="ltr"
                                             type="text" placeholder="/products"
                                             value={slide.ctaPrimaryLink || ""}
                                             onChange={e => onChange("ctaPrimaryLink", e.target.value)} />
                                     </div>
                                 </div>
-                                <div className="rounded-xl border border-slate-100 bg-slate-50/30 p-3 space-y-3">
-                                    <p className="text-xs font-bold text-slate-600">💠 الزر الثانوي (Secondary)</p>
-                                    {label("نص الزر الثانوي", "Secondary Button")}
+
+                                {/* Secondary Button */}
+                                <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="p-1.5 bg-slate-100 rounded-lg text-slate-500"><Link2 className="w-4 h-4" /></div>
+                                        <p className="text-sm font-black text-slate-800">الزر الثانوي (Secondary CTA)</p>
+                                    </div>
+                                    {labelField("نص الزر", "Button Text", "ctaSecondary_ar", "ctaSecondary_en")}
                                     <div>
-                                        <p className="text-[10px] font-bold text-slate-400 mb-1">🔗 رابط الزر الثانوي</p>
+                                        <p className="text-xs font-bold text-slate-500 mb-1.5">🔗 رابط الزر (URL)</p>
                                         <input className={`${inputCls} text-left font-mono text-xs`} dir="ltr"
                                             type="text" placeholder="/contact"
                                             value={slide.ctaSecondaryLink || ""}
                                             onChange={e => onChange("ctaSecondaryLink", e.target.value)} />
                                     </div>
                                 </div>
-                            </>
+                            </div>
                         )}
 
                         {/* ── IMAGE TAB ── */}
                         {tab === "image" && (
-                            <>
+                            <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
                                 {slide.image && (
-                                    <div className="relative rounded-xl overflow-hidden border border-slate-200 group">
-                                        <img src={slide.image} alt="" className="w-full h-36 object-cover" />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <div className="relative rounded-2xl overflow-hidden border-2 border-green-100 group mb-6">
+                                        <img src={slide.image} alt="" className="w-full h-64 object-cover" />
+                                        <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-sm">
                                             <button type="button"
                                                 onClick={() => fileRef.current?.click()}
-                                                className="px-3 py-1.5 bg-white text-slate-700 rounded-lg text-xs font-bold shadow">
+                                                className="px-5 py-2.5 bg-white text-slate-800 rounded-xl text-sm font-bold shadow-lg hover:scale-105 transition-transform">
                                                 تغيير الصورة
                                             </button>
                                             <button type="button"
                                                 onClick={() => onChange("image", "")}
-                                                className="p-1.5 bg-red-500 text-white rounded-lg shadow">
-                                                <X className="w-4 h-4" />
+                                                className="p-2.5 bg-rose-500 text-white rounded-xl shadow-lg hover:bg-rose-600 hover:scale-105 transition-transform" title="إزالة الصورة">
+                                                <X className="w-5 h-5" />
                                             </button>
                                         </div>
                                     </div>
                                 )}
                                 <input ref={fileRef} type="file" accept="image/*" className="hidden"
                                     onChange={async e => { const f = e.target.files?.[0]; if (f) { await handleUpload(f); e.target.value = ""; } }} />
+                                
                                 {!slide.image && (
                                     <div
                                         onClick={() => fileRef.current?.click()}
-                                        className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center cursor-pointer hover:border-green-300 hover:bg-green-50/30 transition-all">
+                                        className="border-2 border-dashed border-slate-300 rounded-2xl p-12 text-center cursor-pointer hover:border-green-400 hover:bg-green-50/50 transition-all mb-6 group">
                                         {uploading
-                                            ? <Loader2 className="w-8 h-8 text-green-500 animate-spin mx-auto mb-2" />
-                                            : <ImageIcon className="w-8 h-8 text-slate-300 mx-auto mb-2" />}
-                                        <p className="text-xs font-bold text-slate-400">
-                                            {uploading ? "جاري رفع الصورة..." : "اضغط لرفع صورة الخلفية"}
+                                            ? <Loader2 className="w-12 h-12 text-green-500 animate-spin mx-auto mb-4" />
+                                            : <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:bg-green-100 transition-all"><ImageIcon className="w-8 h-8 text-slate-400 group-hover:text-green-600" /></div>}
+                                        <p className="text-sm font-bold text-slate-700 mb-1">
+                                            {uploading ? "جاري الرفع..." : "اضغط هنا لرفع صورة الخلفية"}
                                         </p>
+                                        <p className="text-xs text-slate-400">يدعم PNG, JPG, WebP بمقاس 1920x1080</p>
                                     </div>
                                 )}
                                 <div>
-                                    <p className="text-[10px] font-bold text-slate-400 mb-1">أو أدخل رابط الصورة مباشرةً</p>
-                                    <input className={`${inputCls} font-mono text-xs text-left`} dir="ltr"
-                                        type="text" placeholder="/images/hero-bg.png"
+                                    <p className="text-xs font-bold text-slate-500 mb-2">أو أدخل رابط الصورة (URL) مباشرةً</p>
+                                    <input className={`${inputCls} font-mono text-xs text-left bg-slate-50`} dir="ltr"
+                                        type="text" placeholder="https://example.com/image.jpg"
                                         value={slide.image || ""}
                                         onChange={e => onChange("image", e.target.value)} />
                                 </div>
-                                {uploading && (
-                                    <div className="flex items-center gap-2 text-xs text-green-600 font-bold">
-                                        <Loader2 className="w-4 h-4 animate-spin" /> جاري رفع الصورة...
-                                    </div>
-                                )}
-                            </>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -778,64 +792,35 @@ function BilingualField({
     placeholder?: string;
     placeholderEn?: string;
 }) {
+    const [lang, setLang] = useState<"ar" | "en">("ar");
     const inputCls = "w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all text-sm font-medium placeholder:text-slate-300";
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Arabic */}
-            <div>
-                <label className="flex items-center gap-1.5 text-xs font-bold text-slate-500 mb-2">
-                    {labelAr}
+        <div className="space-y-3">
+            <div className="flex items-center justify-between">
+                <label className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
+                    {lang === "ar" ? labelAr : labelEn}
                     {required && <span className="text-red-400">*</span>}
-                    <span className="mr-auto px-1.5 py-0.5 bg-green-50 text-green-600 text-[9px] font-bold rounded">عربي</span>
                 </label>
-                {type === "textarea" ? (
-                    <textarea
-                        value={valueAr}
-                        onChange={(e) => onChangeAr(e.target.value)}
-                        rows={3}
-                        className={`${inputCls} resize-none`}
-                        placeholder={placeholder}
-                        dir="rtl"
-                    />
-                ) : (
-                    <input
-                        type="text"
-                        value={valueAr}
-                        onChange={(e) => onChangeAr(e.target.value)}
-                        className={inputCls}
-                        placeholder={placeholder}
-                        dir={type === "url" ? "ltr" : "rtl"}
-                    />
-                )}
+                <div className="flex bg-slate-100 p-1 rounded-lg">
+                    <button type="button" onClick={() => setLang("ar")} className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${lang === "ar" ? "bg-white text-green-700 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>🇪🇬 العربية</button>
+                    <button type="button" onClick={() => setLang("en")} className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${lang === "en" ? "bg-white text-blue-700 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>🇬🇧 English</button>
+                </div>
             </div>
-            {/* English */}
-            <div>
-                <label className="flex items-center gap-1.5 text-xs font-bold text-slate-500 mb-2">
-                    {labelEn}
-                    {required && <span className="text-red-400">*</span>}
-                    <span className="mr-auto px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[9px] font-bold rounded">EN</span>
-                </label>
-                {type === "textarea" ? (
-                    <textarea
-                        value={valueEn}
-                        onChange={(e) => onChangeEn(e.target.value)}
-                        rows={3}
-                        className={`${inputCls} resize-none text-left`}
-                        placeholder={placeholderEn || placeholder}
-                        dir="ltr"
-                    />
+
+            {lang === "ar" ? (
+                type === "textarea" ? (
+                    <textarea value={valueAr} onChange={(e) => onChangeAr(e.target.value)} rows={3} className={`${inputCls} resize-none`} placeholder={placeholder} dir="rtl" />
                 ) : (
-                    <input
-                        type="text"
-                        value={valueEn}
-                        onChange={(e) => onChangeEn(e.target.value)}
-                        className={`${inputCls} text-left`}
-                        placeholder={placeholderEn || placeholder}
-                        dir="ltr"
-                    />
-                )}
-            </div>
+                    <input type={type === "url" ? "url" : "text"} value={valueAr} onChange={(e) => onChangeAr(e.target.value)} className={inputCls} placeholder={placeholder} dir={type === "url" ? "ltr" : "rtl"} />
+                )
+            ) : (
+                type === "textarea" ? (
+                    <textarea value={valueEn} onChange={(e) => onChangeEn(e.target.value)} rows={3} className={`${inputCls} resize-none text-left`} placeholder={placeholderEn || placeholder} dir="ltr" />
+                ) : (
+                    <input type={type === "url" ? "url" : "text"} value={valueEn} onChange={(e) => onChangeEn(e.target.value)} className={`${inputCls} text-left`} placeholder={placeholderEn || placeholder} dir="ltr" />
+                )
+            )}
         </div>
     );
 }
@@ -1114,17 +1099,19 @@ function ImageUploadField({
 
             {/* Preview */}
             {isImage && !isPdf && (
-                <div className="relative mb-2 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 group">
-                    <img
-                        src={value}
-                        alt="preview"
-                        className="w-full h-32 object-cover"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                    />
+                <div className="relative mb-4 w-full h-56 rounded-2xl overflow-hidden border-2 border-slate-200 bg-white shadow-sm group">
+                    <div className="absolute inset-0 bg-[url('https://transparenttextures.com/patterns/cubes.png')] bg-slate-50 flex items-center justify-center p-4">
+                        <img
+                            src={value}
+                            alt="preview"
+                            className="max-w-full max-h-full object-contain drop-shadow-md"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        />
+                    </div>
                     <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); onChange(""); }}
-                        className="absolute top-2 left-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                        className="absolute top-3 left-3 p-2 bg-red-500/90 text-white rounded-xl opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600 hover:scale-105 active:scale-95"
                         title="حذف الصورة"
                     >
                         <X className="w-5 h-5" />
@@ -1212,6 +1199,8 @@ function ListEditor({
     onAdd,
     onRemove,
     onMove,
+    itemLabel,
+    itemImage,
     children,
     addLabel = "إضافة عنصر جديد",
 }: {
@@ -1219,44 +1208,77 @@ function ListEditor({
     onAdd: () => void;
     onRemove: (index: number) => void;
     onMove: (from: number, to: number) => void;
+    itemLabel?: (item: any, index: number) => string;
+    itemImage?: (item: any, index: number) => string | undefined;
     children: (item: any, index: number) => React.ReactNode;
     addLabel?: string;
 }) {
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+
     return (
         <div className="space-y-3">
-            {items.map((item, idx) => (
-                <div key={idx} className="relative bg-slate-50/50 rounded-xl border border-slate-100 p-4 group">
-                    {/* Item header bar */}
-                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
-                        <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5">
-                            <span className="w-5 h-5 rounded bg-slate-200 text-slate-500 flex items-center justify-center text-[10px] font-black">
+            {items.map((item, idx) => {
+                const isOpen = openIndex === idx;
+                return (
+                <div key={idx} className={`relative bg-white rounded-2xl border transition-all duration-300 group ${isOpen ? "border-green-200 shadow-md ring-4 ring-green-50/50" : "border-slate-200 hover:border-slate-300 shadow-sm"}`}>
+                    
+                    {/* Collapsed Header Bar */}
+                    <div 
+                        onClick={() => setOpenIndex(isOpen ? null : idx)}
+                        className={`flex items-center justify-between p-3 cursor-pointer transition-colors ${isOpen ? "bg-slate-50/50 border-b border-slate-100" : ""}`}
+                    >
+                        <div className="flex items-center gap-3 min-w-0">
+                            <span className="shrink-0 w-6 h-6 rounded-md bg-slate-100 text-slate-500 flex items-center justify-center text-[10px] font-black">
                                 {idx + 1}
                             </span>
-                            عنصر {idx + 1}
-                        </span>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {idx > 0 && (
-                                <button type="button" onClick={() => onMove(idx, idx - 1)} className="p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors" title="نقل لأعلى">
-                                    <ChevronUp className="w-5 h-5" />
-                                </button>
+                            {itemImage?.(item, idx) && (
+                                <img src={itemImage(item, idx)!} alt="" className="w-8 h-8 rounded border border-slate-200 object-contain bg-white shrink-0" />
                             )}
-                            {idx < items.length - 1 && (
-                                <button type="button" onClick={() => onMove(idx, idx + 1)} className="p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors" title="نقل لأسفل">
+                            <span className="text-sm font-bold text-slate-700 truncate">
+                                {itemLabel ? itemLabel(item, idx) : `عنصر ${idx + 1}`}
+                            </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-1">
+                            {/* Controls */}
+                            <div className={`flex items-center gap-1 transition-opacity ${isOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+                                {idx > 0 && (
+                                    <button type="button" onClick={(e) => { e.stopPropagation(); onMove(idx, idx - 1); }} className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors" title="نقل لأعلى">
+                                        <ChevronUp className="w-4 h-4" />
+                                    </button>
+                                )}
+                                {idx < items.length - 1 && (
+                                    <button type="button" onClick={(e) => { e.stopPropagation(); onMove(idx, idx + 1); }} className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors" title="نقل لأسفل">
+                                        <ChevronDown className="w-4 h-4" />
+                                    </button>
+                                )}
+                                <button type="button" onClick={(e) => { e.stopPropagation(); onRemove(idx); }} className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors" title="حذف">
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <div className="ml-2 pl-2 border-l border-slate-200">
+                                <button type="button" className={`p-1 text-slate-400 transition-transform duration-300 ${isOpen ? "rotate-180 text-green-600" : ""}`}>
                                     <ChevronDown className="w-5 h-5" />
                                 </button>
-                            )}
-                            <button type="button" onClick={() => onRemove(idx)} className="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors" title="حذف">
-                                <Trash2 className="w-5 h-5" />
-                            </button>
+                            </div>
                         </div>
                     </div>
-                    {children(item, idx)}
+                    
+                    {/* Expanded Content */}
+                    {isOpen && (
+                        <div className="p-5 bg-slate-50/30 rounded-b-2xl">
+                            {children(item, idx)}
+                        </div>
+                    )}
                 </div>
-            ))}
+            )})}
             <button
                 type="button"
-                onClick={onAdd}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-sm font-bold hover:border-green-300 hover:text-green-600 hover:bg-green-50/50 transition-all"
+                onClick={() => {
+                    onAdd();
+                    setOpenIndex(items.length); // Open the newly added item
+                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-sm font-bold hover:border-green-300 hover:text-green-600 hover:bg-green-50/50 transition-all"
             >
                 <Plus className="w-5 h-5" />
                 {addLabel}
@@ -1322,10 +1344,24 @@ function FieldRenderer({
                     onAdd={handleAdd}
                     onRemove={handleRemove}
                     onMove={handleMove}
+                    itemLabel={(item, idx) => {
+                        const titleField = field.listFields?.find(f => f.key === "title" || f.key === "name" || f.key === "label" || f.key.includes("title") || f.key.includes("name"));
+                        if (titleField) {
+                            return item[titleField.key + "_ar"] || item[titleField.key] || item[titleField.key + "_en"] || `عنصر ${idx + 1}`;
+                        }
+                        const firstTxt = field.listFields?.find(f => f.type === "text");
+                        if (firstTxt) return item[firstTxt.key + "_ar"] || item[firstTxt.key] || `عنصر ${idx + 1}`;
+                        return `عنصر ${idx + 1}`;
+                    }}
+                    itemImage={(item) => {
+                        const imgField = field.listFields?.find(f => f.type === "url" || f.key.includes("image") || f.key.includes("icon") || f.key.includes("logo"));
+                        if (imgField) return item[imgField.key];
+                        return undefined;
+                    }}
                     addLabel={`إضافة ${field.labelAr}`}
                 >
                     {(item, idx) => (
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                             {field.listFields!.map((lf) => {
                                 if (lf.bilingual) {
                                     return (
@@ -1598,110 +1634,161 @@ export function VisualPageEditor({
     };
 
     const scrollToSection = (id: string) => {
-        sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "start" });
-        setActiveSection(id);
+        const el = sectionRefs.current[id];
+        if (el) {
+            const y = el.getBoundingClientRect().top + window.scrollY - 100; // Offset for top bar
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        }
     };
+
+    // ScrollSpy Effect
+    useEffect(() => {
+        if (advancedMode) return;
+        const observer = new IntersectionObserver((entries) => {
+            const visible = entries.find(entry => entry.isIntersecting);
+            if (visible) {
+                setActiveSection(visible.target.id);
+            }
+        }, { rootMargin: "-30% 0px -60% 0px" });
+
+        const refs = Object.values(sectionRefs.current);
+        refs.forEach(ref => { if (ref) observer.observe(ref); });
+
+        return () => observer.disconnect();
+    }, [sections, advancedMode]);
 
     const pageHref = slug === "home" ? "/" : `/${slug}`;
 
     return (
-        <form onSubmit={handleSubmit} className="relative">
-            {/* ── Two-pane layout ── */}
-            <div className={`flex gap-4 ${showPreview ? "flex-row" : "flex-col"}`}>
+        <form onSubmit={handleSubmit} className="relative pb-32">
+            
+            {/* ── Top Control Bar ── */}
+            <div className="flex flex-wrap items-center justify-between gap-4 bg-white/90 backdrop-blur-md px-6 py-4 sticky top-0 z-40 border-b border-gray-200 shadow-sm mb-8">
+                <div className="flex items-center gap-2">
+                    <Link href="/admin/pages" className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 text-sm font-bold transition-colors">
+                        <ArrowRight className="w-4 h-4" /> الصفحات
+                    </Link>
+                    <ChevronRight className="w-4 h-4 text-slate-300" />
+                    <span className="text-sm font-black text-slate-800">{pageNameAr}</span>
+                </div>
 
-                {/* ── LEFT: Editor pane ── */}
-                <div className={`space-y-4 ${showPreview ? "w-1/2 overflow-y-auto max-h-screen" : "w-full"}`}>
-
-                    {/* ── Top bar ── */}
-                    <div className="flex flex-wrap items-center gap-2 bg-white px-4 py-3 rounded-xl border border-gray-100 shadow-sm">
-                        <Link href="/admin/pages" className="flex items-center gap-1 text-slate-400 hover:text-slate-600 text-sm font-bold transition-colors">
-                            <ArrowRight className="w-4 h-4" /> الصفحات
-                        </Link>
-                        <ChevronRight className="w-3 h-3 text-slate-300" />
-                        <span className="text-sm font-bold text-slate-700">{pageNameAr}</span>
-
-                        <div className="mr-auto flex items-center gap-2">
-                            {/* History */}
-                            <div className="relative">
-                                <button type="button" onClick={() => setShowHistory(v => !v)}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 text-xs font-bold transition-colors">
-                                    <History className="w-4 h-4" />
-                                    السجل ({localHistory.length})
-                                </button>
-                                {showHistory && localHistory.length > 0 && (
-                                    <div className="absolute left-0 top-full mt-1 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
-                                        <p className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase border-b border-gray-100">آخر {localHistory.length} نسخ محفوظة</p>
-                                        {localHistory.map((h, i) => (
-                                            <button key={i} type="button" onClick={() => restoreHistory(h.data)}
-                                                className="w-full flex items-center gap-2 px-3 py-2 hover:bg-green-50 text-right transition-colors">
-                                                <RotateCcw className="w-3 h-3 text-slate-400 flex-shrink-0" />
-                                                <span className="text-xs text-slate-600 truncate">{h.label}</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
+                <div className="flex items-center gap-3">
+                    {/* History */}
+                    <div className="relative">
+                        <button type="button" onClick={() => setShowHistory(v => !v)}
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 text-xs font-bold transition-all shadow-sm">
+                            <History className="w-4 h-4" />
+                            السجل ({localHistory.length})
+                        </button>
+                        {showHistory && localHistory.length > 0 && (
+                            <div className="absolute left-0 top-full mt-2 w-72 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 overflow-hidden">
+                                <p className="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase border-b border-gray-100 bg-slate-50/50">آخر {localHistory.length} نسخ محفوظة</p>
+                                <div className="max-h-64 overflow-y-auto">
+                                    {localHistory.map((h, i) => (
+                                        <button key={i} type="button" onClick={() => restoreHistory(h.data)}
+                                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-right transition-colors border-b border-slate-50 last:border-0 group">
+                                            <div className="p-1.5 bg-slate-100 text-slate-400 rounded-lg group-hover:bg-green-100 group-hover:text-green-600 transition-colors">
+                                                <RotateCcw className="w-3.5 h-3.5" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs font-bold text-slate-700 truncate">{h.label}</p>
+                                                <p className="text-[10px] text-slate-400 truncate mt-0.5">اضغط للاستعادة</p>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-
-                            {/* Preview toggle */}
-                            <button type="button" onClick={() => setShowPreview(v => !v)}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${showPreview ? "bg-green-600 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
-                                <PanelRight className="w-4 h-4" />
-                                {showPreview ? "إخفاء المعاينة" : "معاينة مباشرة"}
-                            </button>
-
-                            {/* Advanced mode */}
-                            <button type="button" onClick={advancedMode ? switchToVisual : switchToAdvanced}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${advancedMode ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
-                                {advancedMode ? <><Eye className="w-4 h-4" /> مرئي</> : <><Code2 className="w-4 h-4" /> JSON</>}
-                            </button>
-                        </div>
+                        )}
                     </div>
 
-                    {/* ── Toast messages ── */}
+                    {/* Preview toggle */}
+                    <button type="button" onClick={() => setShowPreview(v => !v)}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm border ${showPreview ? "bg-green-600 text-white border-green-600 shadow-green-600/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}>
+                        <PanelRight className="w-4 h-4" />
+                        {showPreview ? "إخفاء المعاينة" : "معاينة الصفحة"}
+                    </button>
+
+                    {/* Advanced mode */}
+                    <button type="button" onClick={advancedMode ? switchToVisual : switchToAdvanced}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm border ${advancedMode ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}>
+                        {advancedMode ? <><Eye className="w-4 h-4" /> الوضع المرئي</> : <><Code2 className="w-4 h-4" /> وضع المطور (JSON)</>}
+                    </button>
+                </div>
+            </div>
+
+            {/* ── Main Layout Wrapper ── */}
+            <div className="flex gap-8 max-w-[1800px] mx-auto px-6">
+                
+                {/* ── 1. Sticky Navigation Sidebar (Only show if not advanced/preview mode) ── */}
+                {!advancedMode && !showPreview && (
+                    <aside className="hidden lg:block w-72 shrink-0 relative">
+                        <div className="sticky top-28 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div className="bg-slate-50/80 border-b border-slate-100 px-5 py-4 flex items-center gap-2">
+                                <LayoutTemplate className="w-4 h-4 text-slate-400" />
+                                <div>
+                                    <h3 className="font-black text-slate-800 text-sm">أقسام الصفحة</h3>
+                                    <p className="text-[10px] text-slate-500 mt-0.5">انقر للوصول السريع ({sections.length} أقسام)</p>
+                                </div>
+                            </div>
+                            <nav className="p-3 max-h-[calc(100vh-220px)] overflow-y-auto space-y-1 custom-scrollbar">
+                                {sections.map(s => (
+                                    <button key={s.id} type="button" onClick={() => scrollToSection(s.id)}
+                                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-right group ${
+                                            activeSection === s.id 
+                                                ? "bg-green-50 text-green-700 shadow-sm border border-green-200/50" 
+                                                : "text-slate-600 hover:bg-slate-50 border border-transparent hover:border-slate-100"
+                                        }`}>
+                                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-base shadow-sm transition-colors ${
+                                            activeSection === s.id ? "bg-white" : "bg-slate-100 group-hover:bg-white"
+                                        }`}>{s.emoji}</span>
+                                        <span className="truncate flex-1">{s.title.split("(")[0].trim()}</span>
+                                        {activeSection === s.id && <ChevronRight className="w-4 h-4 text-green-500 rotate-180" />}
+                                    </button>
+                                ))}
+                            </nav>
+                        </div>
+                    </aside>
+                )}
+
+                {/* ── 2. Editor Pane ── */}
+                <main className={`flex-1 min-w-0 transition-all duration-300 ${showPreview ? "w-1/2" : "w-full"}`}>
+                    
+                    {/* Toast messages */}
                     {error && (
-                        <div className="flex items-center gap-2 p-3 bg-red-50 text-red-600 rounded-xl font-bold text-sm border border-red-100">
+                        <div className="flex items-center gap-3 p-4 bg-rose-50 text-rose-700 rounded-2xl font-bold text-sm border border-rose-100 shadow-sm mb-6">
                             <AlertCircle className="w-5 h-5 flex-shrink-0" /> {error}
-                            <button type="button" onClick={() => setError("")} className="mr-auto"><X className="w-4 h-4" /></button>
+                            <button type="button" onClick={() => setError("")} className="mr-auto p-1 hover:bg-rose-100 rounded-lg transition-colors"><X className="w-4 h-4" /></button>
                         </div>
                     )}
                     {success && (
-                        <div className="flex items-center gap-2 p-3 bg-green-50 text-green-700 rounded-xl font-bold text-sm border border-green-100">
-                            <CheckCircle2 className="w-5 h-5" /> تم حفظ المحتوى بنجاح ✅
+                        <div className="flex items-center gap-3 p-4 bg-green-50 text-green-800 rounded-2xl font-bold text-sm border border-green-200 shadow-sm mb-6">
+                            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600"><CheckCircle2 className="w-5 h-5" /></div>
+                            تم حفظ التعديلات ونشرها بنجاح! 🎉
                         </div>
                     )}
 
-                    {/* ── Quick section jump ── */}
-                    {!advancedMode && sections.length > 3 && (
-                        <div className="flex flex-wrap gap-2 bg-white px-4 py-3 rounded-xl border border-gray-100">
-                            <span className="text-xs font-bold text-slate-400 self-center">انتقل إلى:</span>
-                            {sections.map(s => (
-                                <button key={s.id} type="button" onClick={() => scrollToSection(s.id)}
-                                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all ${activeSection === s.id ? "bg-green-600 text-white border-green-600" : "bg-slate-50 text-slate-500 border-slate-200 hover:border-green-400 hover:text-green-700"}`}>
-                                    <span>{s.emoji}</span> {s.title.split("(")[0].trim()}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* ── Content area ── */}
+                    {/* Content area */}
                     {advancedMode ? (
-                        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-                            <div className="px-6 py-4 border-b border-gray-50 bg-amber-50/30 flex items-center gap-2">
-                                <Code2 className="w-5 h-5 text-amber-600" />
-                                <span className="text-sm font-bold text-amber-800">الوضع المتقدم — تعديل JSON مباشر</span>
+                        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                            <div className="px-6 py-4 border-b border-gray-100 bg-amber-50/30 flex items-center gap-3">
+                                <div className="p-2 bg-amber-100 text-amber-600 rounded-lg"><Code2 className="w-5 h-5" /></div>
+                                <div>
+                                    <span className="block text-sm font-black text-amber-900">الوضع المتقدم (Advanced JSON)</span>
+                                    <span className="block text-[11px] text-amber-700 mt-0.5">تعديل بنية البيانات مباشرة. كن حذراً، الأخطاء قد تكسر الصفحة.</span>
+                                </div>
                             </div>
-                            <div className="p-4">
+                            <div className="p-4 bg-slate-950">
                                 <textarea value={rawJson} onChange={(e) => { setRawJson(e.target.value); setIsDirty(true); }}
-                                    rows={28} dir="ltr"
-                                    className="w-full px-4 py-3 bg-slate-900 text-green-400 border border-slate-700 rounded-xl focus:ring-2 focus:ring-green-500/20 outline-none font-mono text-xs resize-y leading-relaxed" />
+                                    rows={32} dir="ltr"
+                                    className="w-full p-6 bg-slate-900 text-emerald-400 border border-slate-800 rounded-xl focus:ring-2 focus:ring-emerald-500/30 outline-none font-mono text-sm resize-y leading-relaxed shadow-inner custom-scrollbar" />
                             </div>
                         </div>
                     ) : (
-                        <div className="space-y-4">
+                        <div className="space-y-6">
                             {sections.map((section, sIdx) => {
                                 const sectionData = formData[section.id] || {};
                                 return (
-                                    <div key={section.id} ref={el => { sectionRefs.current[section.id] = el; }}>
+                                    <div key={section.id} id={section.id} ref={el => { sectionRefs.current[section.id] = el; }} className="scroll-mt-32">
                                         {section.id === "heroSlides" ? (
                                             <CollapsibleSection title={section.title} emoji={section.emoji} description={section.description} defaultOpen={true}>
                                                 <HeroSlidesPanel data={sectionData} onChange={(key, value) => handleFieldChange(section.id, key, value)} />
@@ -1723,61 +1810,64 @@ export function VisualPageEditor({
                             })}
                         </div>
                     )}
+                </main>
 
-                    {/* ── Bottom padding for sticky bar ── */}
-                    <div className="h-20" />
-                </div>
-
-                {/* ── RIGHT: Live preview pane ── */}
+                {/* ── 3. Live Preview Pane ── */}
                 {showPreview && (
-                    <div className="w-1/2 flex flex-col gap-2 sticky top-0 h-screen">
-                        <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm">
-                            <Eye className="w-4 h-4 text-green-600" />
-                            <span className="text-sm font-bold text-slate-700">معاينة مباشرة</span>
-                            <div className="mr-auto flex items-center gap-1">
+                    <aside className="w-[45%] flex flex-col gap-4 sticky top-28 h-[calc(100vh-140px)]">
+                        <div className="flex items-center justify-between bg-white px-5 py-3 rounded-2xl border border-gray-200 shadow-sm">
+                            <div className="flex items-center gap-2">
+                                <span className="relative flex h-3 w-3">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                </span>
+                                <span className="text-sm font-bold text-slate-800">معاينة مباشرة</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl">
                                 <button type="button" onClick={() => setPreviewDevice("desktop")}
-                                    className={`p-1.5 rounded-lg transition-colors ${previewDevice === "desktop" ? "bg-green-100 text-green-700" : "text-slate-400 hover:bg-slate-100"}`}>
+                                    className={`p-2 rounded-lg transition-all ${previewDevice === "desktop" ? "bg-white text-green-700 shadow-sm" : "text-slate-400 hover:text-slate-700"}`}>
                                     <Monitor className="w-4 h-4" />
                                 </button>
                                 <button type="button" onClick={() => setPreviewDevice("mobile")}
-                                    className={`p-1.5 rounded-lg transition-colors ${previewDevice === "mobile" ? "bg-green-100 text-green-700" : "text-slate-400 hover:bg-slate-100"}`}>
+                                    className={`p-2 rounded-lg transition-all ${previewDevice === "mobile" ? "bg-white text-green-700 shadow-sm" : "text-slate-400 hover:text-slate-700"}`}>
                                     <Smartphone className="w-4 h-4" />
                                 </button>
-                                <a href={pageHref} target="_blank" rel="noreferrer"
-                                    className="mr-2 flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors">
-                                    <PanelRight className="w-3.5 h-3.5" /> فتح
-                                </a>
                             </div>
                         </div>
-                        <div className={`flex-1 bg-gray-100 rounded-xl overflow-hidden border border-gray-200 flex items-start justify-center ${previewDevice === "mobile" ? "p-4" : ""}`}>
-                            <iframe
-                                src={pageHref}
-                                title="معاينة"
-                                className={`border-0 bg-white shadow-lg transition-all duration-300 ${previewDevice === "mobile" ? "w-[390px] rounded-2xl" : "w-full"} h-full min-h-[600px]`}
-                            />
+                        <div className={`flex-1 bg-slate-100 rounded-3xl overflow-hidden border-4 border-slate-200/50 shadow-inner flex items-center justify-center transition-all duration-500 ${previewDevice === "mobile" ? "py-8" : ""}`}>
+                            <div className={`relative transition-all duration-500 h-full ${previewDevice === "mobile" ? "w-[375px] h-[812px] bg-white rounded-[2rem] shadow-2xl border-[8px] border-slate-800 overflow-hidden" : "w-full"}`}>
+                                <iframe
+                                    src={pageHref}
+                                    title="معاينة"
+                                    className="w-full h-full border-0 bg-white"
+                                />
+                            </div>
                         </div>
-                    </div>
+                    </aside>
                 )}
             </div>
 
             {/* ── Sticky Save Bar ── */}
-            <div className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 ${isDirty || loading ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"}`}>
-                <div className="bg-white border-t border-gray-200 shadow-2xl px-6 py-3 flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                        <span className="text-sm font-bold text-slate-600">
-                            {loading ? "جاري الحفظ..." : "لديك تغييرات غير محفوظة"}
+            <div className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${isDirty || loading ? "translate-y-0 opacity-100" : "translate-y-[150%] opacity-0 pointer-events-none"}`}>
+                <div className="bg-white/80 backdrop-blur-xl border-t border-slate-200 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.1)] px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]"></span>
+                        </span>
+                        <span className="text-sm font-bold text-amber-700">
+                            {loading ? "جاري الحفظ والمزامنة..." : "لديك تعديلات غير محفوظة، لا تنسَ النشر!"}
                         </span>
                     </div>
-                    <span className="text-xs text-slate-400 hidden sm:block">اضغط Ctrl+S للحفظ السريع</span>
-                    <div className="mr-auto flex items-center gap-3">
-                        <button type="button" onClick={() => { setFormData(parseInitialData()); setIsDirty(false); }}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-200 transition-colors">
+                    <div className="flex gap-3 w-full sm:w-auto">
+                        <button type="button" onClick={() => { setFormData(parseInitialData()); setIsDirty(false); }} disabled={loading}
+                            className="flex-1 sm:flex-none px-6 py-2.5 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                             <RotateCcw className="w-4 h-4" /> تجاهل
                         </button>
                         <button type="submit" disabled={loading}
-                            className="flex items-center gap-2 bg-gradient-to-l from-green-600 to-green-700 text-white px-8 py-2.5 rounded-xl font-bold text-sm hover:from-green-700 hover:to-green-800 transition-all shadow-lg shadow-green-600/20 disabled:opacity-50 active:scale-[0.97]">
-                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Zap className="w-4 h-4" /> حفظ الآن</>}
+                            className="flex-1 sm:flex-none px-8 py-2.5 text-sm font-bold text-white bg-green-600 hover:bg-green-500 rounded-xl shadow-md shadow-green-500/20 transition-all active:scale-95 disabled:opacity-70 flex items-center justify-center gap-2">
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                            {loading ? 'جاري النشر...' : 'نشر التعديلات'}
                         </button>
                     </div>
                 </div>
