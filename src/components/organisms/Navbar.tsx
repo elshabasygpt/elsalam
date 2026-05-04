@@ -11,6 +11,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/lib/i18n-context";
 import { useCartStore } from "@/lib/store/useCartStore";
+import { useSiteSettings } from "@/lib/settings-context";
 import { CartDrawer } from "@/components/organisms/CartDrawer";
 import { ShoppingBag } from "lucide-react";
 
@@ -20,7 +21,8 @@ export const Navbar = () => {
     const [scrolled, setScrolled] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>("products");
-    const [logoUrl, setLogoUrl] = useState<string | null>(null);
+    const settings = useSiteSettings();
+    const logoUrl = settings?.logoUrl;
     const [fetchedCategories, setFetchedCategories] = useState<any[]>([]);
     const [isMounted, setIsMounted] = useState(false);
     const pathname = usePathname();
@@ -29,11 +31,6 @@ export const Navbar = () => {
     const { getTotalItems, setIsOpen: setCartOpen } = useCartStore();
 
     useEffect(() => {
-        fetch("/api/site-logo")
-            .then(r => r.json())
-            .then(d => { if (d.logoUrl) setLogoUrl(d.logoUrl); })
-            .catch(() => {});
-            
         fetch("/api/public/categories")
             .then(r => r.json())
             .then(d => { if (d.data) setFetchedCategories(d.data); })

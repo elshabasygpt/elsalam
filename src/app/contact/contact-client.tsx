@@ -22,6 +22,18 @@ interface FormErrors {
     message?: string;
 }
 
+const bText = (obj: any, isRTL: boolean) => {
+    if (!obj) return "";
+    if (typeof obj === "string") return obj;
+    return obj[isRTL ? "ar" : "en"] || obj.ar || obj.en || "";
+};
+
+const WhatsAppIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+    </svg>
+);
+
 export function ContactClient({ settings, cmsContent }: { settings: any, cmsContent?: Record<string, any> }) {
     const { t, isRTL } = useLanguage();
     const [formData, setFormData] = useState({ name: "", email: "", phone: "", message: "" });
@@ -136,43 +148,71 @@ export function ContactClient({ settings, cmsContent }: { settings: any, cmsCont
 
                             <div className="relative z-10">
                                 <Typography variant="h3" className="mb-2 font-bold text-white">{t.contact.contactInfoTitle}</Typography>
-                                <p className="text-white/70 mb-10 text-sm">{t.contact.pageSubtitle}</p>
+                                <p className="text-white/70 mb-8 text-sm">{t.contact.pageSubtitle}</p>
 
-                                <ul className="space-y-8">
-                                    <li className="flex items-start gap-4">
-                                        <span className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-                                            <MapPin className="w-5 h-5 text-green-300" />
+                                <ul className="flex flex-col gap-6">
+                                {/* Main Address */}
+                                    {(bText(cmsContent?.contactInfo?.address, isRTL) || !cmsContent?.branches?.items?.some((b: any) => b.name_ar || b.address_ar)) && (
+                                        <li className="flex items-start gap-4 group">
+                                            <span className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 group-hover:bg-white/20 transition-all">
+                                                <MapPin className="w-4 h-4 text-green-300" />
+                                            </span>
+                                            <div className="mt-0.5 flex-1">
+                                                <h4 className="font-bold text-white mb-0.5">{isRTL ? "العنوان الرئيسي" : "Main Address"}</h4>
+                                                <p className="text-white/80 text-sm leading-relaxed">{bText(cmsContent?.contactInfo?.address, isRTL) || t.footer.address}</p>
+                                            </div>
+                                        </li>
+                                    )}
+
+                                    {/* Additional Branches */}
+                                    {cmsContent?.branches?.items?.map((branch: any, idx: number) => {
+                                        const bName = isRTL ? (branch.name_ar || branch.name) : (branch.name_en || branch.name);
+                                        const bAddr = isRTL ? (branch.address_ar || branch.address) : (branch.address_en || branch.address);
+                                        
+                                        if (!bName && !bAddr) return null;
+                                        return (
+                                            <li key={`branch-${idx}`} className="flex items-start gap-4 group">
+                                                <span className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 group-hover:bg-white/20 transition-all">
+                                                    <MapPin className="w-4 h-4 text-green-300" />
+                                                </span>
+                                                <div className="mt-0.5 flex-1 flex flex-col items-start">
+                                                    {bName && <h4 className="font-bold text-white mb-0.5">{bName}</h4>}
+                                                    {bAddr && <p className="text-white/80 text-sm leading-relaxed mb-1">{bAddr}</p>}
+                                                    {branch.phone && <p className="text-white font-medium text-[15px] tracking-wide mb-2 drop-shadow-sm"><span dir="ltr">{branch.phone}</span></p>}
+                                                    {branch.mapLink && (
+                                                        <a href={branch.mapLink} target="_blank" rel="noopener noreferrer" className="mt-1 text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-full transition-colors inline-flex items-center gap-1.5 backdrop-blur-sm border border-white/10 w-fit">
+                                                            {isRTL ? "عرض الخريطة" : "View Map"} &rarr;
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            </li>
+                                        );
+                                    })}
+                                    <li className="flex items-start gap-4 group">
+                                        <span className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 group-hover:bg-white/20 transition-all">
+                                            <Phone className="w-4 h-4 text-green-300" />
                                         </span>
-                                        <div className="mt-1">
-                                            <h4 className="font-bold text-white mb-1">{isRTL ? "العنوان" : "Address"}</h4>
-                                            <p className="text-white/80 text-sm leading-relaxed">{t.footer.address}</p>
+                                        <div className="mt-0.5 flex-1">
+                                            <h4 className="font-bold text-white mb-0.5">{isRTL ? "الهاتف" : "Phone"}</h4>
+                                            <p className="text-white font-medium text-base tracking-wide drop-shadow-sm"><span dir="ltr">{cmsContent?.contactInfo?.phone || t.footer.phone}</span></p>
                                         </div>
                                     </li>
-                                    <li className="flex items-start gap-4">
-                                        <span className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-                                            <Phone className="w-5 h-5 text-green-300" />
+                                    <li className="flex items-start gap-4 group">
+                                        <span className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 group-hover:bg-white/20 transition-all">
+                                            <Mail className="w-4 h-4 text-green-300" />
                                         </span>
-                                        <div className="mt-1">
-                                            <h4 className="font-bold text-white mb-1">{isRTL ? "الهاتف" : "Phone"}</h4>
-                                            <p className="text-white/80 text-sm leading-relaxed" dir="ltr">{t.footer.phone}</p>
+                                        <div className="mt-0.5 flex-1">
+                                            <h4 className="font-bold text-white mb-0.5">{isRTL ? "البريد الإلكتروني" : "Email"}</h4>
+                                            <p className="text-white/80 text-sm leading-relaxed"><span dir="ltr">{cmsContent?.contactInfo?.email || t.footer.email}</span></p>
                                         </div>
                                     </li>
-                                    <li className="flex items-start gap-4">
-                                        <span className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-                                            <Mail className="w-5 h-5 text-green-300" />
+                                    <li className="flex items-start gap-4 group">
+                                        <span className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 group-hover:bg-white/20 transition-all">
+                                            <Clock className="w-4 h-4 text-green-300" />
                                         </span>
-                                        <div className="mt-1">
-                                            <h4 className="font-bold text-white mb-1">{isRTL ? "البريد الإلكتروني" : "Email"}</h4>
-                                            <p className="text-white/80 text-sm leading-relaxed">{t.footer.email}</p>
-                                        </div>
-                                    </li>
-                                    <li className="flex items-start gap-4">
-                                        <span className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-                                            <Clock className="w-5 h-5 text-green-300" />
-                                        </span>
-                                        <div className="mt-1">
-                                            <h4 className="font-bold text-white mb-1">{isRTL ? "ساعات العمل" : "Working Hours"}</h4>
-                                            <p className="text-white/80 text-sm leading-relaxed">{t.contact.workingHours}</p>
+                                        <div className="mt-0.5 flex-1">
+                                            <h4 className="font-bold text-white mb-0.5">{isRTL ? "ساعات العمل" : "Working Hours"}</h4>
+                                            <p className="text-white/80 text-sm leading-relaxed">{cmsContent?.contactInfo?.workingHours || "السبت - الخميس: 8:00 ص - 5:00 م"}</p>
                                         </div>
                                     </li>
                                 </ul>
@@ -180,12 +220,12 @@ export function ContactClient({ settings, cmsContent }: { settings: any, cmsCont
 
                             <div className="relative z-10 mt-12 space-y-4">
                                 <Typography variant="h4" className="mb-4 text-white/90">{t.contact.quickContact}</Typography>
-                                <a href={`https://wa.me/${(settings?.whatsapp || "").replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-4 bg-white text-green-900 font-bold rounded-xl hover:bg-green-50 transition-colors shadow-lg">
-                                    <MessageCircle className="w-5 h-5" />
+                                <a href={`https://wa.me/${(settings?.whatsapp || "").replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-4 bg-[#25D366] text-white font-bold rounded-xl hover:bg-[#1da851] transition-colors shadow-lg">
+                                    <WhatsAppIcon className="w-6 h-6" />
                                     {t.contact.whatsappLocal}
                                 </a>
-                                <a href={`https://wa.me/${(settings?.phone || "").replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-4 bg-white/10 border border-white/20 text-white font-bold rounded-xl hover:bg-white/20 transition-colors backdrop-blur-sm">
-                                    <MessageCircle className="w-5 h-5" />
+                                <a href={`https://wa.me/${(settings?.phone || "").replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-4 bg-white/10 border border-white/20 text-white font-bold rounded-xl hover:bg-[#25D366] hover:border-transparent transition-all backdrop-blur-sm">
+                                    <WhatsAppIcon className="w-6 h-6" />
                                     {t.contact.whatsappExport}
                                 </a>
                             </div>
@@ -223,18 +263,19 @@ export function ContactClient({ settings, cmsContent }: { settings: any, cmsCont
                             <form className="space-y-6" onSubmit={handleSubmit} noValidate>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <FormField label={t.contact.name} placeholder={t.contact.namePlaceholder} required value={formData.name} onChange={(e) => handleChange("name", e.target.value)} />
+                                        <FormField id="contact-name" label={t.contact.name} placeholder={t.contact.namePlaceholder} required value={formData.name} onChange={(e) => handleChange("name", e.target.value)} />
                                         {errors.name && <p className="text-red-500 text-sm mt-1 font-semibold">{errors.name}</p>}
                                     </div>
                                     <div>
-                                        <FormField label={t.contact.emailLabel} type="email" placeholder={t.contact.emailPlaceholder} dir="ltr" required value={formData.email} onChange={(e) => handleChange("email", e.target.value)} />
+                                        <FormField id="contact-email" label={t.contact.emailLabel} type="email" placeholder={t.contact.emailPlaceholder} dir="ltr" required value={formData.email} onChange={(e) => handleChange("email", e.target.value)} />
                                         {errors.email && <p className="text-red-500 text-sm mt-1 font-semibold">{errors.email}</p>}
                                     </div>
                                 </div>
-                                <FormField label={t.contact.phone} type="tel" placeholder={t.contact.phonePlaceholder} dir="ltr" value={formData.phone} onChange={(e) => handleChange("phone", e.target.value)} />
+                                <FormField id="contact-phone" label={t.contact.phone} type="tel" placeholder={t.contact.phonePlaceholder} dir="ltr" value={formData.phone} onChange={(e) => handleChange("phone", e.target.value)} />
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-800 mb-2">{t.contact.message} *</label>
+                                    <label htmlFor="contact-message" className="block text-sm font-bold text-gray-800 mb-2">{t.contact.message} *</label>
                                     <textarea
+                                        id="contact-message"
                                         rows={6}
                                         className="w-full px-5 py-4 rounded-xl border border-gray-200 bg-gray-50/50 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 resize-none transition-all shadow-sm"
                                         placeholder={t.contact.messagePlaceholder}
@@ -263,7 +304,25 @@ export function ContactClient({ settings, cmsContent }: { settings: any, cmsCont
                             <div className="w-full h-[400px] rounded-[1.5rem] overflow-hidden relative">
                                 <div className="absolute inset-0 bg-gray-200 animate-pulse -z-10" />
                                 <iframe
-                                    src={settings?.mapUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1576.4326162312674!2d30.0150!3d30.5510!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDMzJzAzLjYiTiAzMMKwMDAnNTQuMCJF!5e0!3m2!1sar!2seg!4v1"}
+                                    src={(() => {
+                                        let mapSrc = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1576.4326162312674!2d30.0150!3d30.5510!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDMzJzAzLjYiTiAzMMKwMDAnNTQuMCJF!5e0!3m2!1sar!2seg!4v1";
+                                        
+                                        if (cmsContent?.map?.lat && cmsContent?.map?.lng) {
+                                            return `https://maps.google.com/maps?q=${cmsContent.map.lat},${cmsContent.map.lng}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                                        } else if (cmsContent?.map?.mapEmbedUrl) {
+                                            const url = cmsContent.map.mapEmbedUrl;
+                                            if (url.includes('embed') || url.includes('output=embed')) {
+                                                return url;
+                                            } else {
+                                                const match = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+                                                if (match) {
+                                                    return `https://maps.google.com/maps?q=${match[1]},${match[2]}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                                                }
+                                                return `https://maps.google.com/maps?q=${encodeURIComponent(settings?.siteNameEn || "Elsalam Oils Factory")}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                                            }
+                                        }
+                                        return mapSrc;
+                                    })()}
                                     width="100%"
                                     height="100%"
                                     style={{ border: 0 }}

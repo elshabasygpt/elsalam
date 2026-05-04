@@ -1067,7 +1067,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
             emoji: "📋",
             description: "عنوان المصنع وأرقام الهاتف والبريد",
             fields: [
-                { key: "address", labelAr: "العنوان", labelEn: "Address", type: "text", bilingual: true },
+                { key: "address", labelAr: "العنوان الرئيسي", labelEn: "Main Address", type: "text", bilingual: true },
                 { key: "phone", labelAr: "رقم الهاتف", labelEn: "Phone", type: "text", bilingual: false, placeholder: "+20 1xx xxx xxxx" },
                 { key: "email", labelAr: "البريد الإلكتروني", labelEn: "Email", type: "text", bilingual: false, placeholder: "info@elsalamoils.com" },
                 { key: "workingHours", labelAr: "ساعات العمل", labelEn: "Working Hours", type: "text", bilingual: true },
@@ -1128,6 +1128,7 @@ export const PAGE_SECTIONS: Record<string, SectionConfig[]> = {
                         { key: "name", labelAr: "اسم الفرع", labelEn: "Branch Name", type: "text", bilingual: true },
                         { key: "address", labelAr: "العنوان", labelEn: "Address", type: "text", bilingual: true },
                         { key: "phone", labelAr: "رقم الهاتف", labelEn: "Phone", type: "text", bilingual: false },
+                        { key: "mapLink", labelAr: "رابط خريطة جوجل", labelEn: "Google Maps Link", type: "url", bilingual: false },
                     ],
                 },
             ],

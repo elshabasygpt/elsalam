@@ -238,7 +238,12 @@ export function AboutPageClient({ cmsContent = {} }: { cmsContent?: Record<strin
                                 <div className="sticky top-32">
                                     <div className="relative mb-8 aspect-square rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white group">
                                         {cmsContent?.ceo?.image ? (
-                                            <img src={cmsContent.ceo.image} alt={t.about.ceoBio.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 z-10" />
+                                            <img 
+                                                src={cmsContent.ceo.image} 
+                                                alt={t.about.ceoBio.name} 
+                                                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 z-10" 
+                                                style={{ WebkitTransform: 'translateZ(0)', WebkitBackfaceVisibility: 'hidden', imageRendering: 'high-quality' as any }}
+                                            />
                                         ) : (
                                             <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center z-10 relative">
                                                 <User className="w-40 h-40 text-gray-400 group-hover:scale-110 group-hover:text-green-600 transition-all duration-700" />

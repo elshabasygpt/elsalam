@@ -5,6 +5,7 @@ import { QuickContactWidget } from '@/components/organisms/QuickContactWidget'
 import { BackToTop } from '@/components/organisms/BackToTop'
 import { MobileBottomNav } from '@/components/organisms/MobileBottomNav'
 import { LanguageProvider } from '@/lib/i18n-context'
+import { SettingsProvider } from '@/lib/settings-context'
 import { Toaster } from 'react-hot-toast'
 import Script from 'next/script'
 import { prisma } from '@/lib/prisma'
@@ -134,13 +135,15 @@ export default async function RootLayout({
                         </Script>
                     </>
                 )}
-                <LanguageProvider>
-                    <Toaster position="top-center" reverseOrder={false} />
-                    {children}
-                    <QuickContactWidget />
-                    <BackToTop />
-                    <MobileBottomNav />
-                </LanguageProvider>
+                <SettingsProvider settings={settings}>
+                    <LanguageProvider>
+                        <Toaster position="top-center" reverseOrder={false} />
+                        {children}
+                        <QuickContactWidget />
+                        <BackToTop />
+                        <MobileBottomNav />
+                    </LanguageProvider>
+                </SettingsProvider>
             </body>
         </html>
     )

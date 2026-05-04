@@ -11,6 +11,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useLanguage } from "@/lib/i18n-context";
 import { usePageContent, getBilingualValue } from "@/lib/page-content-context";
+import { useSiteSettings } from "@/lib/settings-context";
 
 const QUICK_LINK_HREFS = ["/", "/about", "/quality", "/production", "/media", "/contact"];
 const PRODUCT_LINK_HREFS = ["/products", "/products", "/products", "/b2b", "/export"];
@@ -18,16 +19,9 @@ const PRODUCT_LINK_HREFS = ["/products", "/products", "/products", "/b2b", "/exp
 export const Footer = () => {
     const { t, isRTL, locale } = useLanguage();
     const cmsFooter = usePageContent("footer");
-    const [settings, setSettings] = useState<any>(null);
+    const settings = useSiteSettings();
     const [email, setEmail] = useState("");
     const [subscribed, setSubscribed] = useState(false);
-
-    useEffect(() => {
-        fetch("/api/public/settings", { cache: "no-store" })
-            .then(res => res.json())
-            .then(data => { if (data && !data.error) setSettings(data); })
-            .catch(err => console.error("Failed to fetch settings config:", err));
-    }, []);
 
     // ── Merge data priority: CMS → Settings → Fallback ──
     const displayPhone   = cmsFooter?.phone   || settings?.contactPhone || t.footer.phone;
@@ -41,7 +35,7 @@ export const Footer = () => {
     const displayIG      = cmsFooter?.instagram || settings?.instagramUrl || "https://instagram.com/elsalamoils";
     const displayLI      = cmsFooter?.linkedin  || settings?.linkedinUrl  || "https://linkedin.com/company/elsalamoils";
     const displayBrand   = locale === "ar" ? (cmsFooter?.brandName || t.nav.brand) : (cmsFooter?.brandEn || t.nav.brand);
-    const displayLogoStr = cmsFooter?.logo;
+    const displayLogoStr = cmsFooter?.logo || settings?.logoUrl;
 
     const SOCIAL = [
         { icon: <Facebook  className="w-6 h-6 md:w-5 md:h-5" strokeWidth={1.8} />, href: displayFB, label: "Facebook",  color: "hover:bg-blue-600/80  hover:border-blue-500" },
