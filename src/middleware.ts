@@ -1,28 +1,41 @@
-import { withAuth } from "next-auth/middleware";
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default withAuth(
-    function middleware(req) {
-        // Here you can add custom logic if needed after auth
-        return NextResponse.next();
-    },
-    {
-        callbacks: {
-            authorized: ({ token }) => !!token,
+export async function middleware(req: NextRequest) {
+    // 1. Generate Request ID
+    const requestId = crypto.randomUUID();
+    const requestHeaders = new Headers(req.headers);
+    requestHeaders.set("x-request-id", requestId);
+
+    // Create base response with new headers
+    const response = NextResponse.next({
+        request: {
+            headers: requestHeaders,
         },
-        pages: {
-            signIn: "/admin/login",
-        },
+    });
+    response.headers.set("x-request-id", requestId);
+
+    // 2. Auth Logic for Admin Routes
+    const isAdminRoute = req.nextUrl.pathname.startsWith("/admin") && !req.nextUrl.pathname.startsWith("/admin/login");
+    const isAdminApiRoute = req.nextUrl.pathname.startsWith("/api/admin");
+
+    if (isAdminRoute || isAdminApiRoute) {
+        const token = await getToken({ req });
+        if (!token) {
+            if (isAdminApiRoute) {
+                return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: response.headers });
+            }
+            return NextResponse.redirect(new URL("/admin/login", req.url));
+        }
     }
-);
+
+    return response;
+}
 
 export const config = {
     matcher: [
-        /*
-         * Match all request paths inside /admin and /api/admin
-         * Except for /admin/login
-         */
-        "/((?!admin/login)admin/.*)",
-        "/api/admin/:path*",
+        "/api/:path*", // All APIs for Request ID logging
+        "/admin/:path*" // Admin pages
     ],
 };

@@ -2,48 +2,41 @@ import { handleApiError } from "@/lib/error-handler";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { quotationService } from "./quotation.service";
+import { QuotationStatus } from "./types";
+
+
+// 1. Strict Zod Schemas map to Enums
+const paramsSchema = z.object({
+    id: z.coerce.number().int().positive()
+});
+
+const bodySchema = z.object({
+    status: z.nativeEnum(QuotationStatus)
+});
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    const session = await getServerSession(authOptions);
-    if (!session || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { id } = await params;
-    const orderId = parseInt(id);
-
-    if (isNaN(orderId)) {
-        return NextResponse.json({ error: "Invalid quotation ID" }, { status: 400 });
-    }
-
     try {
+        const session = await getServerSession(authOptions);
+        if (!session || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        // 2. Controller Validation
+        const resolvedParams = await params;
+        const { id: orderId } = paramsSchema.parse(resolvedParams);
+        
         const body = await req.json();
-        const { status } = body;
+        const { status } = bodySchema.parse(body);
 
-        const validStatuses = ["QUOTE_PENDING", "QUOTE_REVIEWED", "QUOTE_APPROVED", "QUOTE_REJECTED"];
-        if (!validStatuses.includes(status)) {
-            return NextResponse.json({ error: "Invalid status" }, { status: 400 });
-        }
+        // 3. Delegation (Zero logic in Controller)
+        const updatedQuoteDTO = await quotationService.updateStatus(orderId, status);
 
-        const quotation = await prisma.webOrder.findFirst({
-            where: { id: orderId, isQuotation: true }
-        });
-
-        if (!quotation) {
-            return NextResponse.json({ error: "Quotation not found" }, { status: 404 });
-        }
-
-        const updatedQuote = await prisma.webOrder.update({
-            where: { id: orderId },
-            data: { status }
-        });
-
-        // 6. Send notification (Mock)
-        console.log(`[NOTIFICATION] Quotation #${orderId} status updated to: ${status}. Notification sent to ${quotation.customerEmail || 'Customer'}.`);
-
-        return NextResponse.json({ success: true, data: updatedQuote });
+        // 4. Return Normalized DTO
+        return NextResponse.json({ success: true, data: updatedQuoteDTO });
     } catch (error: any) {
+        // 5. Global Exception Interceptor
         return handleApiError(error);
     }
 }
