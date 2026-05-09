@@ -4,14 +4,14 @@ const nextConfig = {
     output: 'standalone', // Required for Vercel / Docker deployments
     
     serverExternalPackages: ['@prisma/client', 'bcrypt'],
+    outputFileTracingExcludes: {
+        '*': [
+            'public/uploads/**/*',
+        ],
+    },
     // 🚀 Bundle Size Optimizations
     experimental: {
         optimizePackageImports: ['lucide-react', 'date-fns', 'lodash'],
-        outputFileTracingExcludes: {
-            '*': [
-                'public/uploads/**/*',
-            ],
-        },
     },
     
     // 🖼️ Advanced Image Optimization for Production
