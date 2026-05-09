@@ -6,7 +6,8 @@
         "dev": "next dev --webpack",
         "build": "prisma generate && next build",
         "postinstall": "prisma generate",
-        "start": "next start"
+        "start": "next start",
+        "deploy": "git pull origin main && npm install && rm -rf .next && npm run build && pm2 restart all"
     },
     "dependencies": {
         "@auth/prisma-adapter": "^2.11.1",
