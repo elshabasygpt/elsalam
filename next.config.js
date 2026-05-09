@@ -3,10 +3,15 @@ const nextConfig = {
     reactStrictMode: true,
     output: 'standalone', // Required for Vercel / Docker deployments
     
+    serverExternalPackages: ['@prisma/client', 'bcrypt'],
     // 🚀 Bundle Size Optimizations
     experimental: {
         optimizePackageImports: ['lucide-react', 'date-fns', 'lodash'],
-        serverComponentsExternalPackages: ['@prisma/client', 'bcrypt'],
+        outputFileTracingExcludes: {
+            '*': [
+                'public/uploads/**/*',
+            ],
+        },
     },
     
     // 🖼️ Advanced Image Optimization for Production
