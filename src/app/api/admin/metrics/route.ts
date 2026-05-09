@@ -11,7 +11,7 @@ export async function GET() {
     }
 
     // Export in official Prometheus format
-    const promFormat = metrics.exportPrometheusFormat();
+    const promFormat = await metrics.exportPrometheusFormat();
 
     return new NextResponse(promFormat, {
         headers: {

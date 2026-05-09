@@ -1,7 +1,7 @@
 import Redis from "ioredis";
 import { logger } from "@/lib/logger";
 import crypto from "crypto";
-import { alertSystem } from "@/lib/observability/alerts";
+import { alerts } from "@/lib/observability/alerts";
 
 export class DistributedLock {
     private redis: Redis | null = null;
@@ -45,7 +45,7 @@ export class DistributedLock {
         } catch (error: any) {
             // CRITICAL ARCHITECTURE FIX: Visibility & Fail-Closed
             logger.error({ message: `[LOCK] Redis failure. Denying lock ${lockKey}` });
-            alertSystem.sendAlert("CRITICAL", `Redis distributed lock failed! System is vulnerable to race conditions. Error: ${error.message}`);
+            alerts.trigger({ level: "CRITICAL", title: "Redis Lock Failure", message: `Redis distributed lock failed! System is vulnerable to race conditions. Error: ${error.message}` });
             return null; // Deny operation instead of split-brain local lock
         }
     }
