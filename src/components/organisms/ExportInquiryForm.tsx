@@ -9,6 +9,7 @@ import { Typography } from "@/components/atoms/Typography";
 import { Globe } from "lucide-react";
 
 import { useLanguage } from "@/lib/i18n-context";
+import toast from "react-hot-toast";
 
 const INCOTERMS = ["FOB Alexandria", "CIF", "DDP", "EXW"];
 

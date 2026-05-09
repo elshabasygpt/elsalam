@@ -70,7 +70,12 @@ export async function POST(req: NextRequest) {
 
         // Calculate totals from latest product prices (so the rep cannot tamper with prices)
         let totalAmount = 0;
-        const processedItems = [];
+        const processedItems: {
+            productId: number;
+            quantity: number;
+            unitPrice: number;
+            subtotal: number;
+        }[] = [];
 
         for (const item of body.items) {
             const product = await prisma.product.findUnique({ where: { id: parseInt(item.productId) } });
